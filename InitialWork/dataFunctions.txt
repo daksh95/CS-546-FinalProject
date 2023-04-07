@@ -1,0 +1,34 @@
+Data functions (for users):
+
+1) getLandByArea (lands in a specific area)
+2) getLandById (Specific land details)
+3) filterByArea (1000 sq. feet)
+4) filterByPrice
+5) getOwnerByLandId (using land id, we will get the owner details)
+6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected)
+7) getUserByEmail
+8) updateUserData
+9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties)
+10) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land)
+11) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land)
+12) sellerApproved (this'll transfer the transaction to land surveyors account)
+13) addNewLand (this'll show up only when account is created)
+
+Data functions (for land surveyors/titleCompany/government):
+
+1) getEntityById
+2) updateEntityById
+3) getAllTransactions
+4) getTransactionsById (they'll approve/reject, with comment box)
+5) entityApproved (this'll transfer the transaction to title company account)
+6) terminateTransaction (transaction is terminated when transaction is rejected)
+7) filterByStatus (filter pending transactions, max pending transactions can be ONLY 25)
+
+Data functions (for admin):
+
+1) getAllLands
+2) getAllEntities
+3) approveUser (this'll add new user to database, activated when "Signup" is done)
+4) approveLand (this'll add new land to database, activated when "addLand" is called)
+5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved)
+6) terminateTransaction (transaction is terminated when transaction is rejected)
