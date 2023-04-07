@@ -1,37 +1,37 @@
 Data functions (for users):
 
 -- Yash
-1) getLandByArea (lands in a specific area)
-2) getLandById (Specific land details)
-3) filterByArea (1000 sq. feet)
-4) filterByPrice
-5) getOwnerByLandId (using land id, we will get the owner details)
-6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected)
-7) getUserByEmail
-8) updateUserData
+1) getLandByArea (lands in a specific area) -- land.js
+2) getLandById (Specific land details) -- land.js
+3) filterByArea (1000 sq. feet) -- land.js
+4) filterByPrice -- land.js
+5) getOwnerByLandId (using land id, we will get the owner details) -- user.js
+6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
+7) getUserByEmail -- user.js
+8) updateUserData -- user.js
 
 -- Bhavin
-9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties)
-10) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land)
-11) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land)
-12) sellerApproved (this'll transfer the transaction to land surveyors account)
-13) addNewLand (this'll show up only when account is created)
+9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties) -- transaction.js
+10) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land) -- transaction.js
+11) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land) -- transaction.js
+12) sellerApproved (this'll transfer the transaction to land surveyors account) -- transaction.js
+13) addNewLand (this'll show up only when account is created) -- land.js
 
 Data functions (for land surveyors/titleCompany/government): -- Tanya
 
-1) getEntityById
-2) updateEntityById
-3) getAllTransactions
-4) getTransactionsById (they'll approve/reject, with comment box)
-5) entityApproved (this'll transfer the transaction to title company account)
-6) terminateTransaction (transaction is terminated when transaction is rejected)
-7) filterByStatus (filter pending transactions, max pending transactions can be ONLY 25)
+1) getEntityById  -- entities.js
+2) updateEntityById -- entities.js
+3) getAllTransactions -- transaction.js
+4) getTransactionsById (they'll approve/reject, with comment box) -- transaction.js
+5) entityApproved (this'll transfer the transaction to title company account) -- entities.js
+6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js
+7) filterByStatus (filter pending transactions, max pending transactions can be ONLY 25) -- transaction.js
 
 Data functions (for admin): -- Daksh
 
-1) getAllLands
-2) getAllEntities
-3) approveUser (this'll add new user to database, activated when "Signup" is done)
-4) approveLand (this'll add new land to database, activated when "addLand" is called)
-5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved)
-6) terminateTransaction (transaction is terminated when transaction is rejected)
+1) getAllLands -- land.js   
+2) getAllEntities -- entities.js
+3) approveUser (this'll add new user to database, activated when "Signup" is done) -- admin.js
+4) approveLand (this'll add new land to database, activated when "addLand" is called) -- admin.js
+5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved) -- admin.js
+6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js
