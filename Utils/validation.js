@@ -66,13 +66,20 @@ const validWebsite = (website) =>{
  }
 
  const validEmail = (email)=>{
-    
+    validString(email, "email");
+    email = email.trim();
+    const regex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+    if(!regex.test(email)){
+        throw `Valid email id needed`;
+    }
+    return email;
  }
 const validation ={
     validString:validString,
     validArray:validArray,
     validWebsite: validWebsite,
     validNumber:validNumber,
-    validObjectId: isValidObjectId,
+    validObjectId: validObjectId,
+    validEmail:validEmail
 };
 export default validation;

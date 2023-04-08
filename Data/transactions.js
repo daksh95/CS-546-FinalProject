@@ -2,6 +2,17 @@ import { ObjectId } from "mongodb";
 import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 //fetch all the information about the a single land from transaction collection
+const getTransactionsByBuyerId = async(id)=>{
+    id  = validation.validObjectId(id,"Buyer Id");
+    const client = getClient();
+    const result = client.collection("transaction").find({buyer: new ObjectId (id)}).toArray();
+    const data ={};
+    //get land by Id,
+    //get status;
+    
+}
+
+
 const getTransactionsByLandId = async(id) => {
     id = validation.validObjectId(id, "land Id");
     const client = getClient();
