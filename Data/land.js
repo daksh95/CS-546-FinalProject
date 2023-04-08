@@ -1,11 +1,11 @@
-import exp from "constants";
-import { object } from "webidl-conversions";
-
+import { getClient } from "../config/connection.js";
 const getLand = async (id)=>{
 
 };
 const getAllLand = async ()=>{
-
+    const client = getClient();
+    const result = await client.collection("land").find().toArray();
+    return result;
 };
 
 const updateLand = async (object) =>{
