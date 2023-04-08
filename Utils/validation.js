@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+import { isValidObjectId } from "mongoose";
 
 const validString = (string, parameter) =>{
     if(typeof string == 'undefined'){
@@ -54,12 +56,23 @@ const validWebsite = (website) =>{
         throw `Valid website URL needed`;
     }
 }
+ const validObjectId = (id, param)=>{
+    validString(id, param);
+    id = id.trim();
+    if(!ObjectId.isValid(id)){
+        throw `Valid ObjectId required for ${param}`;
+    }
+    return id;
+ }
 
-
+ const validEmail = (email)=>{
+    
+ }
 const validation ={
     validString:validString,
     validArray:validArray,
     validWebsite: validWebsite,
     validNumber:validNumber,
+    validObjectId: isValidObjectId,
 };
 export default validation;

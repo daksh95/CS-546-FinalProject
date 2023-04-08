@@ -3,11 +3,7 @@ import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByLandId = async(id) => {
-    validation.validString(id, "id");
-    id = id.trim();
-    if(!ObjectId.isValid(id)){
-        throw "Valid id is needed";
-    }
+    id = validation.validObjectId(id, "land Id");
     const client = getClient();
     const result = client.collection("transaction").find({landId: new ObjectId (id)},{_id:0,buyer:1, status:1}).toArray();
     if(result.lenght<1){
@@ -23,3 +19,14 @@ const getTransactionsByLandId = async(id) => {
     };
     return data;
 };
+const sellerApproved = async(transactionId, sellersId)=>{   
+    //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
+    transactionId = validation.validObjectId(transactionId, "transactionId");
+    sellersId = validation.validObjectId(sellersId, "sellersId");
+    const client = getClient();
+    const result = await client.collection("transaction").findOneAndUpdate({_id: new ObjectId( transactionId), seller: new ObjectId(sellersId)}, {sellersStatus: true},  {returnDocument: 'after'});
+    if(result.lastErrorObject.n <1){
+        throw "could not be approved";
+      };
+    return result;
+}
