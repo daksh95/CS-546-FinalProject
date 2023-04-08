@@ -6,12 +6,31 @@ const getTransactionsByBuyerId = async(id)=>{
     id  = validation.validObjectId(id,"Buyer Id");
     const client = getClient();
     const result = client.collection("transaction").find({buyer: new ObjectId (id)}).toArray();
-    const data ={};
     //get land by Id,
     //get status;
-    
+    const data = [];
+    for(let i =0; i<result.length; i++){
+        data[i] = {
+            landId: result[i].landId,
+            status: result[i].status,
+        };
+    }
+
+    return data;  
 }
 
+const getTransactionsBySellerId = async(id)=>{
+    id  = validation.validObjectId(id,"Seller Id");
+    const client = getClient();
+    const result = client.collection("transaction").find({seller: new ObjectId (id)}).toArray();
+    //get land by Id,
+    //get status;
+    const data ={
+        landId: result.landId,
+        status: result.status,
+    };
+    return data;  
+}
 
 const getTransactionsByLandId = async(id) => {
     id = validation.validObjectId(id, "land Id");
