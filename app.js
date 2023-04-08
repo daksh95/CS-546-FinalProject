@@ -1,7 +1,7 @@
 import express from "express";
 import "dotenv/config.js";
 import {connectDB, getClient} from "./config/connection.js"
-import  landRoutes from "./Routes/land.js"
+import constructorMethod from "./Routes/index.js";
 
 const app = express();
 const port = 3000;
@@ -9,8 +9,7 @@ const port = 3000;
 
 //middleware
 app.use(express.json());
-
-app.use('/land',landRoutes)
+constructorMethod(app)
 
 
 const start = async() =>{
