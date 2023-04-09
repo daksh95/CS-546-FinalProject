@@ -1,8 +1,8 @@
 // You can add and export any helper functions you want here - if you aren't using any, then you can just leave this file as is
 export let exists = (param) => {
-    if (!param && !(param==false)) return false
-    else return true
-}
+  if (!param && !(param == false)) return false;
+  else return true;
+};
 
 export let stringPalindromes = (str) => {
   let stringArray = str.split("");
@@ -91,3 +91,56 @@ export let emptyArrayCheck = (...args) => {
   }
   return result;
 };
+
+export const validStateCodes = [
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
+];
