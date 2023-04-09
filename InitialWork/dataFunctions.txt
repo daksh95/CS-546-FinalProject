@@ -1,7 +1,7 @@
 Data functions (for users):
 
 -- Yash
-1) getLandByArea (lands in a specific area) -- land.js
+1) getLandByState (lands in a specific state) -- land.js
 2) getLandById (Specific land details) -- land.js
 3) filterByArea (1000 sq. feet) -- land.js
 4) filterByPrice -- land.js
