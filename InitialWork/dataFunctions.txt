@@ -7,8 +7,9 @@ Data functions (for users):
 4) filterByPrice -- land.js
 5) getOwnerByLandId (using land id, we will get the owner details) -- user.js
 6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
-7) getUserByEmail -- user.js
-8) updateUserData -- user.js
+7) getUserByEmail -- user.js  (Completed)
+8) updateUserData -- user.js    
+9) getUserById -- user.js (Completed)
 
 -- Bhavin
 9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties) -- transaction.js
