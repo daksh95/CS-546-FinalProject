@@ -1,6 +1,12 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
-import { exists, checkInputType, validStateCodes, arrayLength } from "../Utils/helpers.js";
+import {
+  exists,
+  checkInputType,
+  validStateCodes,
+  arrayLength,
+  inputValidation,
+} from "../Utils/helpers.js";
 
 const getLand = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exists");
@@ -47,6 +53,23 @@ const getLandByState = async (state) => {
     .find({ state: state })
     .toArray();
   return result;
+};
+
+const filterByArea = async (state, area) => {
+  try {
+    state = inputValidation(state, "string");
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  try {
+    area = inputValidation(area, "string");
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    throw new Error(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
 };
 
 const landData = {

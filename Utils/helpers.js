@@ -62,6 +62,15 @@ export let checkInputType = (input, type) => {
   }
 };
 
+export let inputValidation = (input, type) => {
+  if (!exists(input)) throw new Error(`${input} parameter does not exists`);
+  if (!checkInputType(input, type))
+    throw new Error(`${input} must be of type ${type} only`);
+  if (input.trim().length === 0)
+    throw new Error(`${input} cannot contain empty spaces only`);
+  return input.trim();
+};
+
 export let objectType = (object, type) => {
   return Object.values(object).every((value) => typeof value === type);
 };
