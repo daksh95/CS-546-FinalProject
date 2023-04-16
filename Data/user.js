@@ -47,3 +47,13 @@ const getUserById = async (id) => {
   result._id = result._id.toString();
   return result;
 };
+
+const createUser = async (
+  name,
+  phone,
+  emailId,
+  govtIdType,
+  govtIdNumber,
+  dob,
+  gender
+) => {};

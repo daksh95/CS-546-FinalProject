@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { isValidObjectId } from "mongoose";
 
-const validString = (string, parameter) =>{
+const validString = (string, parameter) => {
     if(typeof string == 'undefined'){
       throw `${parameter} should be provided`;   
     }
@@ -17,7 +17,7 @@ const validString = (string, parameter) =>{
 }
 
 //this is for string arrays
-const validArray = (array, parameter) =>{
+const validArray = (array, parameter) => {
 
     if(typeof array == "undefined"){
         throw `${parameter} should be provided`;
@@ -38,7 +38,7 @@ const validArray = (array, parameter) =>{
     }
 }
 
-const validNumber =(num, parameter)=>{
+const validNumber =(num, parameter) => {
     if(typeof num == "undefined"){
         throw `${parameter} should be provided`;
     }
@@ -50,22 +50,23 @@ const validNumber =(num, parameter)=>{
     }
 }
 
-const validWebsite = (website) =>{
+const validWebsite = (website) => {
     const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
     if(!regex.test(website)){
         throw `Valid website URL needed`;
     }
 }
- const validObjectId = (id, param)=>{
+
+const validObjectId = (id, param) => {
     validString(id, param);
     id = id.trim();
     if(!ObjectId.isValid(id)){
         throw `Valid ObjectId required for ${param}`;
     }
     return id;
- }
+}
 
- const validEmail = (email)=>{
+const validEmail = (email) => {
     validString(email, "email");
     email = email.trim();
     const regex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
@@ -73,8 +74,9 @@ const validWebsite = (website) =>{
         throw `Valid email id needed`;
     }
     return email;
- }
-const validation ={
+}
+
+const validation = {
     validString:validString,
     validArray:validArray,
     validWebsite: validWebsite,
@@ -82,4 +84,5 @@ const validation ={
     validObjectId: validObjectId,
     validEmail:validEmail
 };
+
 export default validation;

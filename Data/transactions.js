@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { inputValidation } from "../Utils/helpers.js";
+
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByBuyerId = async (id) => {
   id = validation.validObjectId(id, "Buyer Id");
@@ -59,6 +60,7 @@ const getTransactionsByLandId = async (id) => {
   };
   return data;
 };
+
 const sellerApproved = async (transactionId, sellersId) => {
   //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
   transactionId = validation.validObjectId(transactionId, "transactionId");
@@ -95,5 +97,24 @@ const createTransaction = async (
   governmentComment,
   adminId,
   adminApproval,
-  adminiComment
+  adminComment
 ) => {};
+
+const terminateTransaction = async (transactionId, adminComment) => {
+  transactionId = validation.validObjectId(transactionId, "transactionId");
+  const client = getClient();
+  const result = await client
+    .collection('transaction')
+    .findOneAndUpdate(
+      { _id: new ObjectId(transactionId) },
+      { status: "Terminated",
+        'admin.status': false,
+        'admin.Comment': adminComment },
+      { returnDocument: "after" }
+    );
+
+  if (result.lastErrorObject.n < 1) {
+    throw "transaction could not be terminated";
+  }
+  return result;
+};
