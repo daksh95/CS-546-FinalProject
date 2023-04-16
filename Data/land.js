@@ -55,14 +55,19 @@ const getLandByState = async (state) => {
   return result;
 };
 
-const filterByArea = async (state, area) => {
+const filterByArea = async (state, minArea, maxArea) => {
   try {
-    state = inputValidation(state, "string");
+    state = inputValidation(state, "string").trim();
   } catch (error) {
     throw new Error(error.message);
   }
   try {
-    area = inputValidation(area, "string");
+    minArea = inputValidation(minArea, "string").trim();
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  try {
+    maxArea = inputValidation(maxArea, "string").trim();
   } catch (error) {
     throw new Error(error.message);
   }
@@ -70,6 +75,44 @@ const filterByArea = async (state, area) => {
     throw new Error(
       "State parameter must be a valid statecode in abbreviations only"
     );
+  const client = getClient();
+  const result = await client
+    .collection("land")
+    .find({
+      $and: [{ state: state }, { area: { $gte: minArea, $lte: maxArea } }],
+    })
+    .toArray();
+  return result;
+};
+
+const filterByPrice = async (state, minPrice, maxPrice) => {
+  try {
+    state = inputValidation(state, "string").trim();
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  try {
+    minPrice = inputValidation(minPrice, "number");
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  try {
+    maxPrice = inputValidation(maxPrice, "number");
+  } catch (error) {
+    throw new Error(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    throw new Error(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
+  const client = getClient()
+  const result = await client
+  .collection("land")
+  .find({
+    $and: [{ state: state }, { price: { $gte: minPrice, $lte: maxPrice } }],
+  })
+  .toArray();
+return result;
 };
 
 const landData = {
@@ -80,6 +123,8 @@ const landData = {
   postLand: postLand,
   removeLand: removeLand,
   getLandByState: getLandByState,
+  filterByArea: filterByArea,
+  filterByPrice: filterByPrice
 };
 
 export default landData;

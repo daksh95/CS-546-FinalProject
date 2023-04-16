@@ -3,8 +3,8 @@ Data functions (for users):
 -- Yash
 1) getLandByState (lands in a specific state) -- land.js   (Completed)
 2) getLandById (Specific land details) -- land.js (Completed) 
-3) filterByArea (1000 sq. feet) -- land.js
-4) filterByPrice -- land.js
+3) filterByArea (1000 sq. feet) -- land.js (Completed)
+4) filterByPrice -- land.js (Completed)
 5) getOwnerByLandId (using land id, we will get the owner details) -- user.js (Completed)
 6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
 7) getUserByEmail -- user.js  (Completed)

@@ -66,9 +66,11 @@ export let inputValidation = (input, type) => {
   if (!exists(input)) throw new Error(`${input} parameter does not exists`);
   if (!checkInputType(input, type))
     throw new Error(`${input} must be of type ${type} only`);
-  if (input.trim().length === 0)
+  if (type === "string" && input.trim().length === 0)
     throw new Error(`${input} cannot contain empty spaces only`);
-  return input.trim();
+  if (type === "number" && (input === NaN || input === Infinity))
+    throw new Error(`${input} must be of type number only`);
+  return input;
 };
 
 export let objectType = (object, type) => {
