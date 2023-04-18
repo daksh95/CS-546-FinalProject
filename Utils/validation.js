@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { isValidObjectId } from "mongoose";
+import moment from "moment";
 
 const validString = (string, parameter = "input") => {
     if (string === undefined || !string || typeof string !== "string")
@@ -65,6 +66,30 @@ const validEmail = (email) => {
     return email;
 }
 
+const validDOB = (dob, parameter="DOB") => {
+    dob = validString(dob, parameter);
+    if (!moment(dob, "MM/DD/YYYY", false).isValid())
+        throw `${parameter}: ${dob} is not a valid date format`;
+    
+    const dobDate = moment(dob, "MM/DD/YYYY");
+    const age = moment().diff(dobDate, 'years');
+    if (age < 18) throw `User should be 18 years or older in order to register`;
+    return dob;
+}
+
+const validGenders = [
+    'male',
+    'female',
+    'non-binary'
+]
+
+const validGender = (gender, parameter="gender") => {
+    gender = validString(gender, parameter).toLowerCase();
+    if (!validGender.includes(gender))
+        throw `${gender} is not a recognized gender`;
+    return gender;
+}
+
 const validation = {
     validString:validString,
     validArrayOfStrings:validArrayOfStrings,
@@ -72,6 +97,8 @@ const validation = {
     validNumber:validNumber,
     validObjectId: validObjectId,
     validEmail:validEmail,
+    validDOB:validDOB,
+    validGender:validGender
 };
 
 export default validation;

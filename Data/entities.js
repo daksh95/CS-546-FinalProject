@@ -6,3 +6,9 @@ const getAllEntities = async () => {
   const result = await client.collection("entities").find().toArray();
   return result;
 };
+
+const entitiesData = {
+  getAllEntities:getAllEntities
+};
+
+export default entitiesData;

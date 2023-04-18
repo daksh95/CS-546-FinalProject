@@ -118,8 +118,7 @@ return result;
 const landData = {
   getAllLand: getAllLand,
   getLand: getLand,
-  updateLand,
-  updateLand,
+  updateLand:updateLand,
   postLand: postLand,
   removeLand: removeLand,
   getLandByState: getLandByState,

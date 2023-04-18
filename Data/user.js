@@ -1,6 +1,7 @@
 import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { checkInputType, exists } from "../Utils/helpers.js";
+import validation from "../Utils/validation.js";
 import { ObjectId } from "mongodb";
 
 const getOwnerByLandId = async (landID) => {
@@ -50,10 +51,54 @@ const getUserById = async (id) => {
 
 const createUser = async (
   name,
-  phone,
+  phone, //TODO: Discuss whether this will be a string or a number
   emailId,
   govtIdType,
   govtIdNumber,
   dob,
   gender
-) => {};
+) => {
+
+  // Validate input
+  name = validation.validString(name);
+  phone = validation.validNumber(phone);
+  emailId = validation.validEmail(emailId);
+  govtIdType = validation.validString(govtIdType);
+  govtIdNumber = validation.validString(govtIdNumber); 
+  dob = validation.validDOB(dob);
+  gender = validation.validGender(gender);
+
+  const govtIdHashed = govtIdNumber; //TODO: Gotta hash this
+
+  // Initialize
+  let newUser = {
+    'name': name,
+    'phone': phone,
+    'emailId': emailId,
+    'governmentId': {
+      'typeofId': govtIdType,
+      'id': govtIdHashed
+    },
+    'dob': dob,
+    'gender': gender,
+    'approved': false,
+    'rating': {
+      'totalRating': 0,
+      'noOfRating': 0
+    },
+    'land': []
+  };
+
+  // Insert user into database
+  const client = getClient();
+  const result = await client
+    .collection("users")
+    .insertOne(newUser);
+
+  if (!result.ackowledged || !result.insertedId)
+    throw `failed to insert user`;
+
+  const newId = result.insertedId.toString();
+  const user = await getUserById(newId);
+  return user;
+};
