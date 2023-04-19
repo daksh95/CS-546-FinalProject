@@ -102,3 +102,13 @@ const createUser = async (
   const user = await getUserById(newId);
   return user;
 };
+
+const userData = {
+  getOwnerByLandId: getOwnerByLandId,
+  getUserByEmail: getUserByEmail,
+  updateUserData: updateUserData,
+  getUserById: getUserById,
+  createUser: createUser
+};
+
+export default userData;

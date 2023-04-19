@@ -1,4 +1,4 @@
-import landData from "../data/land.js";
+import landData from "../Data/land.js";
 
 const getLand = async (req, res) => {
   const result = await landData.getLand(req.params.id);

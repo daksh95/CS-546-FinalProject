@@ -36,4 +36,4 @@ Data functions (for admin): -- Daksh
 4) approveLand (this'll add new land to database, activated when "addLand" is called) -- admin.js
 5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved) -- admin.js
 6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js (Completed)
-7) createUser (this'll add a new user to the database, unapproved) -- user.js
+7) createUser (this'll add a new user to the database, unapproved) -- user.js (Completed) (TODOS)

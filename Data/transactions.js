@@ -118,3 +118,15 @@ const terminateTransaction = async (transactionId, adminComment) => {
   }
   return result;
 };
+
+
+const transactionData = {
+  getTransactionsByBuyerId: getTransactionsByBuyerId,
+  getTransactionsBySellerId: getTransactionsBySellerId,
+  getTransactionsByLandId: getTransactionsByLandId,
+  sellerApproved: sellerApproved,
+  createTransaction: createTransaction,
+  terminateTransaction: terminateTransaction
+};
+
+export default transactionData;
