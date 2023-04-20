@@ -15,7 +15,6 @@ const getTransactionsByBuyerId = async(id)=>{
             status: result[i].status,
         };
     }
-
     return data;  
 }
 
@@ -25,10 +24,13 @@ const getTransactionsBySellerId = async(id)=>{
     const result = client.collection("transaction").find({seller: new ObjectId (id)}).toArray();
     //get land by Id,
     //get status;
-    const data ={
-        landId: result.landId,
-        status: result.status,
-    };
+    const data = [];
+    for(let i =0; i<result.length; i++){
+        data[i] = {
+            landId: result[i].landId,
+            status: result[i].status,
+        };
+    }
     return data;  
 }
 

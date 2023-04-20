@@ -12,8 +12,10 @@ const getUserByEmail = async (email)=> {
    return result;
 }
 
-const updateUserData = async (email)=> {
-    
+const updateUserData = async (phone, gender, name, governmentId)=> {
+    //phone number is independent of GOvernment Id
+    //rest all fields requires updated governmentI      
+      
 }
 
 const getUserById = async(id)=>{
