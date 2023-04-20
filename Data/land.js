@@ -53,7 +53,7 @@ const addNewLand = async(object)=>{
     const client = getClient();
     
     //inserting new land
-    let result = await client.insertOne(queryData);
+    let result = await client.collection("land").insertOne(queryData);
 
     //error handling incase Insertion doesn't happen
     if (!result.acknowledged || !result.insertedId) throw 'Could not add land';

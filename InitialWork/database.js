@@ -9,7 +9,7 @@ const users= { // buyers and sellers
     },
     DOB: String,
     gender: String,
-    approved:Boolean,
+    approved: Boolean,// to be discussed. 
     rating:{   
         totalRating: Number,
         count: Number,
