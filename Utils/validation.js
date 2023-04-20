@@ -35,7 +35,7 @@ const validArrayOfStrings = (array, parameter = "input") => {
     return arr;
 };
 
-const validNumber =(num, parameter) => {
+const validNumber =(num, parameter = "input") => {
     if(typeof num == "undefined"){
         throw `${parameter} should be provided`;
     }
@@ -85,9 +85,18 @@ const validGenders = [
 
 const validGender = (gender, parameter="gender") => {
     gender = validString(gender, parameter).toLowerCase();
-    if (!validGender.includes(gender))
+    if (!validGenders.includes(gender))
         throw `${gender} is not a recognized gender`;
     return gender;
+}
+
+const validBool = (bool, parameter="input") =>{
+    if(typeof bool == "undefined"){
+        throw `${parameter} is required`;
+    }
+    if(typeof bool != "boolean"){
+        throw `${parameter} should be a true or false`
+    }
 }
 
 const validation = {
@@ -98,7 +107,8 @@ const validation = {
     validObjectId: validObjectId,
     validEmail:validEmail,
     validDOB:validDOB,
-    validGender:validGender
+    validGender:validGender,
+    validBool:validBool
 };
 
 export default validation;
