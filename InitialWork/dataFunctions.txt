@@ -1,16 +1,16 @@
 Data functions (for users):
 
 -- Yash
-1) getLandByArea (lands in a specific area) -- land.js
-2) getLandById (Specific land details) -- land.js
-3) filterByArea (1000 sq. feet) -- land.js
-4) filterByPrice -- land.js
-5) getOwnerByLandId (using land id, we will get the owner details) -- user.js
+1) getLandByState (lands in a specific state) -- land.js   (Completed)
+2) getLandById (Specific land details) -- land.js (Completed) 
+3) filterByArea (1000 sq. feet) -- land.js (Completed)
+4) filterByPrice -- land.js (Completed)
+5) getOwnerByLandId (using land id, we will get the owner details) -- user.js (Completed)
 6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
-
--- Bhavin
 7) getUserByEmail -- user.js
 8) updateUserData -- user.js
+
+-- Bhavin
 9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties) -- transaction.js
 10) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land) -- transaction.js
 11) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land) -- transaction.js
@@ -29,9 +29,10 @@ Data functions (for land surveyors/titleCompany/government): -- Tanya
 
 Data functions (for admin): -- Daksh
 
-1) getAllLands -- land.js   
-2) getAllEntities -- entities.js
+1) getAllLands -- land.js (Completed)
+2) getAllEntities -- entities.js (Completed)
 3) approveUser (this'll add new user to database, activated when "Signup" is done) -- admin.js
 4) approveLand (this'll add new land to database, activated when "addLand" is called) -- admin.js
 5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved) -- admin.js
-6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js
+6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js (Completed)
+7) createUser (this'll add a new user to the database, unapproved) -- user.js (Completed) (TODOS)

@@ -1,25 +1,19 @@
-import landData from "../data/land.js";
+import landData from "../Data/land.js";
 
-const getLand = async (req, res)=>{
-    const result = await landData.getLand(req.params.id);
-    res.status(200).json({data: result});
+const getLand = async (req, res) => {
+  const result = await landData.getLand(req.params.id);
+  res.status(200).json({ data: result });
 };
-const getAllLand = async (req, res)=>{
-    const result = await landData.getAllLand();
-    res.status(200).json(result);
-};
-
-const updateLand = async (req, res) =>{
-
+const getAllLand = async (req, res) => {
+  const result = await landData.getAllLand();
+  res.status(200).json(result);
 };
 
-const postLand = async (req, res) =>{
+const updateLand = async (req, res) => {};
 
-};
+const postLand = async (req, res) => {};
 
-const removeLand = async(id)=> {
-
-};
+const removeLand = async (id) => {};
 
 // const landRestMethods = {
 //     getAllLand: getAllLand,
@@ -29,5 +23,4 @@ const removeLand = async(id)=> {
 //     removeLand:removeLand
 // }
 
-export {getAllLand, getLand, updateLand, postLand, removeLand};
-
+export { getAllLand, getLand, updateLand, postLand, removeLand };
