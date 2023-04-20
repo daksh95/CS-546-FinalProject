@@ -156,7 +156,8 @@ const landData = {
   removeLand: removeLand,
   getLandByState: getLandByState,
   filterByArea: filterByArea,
-  filterByPrice: filterByPrice
+  filterByPrice: filterByPrice,
+  addNewLand:addNewLand
 };
 
 export default landData;

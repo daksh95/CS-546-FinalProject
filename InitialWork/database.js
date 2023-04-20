@@ -83,4 +83,5 @@ const credentials ={
     typeOfUser: String,
     emailId: String,
     password: String,
+    previousPassword: [String]
 }

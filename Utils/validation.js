@@ -63,7 +63,8 @@ const validEmail = (email) => {
     if(!regex.test(email)){
         throw `Valid email id needed ${email}`;
     }
-    return email;
+
+    return email.toLowerCase();
 }
 
 const validDOB = (dob, parameter="DOB") => {

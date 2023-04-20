@@ -9,13 +9,18 @@ Data functions (for users):
 6) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
 
 -- Bhavin
-7) getUserByEmail -- user.js
-8) updateUserData -- user.js
-9) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties) -- transaction.js
-10) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land) -- transaction.js
-11) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land) -- transaction.js
-12) sellerApproved (this'll transfer the transaction to land surveyors account) -- transaction.js
-13) addNewLand (this'll show up only when account is created) -- land.js
+1) getUserByEmail -- user.js
+2) updateUserData -- user.js
+3) getTransactionsByBuyerName (this'll get all the transactions in which there is same buyer - one person inputted request in which all properties) -- transaction.js
+4) getTransactionBySellerName (this'll get all the transactions in which there is same seller - who all sent a request/quotation for their land) -- transaction.js
+5) getTransactionsByLandId ( this'll get all the requests/qoutations put in for that specific land) -- transaction.js
+6) sellerApproved (this'll transfer the transaction to land surveyors account) -- transaction.js
+7) addNewLand (this'll show up only when account is created) -- land.js
+8) addCredential -- credential.js
+9) getCredentialByEmailId -- credential.js
+10) updateEmailId -- credential.js
+11) updatePassword -- credential.js
+
 
 Data functions (for land surveyors/titleCompany/government): -- Tanya
 
