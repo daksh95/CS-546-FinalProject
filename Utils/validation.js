@@ -90,6 +90,8 @@ const validGender = (gender, parameter="gender") => {
     return gender;
 }
 
+const validPhoneNumber = (phone, parameter='phone') => {};
+
 const validation = {
     validString:validString,
     validArrayOfStrings:validArrayOfStrings,
