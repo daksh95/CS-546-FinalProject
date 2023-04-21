@@ -27,9 +27,7 @@ const getUserByEmail = async (email) => {
 };
 
 const updateUserData = async (email, name, phone, dob, gender) => {
-   // if (!exists(email)) throw new Error("Email parameter does not exist")
-   // if (!checkInputType(email, "string")) throw new Error("Email must be of type string only")
-   // if ()
+    
 };
 
 const getUserById = async (id) => {

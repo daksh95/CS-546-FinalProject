@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
+import validation from "../Utils/validation.js";
 import {
   exists,
   checkInputType,
@@ -29,6 +30,38 @@ const getAllLand = async () => {
   const result = await client.collection("land").find().toArray();
   return result;
 };
+
+const addNewLand = async(object)=>{
+    let {dimensions, type, restrictions, sale,address, price, approved } = object;
+    const queryData={};
+    
+    //valid numbers
+    queryData.length = validation.validNumber(dimensions.length, "length");
+    queryData.breadth = validation.validNumber(dimensions.breadth, "breadth");
+    queryData.price = validation.validNumber(price, "price");
+   
+    //valid string and string of array
+    queryData.type = validation.validString(type, "type of land");
+    queryData.address = validation.validString(address, "address");
+    queryData.restrictions = validation.validArrayOfStrings(restrictions, "restrictions");
+
+    //valid bool
+    queryData.sale = validation.validBool(sale, "sale");
+    queryData.approved = validation.validBool(approved, "approved");
+
+    //fetch db reference
+    const client = getClient();
+    
+    //inserting new land
+    let result = await client.collection("land").insertOne(queryData);
+
+    //error handling incase Insertion doesn't happen
+    if (!result.acknowledged || !result.insertedId) throw 'Could not add land';
+    
+    //returning newly added land
+    const addedLand = await getLand(result.insertedId.toString());
+    return addedLand;
+  } 
 
 const updateLand = async (object) => {};
 
@@ -123,7 +156,8 @@ const landData = {
   removeLand: removeLand,
   getLandByState: getLandByState,
   filterByArea: filterByArea,
-  filterByPrice: filterByPrice
+  filterByPrice: filterByPrice,
+  addNewLand:addNewLand
 };
 
 export default landData;

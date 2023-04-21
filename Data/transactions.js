@@ -112,7 +112,6 @@ const terminateTransaction = async (transactionId, adminComment) => {
         'admin.Comment': adminComment } },
       { returnDocument: "after" }
     );
-
   if (result.lastErrorObject.n < 1) {
     throw "transaction could not be terminated";
   }
