@@ -1,0 +1,14 @@
+<header>
+    <h1>Lands</h1>
+</header>
+{{#each landByState}}
+<a href="/land/{{this.id}}">
+    <div>
+        Name: {{this.name}}
+        Dimensions: {{this.dimensions}}
+        Price: {{this.price}}
+        Address: {{this.address}}
+        Sale: {{this.sale}}
+    </div>
+</a>
+{{/each}}

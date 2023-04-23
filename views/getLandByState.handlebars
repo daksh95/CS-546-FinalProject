@@ -1,0 +1,18 @@
+<header>
+    <h1>Get Land By State</h1>
+</header>
+<form action="/land" method="post" id="get-state-form">
+    <label for="stateInput">State</label>
+    <input type="text" name="stateInput" id="stateInput">
+    <button type="submit">Search</button>
+</form>
+
+{{#if hasError}}
+<ul class="error">
+    {{#each error}}
+    <li>
+        {{this}}
+    </li>
+    {{/each}}
+</ul>
+{{/if}}
