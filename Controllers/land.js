@@ -1,5 +1,10 @@
 import landData from "../Data/land.js";
-import { checkInputType, exists, validStateCodes } from "../Utils/helpers.js";
+import {
+  checkInputType,
+  exists,
+  validStateCodes,
+  inputValidation,
+} from "../Utils/helpers.js";
 
 const getLand = async (req, res) => {
   const result = await landData.getLand(req.params.id);
@@ -36,17 +41,67 @@ const postLandByState = async (req, res) => {
 
   try {
     let landByState = await landData.getLandByState(state);
-    res
-      .status(200)
-      .render("displayLandByState", {
-        title: "Lands",
-        landByState: landByState,
-      });
+    res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: landByState,
+      state: state,
+    });
   } catch (error) {
     return res.status(400).render("getLandByState", {
       title: "Get Lands By State",
       hasError: true,
       error: error.message,
+    });
+  }
+};
+
+const postFilterArea = async (req, res) => {
+  let state = req.params.state;
+  let minArea = req.body.minAreaInput;
+  let maxArea = req.body.maxAreaInput;
+  let errors = [];
+  try {
+    state = inputValidation(state, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    minArea = inputValidation(minArea, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    maxArea = inputValidation(maxArea, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    errors.push(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
+  if (errors.length !== 0)
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
+    });
+
+  try {
+    filteredLands = await landData.filterByArea(state, minArea, maxArea);
+    return res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: filteredLands,
+      state: state,
+    });
+  } catch (error) {
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
     });
   }
 };
@@ -73,4 +128,5 @@ export {
   removeLand,
   getLandByState,
   postLandByState,
+  postFilterArea,
 };

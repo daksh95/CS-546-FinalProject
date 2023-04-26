@@ -1,13 +1,38 @@
+<nav>
+    <form action="/land/area/{{state}}" method="post" id="filter-area">
+        <label for="minAreaInput">Min Area</label>
+        <input type="text" name="minAreaInput" id="minAreaInput">
+        <label for="maxAreaInput">Max Area</label>
+        <input type="text" name="maxAreaInput" id="maxAreaInput">
+        <button type="submit">Search</button>
+    </form>
+    <form action="" method="post" id="filter-price">
+        <label for="minPriceInput">Min Price</label>
+        <input type="text" name="minPriceInput" id="minPriceInput">
+        <label for="maxPriceInput">Max Price</label>
+        <input type="text" name="maxPriceInput" id="maxPriceInput">
+        <button type="submit">Search</button>
+    </form>
+</nav>
+{{#if hasError}}
+<ul class="error">
+    {{#each error}}
+    <li>
+        {{this}}
+    </li>
+    {{/each}}
+</ul>
+{{/if}}
+
 <header>
     <h1>Lands</h1>
 </header>
 {{#each landByState}}
 <a href="/land/{{this.id}}">
     <div>
-        Name: {{this.name}}
+        Name: {{this.address}}
         Dimensions: {{this.dimensions}}
         Price: {{this.price}}
-        Address: {{this.address}}
         Sale: {{this.sale}}
     </div>
 </a>
