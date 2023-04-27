@@ -6,11 +6,11 @@
         <input type="text" name="maxAreaInput" id="maxAreaInput">
         <button type="submit">Search</button>
     </form>
-    <form action="" method="post" id="filter-price">
+    <form action="/land/price/{{state}}" method="post" id="filter-price">
         <label for="minPriceInput">Min Price</label>
-        <input type="text" name="minPriceInput" id="minPriceInput">
+        <input type="number" name="minPriceInput" id="minPriceInput">
         <label for="maxPriceInput">Max Price</label>
-        <input type="text" name="maxPriceInput" id="maxPriceInput">
+        <input type="number" name="maxPriceInput" id="maxPriceInput">
         <button type="submit">Search</button>
     </form>
 </nav>

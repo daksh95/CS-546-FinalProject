@@ -55,6 +55,57 @@ const postLandByState = async (req, res) => {
   }
 };
 
+const postFilterPrice = async (req, res) => {
+  let state = req.params.state;
+  let minPrice = parseInt(req.body.minPriceInput);
+  let maxPrice = parseInt(req.body.maxPriceInput);
+  let errors = [];
+  try {
+    state = inputValidation(state, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    minPrice = inputValidation(minPrice, "number")
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    maxPrice = inputValidation(maxPrice, "number")
+  } catch (error) {
+    errors.push(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    errors.push(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
+  if (errors.length !== 0)
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
+    });
+
+  try {
+    filteredLands = await landData.filterByPrice(state, minPrice, maxPrice);
+    return res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: filteredLands,
+      state: state,
+    });
+  } catch (error) {
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
+    });
+  }
+};
+
 const postFilterArea = async (req, res) => {
   let state = req.params.state;
   let minArea = req.body.minAreaInput;
@@ -112,14 +163,6 @@ const postLand = async (req, res) => {};
 
 const removeLand = async (id) => {};
 
-// const landRestMethods = {
-//     getAllLand: getAllLand,
-//     getLand:getLand,
-//     updateLand: updateLand,
-//     postLand: postLand,
-//     removeLand:removeLand
-// }
-
 export {
   getAllLand,
   getLand,
@@ -129,4 +172,5 @@ export {
   getLandByState,
   postLandByState,
   postFilterArea,
+  postFilterPrice,
 };
