@@ -48,7 +48,7 @@ const getUserById = async (id) => {
 
 const createUser = async (
   name,
-  phone, //TODO: Discuss whether this will be a string or a number
+  phone, //TODO: Discuss whether this will be a string or a number (STRING)
   emailId,
   govtIdType,
   govtIdNumber,
@@ -64,7 +64,7 @@ const createUser = async (
   dob = validation.validDOB(dob);
   gender = validation.validGender(gender);
 
-  const govtIdHashed = govtIdNumber; //TODO: Gotta hash this
+  const govtIdHashed = govtIdNumber; //TODO: Gotta hash this (BCRYPT)
 
   // Initialize
   let newUser = {

@@ -107,9 +107,9 @@ const terminateTransaction = async (transactionId, adminComment) => {
     .collection('transaction')
     .findOneAndUpdate(
       { _id: new ObjectId(transactionId) },
-      { status: "Terminated",
+      { $set: { status: "Terminated",
         'admin.status': false,
-        'admin.Comment': adminComment },
+        'admin.Comment': adminComment } },
       { returnDocument: "after" }
     );
   if (result.lastErrorObject.n < 1) {
@@ -125,7 +125,8 @@ const transactionData = {
   getTransactionsByLandId: getTransactionsByLandId,
   sellerApproved: sellerApproved,
   createTransaction: createTransaction,
-  terminateTransaction: terminateTransaction
+  terminateTransaction: terminateTransaction,
+  updateBid: updateBid
 };
 
 export default transactionData;

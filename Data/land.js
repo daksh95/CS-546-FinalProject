@@ -31,43 +31,59 @@ const getAllLand = async () => {
   return result;
 };
 
-const addNewLand = async(object)=>{
-    let {dimensions, type, restrictions, sale,address, price, approved } = object;
-    const queryData={};
-    
-    //valid numbers
-    queryData.length = validation.validNumber(dimensions.length, "length");
-    queryData.breadth = validation.validNumber(dimensions.breadth, "breadth");
-    queryData.price = validation.validNumber(price, "price");
-   
-    //valid string and string of array
-    queryData.type = validation.validString(type, "type of land");
-    queryData.address = validation.validString(address, "address");
-    queryData.restrictions = validation.validArrayOfStrings(restrictions, "restrictions");
+const addNewLand = async (object) => {
+  let { dimensions, type, restrictions, sale, address, price, approved } =
+    object;
+  const queryData = {};
 
-    //valid bool
-    queryData.sale = validation.validBool(sale, "sale");
-    queryData.approved = validation.validBool(approved, "approved");
+  //valid numbers
+  queryData.length = validation.validNumber(dimensions.length, "length");
+  queryData.breadth = validation.validNumber(dimensions.breadth, "breadth");
+  queryData.price = validation.validNumber(price, "price");
 
-    //fetch db reference
-    const client = getClient();
-    
-    //inserting new land
-    let result = await client.collection("land").insertOne(queryData);
+  //valid string and string of array
+  queryData.type = validation.validString(type, "type of land");
+  queryData.address = validation.validString(address, "address");
+  queryData.restrictions = validation.validArrayOfStrings(
+    restrictions,
+    "restrictions"
+  );
 
-    //error handling incase Insertion doesn't happen
-    if (!result.acknowledged || !result.insertedId) throw 'Could not add land';
-    
-    //returning newly added land
-    const addedLand = await getLand(result.insertedId.toString());
-    return addedLand;
-  } 
+  //valid bool
+  queryData.sale = validation.validBool(sale, "sale");
+  queryData.approved = validation.validBool(approved, "approved");
+
+  //fetch db reference
+  const client = getClient();
+
+  //inserting new land
+  let result = await client.collection("land").insertOne(queryData);
+
+  //error handling incase Insertion doesn't happen
+  if (!result.acknowledged || !result.insertedId) throw "Could not add land";
+
+  //returning newly added land
+  const addedLand = await getLand(result.insertedId.toString());
+  return addedLand;
+};
 
 const updateLand = async (object) => {};
 
-const postLand = async (object) => {};
-
-const removeLand = async (id) => {};
+const removeLand = async (id) => {
+  if (!exists(id)) throw new Error("ID parameter does not exists");
+  if (!checkInputType(id, "string"))
+    throw new Error("ID must be of string only");
+  if (id.trim().length === 0) throw new Error("ID cannot be of empty spaces");
+  id = id.trim();
+  if (!ObjectId.isValid(id)) throw new Error("Invalid Object ID");
+  const client = getClient();
+  const result = await client.collection("land").findOneAndDelete({
+    _id: new ObjectId(id),
+  });
+  if (result.lastErrorObject.n === 0)
+    throw new Error("Could not delete land with that id");
+  return `${result.value.name} has been successfully deleted`;
+};
 
 const getLandByState = async (state) => {
   if (!exists(state)) throw new Error("State parameter does not exists");
@@ -138,26 +154,25 @@ const filterByPrice = async (state, minPrice, maxPrice) => {
     throw new Error(
       "State parameter must be a valid statecode in abbreviations only"
     );
-  const client = getClient()
+  const client = getClient();
   const result = await client
-  .collection("land")
-  .find({
-    $and: [{ state: state }, { price: { $gte: minPrice, $lte: maxPrice } }],
-  })
-  .toArray();
-return result;
+    .collection("land")
+    .find({
+      $and: [{ state: state }, { price: { $gte: minPrice, $lte: maxPrice } }],
+    })
+    .toArray();
+  return result;
 };
 
 const landData = {
   getAllLand: getAllLand,
   getLand: getLand,
-  updateLand:updateLand,
-  postLand: postLand,
+  updateLand: updateLand,
   removeLand: removeLand,
   getLandByState: getLandByState,
   filterByArea: filterByArea,
   filterByPrice: filterByPrice,
-  addNewLand:addNewLand
+  addNewLand: addNewLand,
 };
 
 export default landData;

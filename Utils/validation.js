@@ -91,6 +91,8 @@ const validGender = (gender, parameter="gender") => {
     return gender;
 }
 
+const validPhoneNumber = (phone, parameter='phone') => {};
+
 const validBool = (bool, parameter="input") =>{
     if(typeof bool == "undefined"){
         throw `${parameter} is required`;
