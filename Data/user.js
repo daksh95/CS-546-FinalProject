@@ -1,7 +1,6 @@
 import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { checkInputType, exists } from "../Utils/helpers.js";
-import validation from "../Utils/validation.js";
 import { ObjectId } from "mongodb";
 
 const getOwnerByLandId = async (landID) => {
@@ -13,7 +12,9 @@ const getOwnerByLandId = async (landID) => {
   id = id.trim();
   if (!ObjectId.isValid(id)) throw new Error("Invalid object id");
   const client = getClient();
-  const result = await client.collection("users").findOne({ landId: new Object(landID) });
+  const result = await client
+    .collection("users")
+    .findOne({ landId: new Object(landID) });
   if (result === null) throw new Error("No user found for this Land ID");
   result._id = result._id.toString();
   return result[0];
@@ -26,9 +27,7 @@ const getUserByEmail = async (email) => {
   return result;
 };
 
-const updateUserData = async (email, name, phone, dob, gender) => {
-    
-};
+const updateUserData = async (email, name, phone, dob, gender) => {};
 
 const getUserById = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exist");
@@ -56,13 +55,12 @@ const createUser = async (
   dob,
   gender
 ) => {
-
   // Validate input
   name = validation.validString(name);
   phone = validation.validNumber(phone);
   emailId = validation.validEmail(emailId);
   govtIdType = validation.validString(govtIdType);
-  govtIdNumber = validation.validString(govtIdNumber); 
+  govtIdNumber = validation.validString(govtIdNumber);
   dob = validation.validDOB(dob);
   gender = validation.validGender(gender);
 
@@ -70,31 +68,28 @@ const createUser = async (
 
   // Initialize
   let newUser = {
-    'name': name,
-    'phone': phone,
-    'emailId': emailId,
-    'governmentId': {
-      'typeofId': govtIdType,
-      'id': govtIdHashed
+    name: name,
+    phone: phone,
+    emailId: emailId,
+    governmentId: {
+      typeofId: govtIdType,
+      id: govtIdHashed,
     },
-    'dob': dob,
-    'gender': gender,
-    'approved': false,
-    'rating': {
-      'totalRating': 0,
-      'noOfRating': 0
+    dob: dob,
+    gender: gender,
+    approved: false,
+    rating: {
+      totalRating: 0,
+      noOfRating: 0,
     },
-    'land': []
+    land: [],
   };
 
   // Insert user into database
   const client = getClient();
-  const result = await client
-    .collection("users")
-    .insertOne(newUser);
+  const result = await client.collection("users").insertOne(newUser);
 
-  if (!result.ackowledged || !result.insertedId)
-    throw `failed to insert user`;
+  if (!result.ackowledged || !result.insertedId) throw `failed to insert user`;
 
   const newId = result.insertedId.toString();
   const user = await getUserById(newId);
@@ -106,7 +101,7 @@ const userData = {
   getUserByEmail: getUserByEmail,
   updateUserData: updateUserData,
   getUserById: getUserById,
-  createUser: createUser
+  createUser: createUser,
 };
 
 export default userData;
