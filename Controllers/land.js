@@ -1,14 +1,53 @@
 import landData from "../Data/land.js";
+import userData from "../Data/user.js";
 import {
   checkInputType,
   exists,
   validStateCodes,
   inputValidation,
 } from "../Utils/helpers.js";
+import { ObjectId } from "mongodb";
 
 const getLand = async (req, res) => {
-  const result = await landData.getLand(req.params.id);
-  res.status(200).json({ data: result });
+  let id = req.params.id;
+  let error = [];
+  if (!exists(id)) error.push("ID parameter does not exists");
+  if (!checkInputType(id, "string"))
+    error.push("ID must be of type string only");
+  if (id.trim().length === 0) error.push("ID cannot be of empty spaces");
+  id = id.trim();
+  if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+  let isOwner = false;
+  let owner = undefined;
+  try {
+    owner = await userData.getOwnerByLandId(id);
+    isOwner = true;
+  } catch (error) {
+    isOwner = false;
+  }
+
+  try {
+    const land = await landData.getLand(id);
+    res.status(200).render("displayLandDetails", {
+      title: "Land Details",
+      land: land,
+      owner: owner,
+      isOwner: isOwner,
+    });
+  } catch (error) {
+    res.status(404).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+  // res.status(200).json({ data: result });/
 };
 const getAllLand = async (req, res) => {
   const result = await landData.getAllLand();
@@ -66,12 +105,12 @@ const postFilterPrice = async (req, res) => {
     errors.push(error.message);
   }
   try {
-    minPrice = inputValidation(minPrice, "number")
+    minPrice = inputValidation(minPrice, "number");
   } catch (error) {
     errors.push(error.message);
   }
   try {
-    maxPrice = inputValidation(maxPrice, "number")
+    maxPrice = inputValidation(maxPrice, "number");
   } catch (error) {
     errors.push(error.message);
   }

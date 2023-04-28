@@ -7,6 +7,8 @@ Data functions (for users):
 4) filterByPrice -- land.js (Completed)
 5) getOwnerByLandId (using land id, we will get the owner details) -- user.js (Completed)
 6) removeLand (remove land of that id) -- land.js (Completed)
+7) getLandOfUserId (Get all lands of that current User) -- user.js (Completed)
+8) getUserById -- user.js (Completed)
 
 -- Bhavin
 1) getUserByEmail -- user.js
