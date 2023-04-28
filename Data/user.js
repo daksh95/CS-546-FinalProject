@@ -1,7 +1,6 @@
 import validation from "../Utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { checkInputType, exists } from "../Utils/helpers.js";
-import validation from "../Utils/validation.js";
 import { ObjectId } from "mongodb";
 
 const getOwnerByLandId = async (landID) => {

@@ -31,8 +31,8 @@ Data functions (for land surveyors/titleCompany/government): -- Tanya
 3) getAllTransactions -- transaction.js
 4) getTransactionsById (they'll approve/reject, with comment box) -- transaction.js
 5) entityApproved (this'll transfer the transaction to title company account) -- entities.js
-6) filterByStatus (filter pending transactions, max pending transactions can be ONLY 25) -- transaction.js
-7) addEntity -- entities.js
+6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js
+7) filterByStatus (filter pending transactions, max pending transactions can be ONLY 25) -- transaction.js
 
 Data functions (for admin): -- Daksh
 
