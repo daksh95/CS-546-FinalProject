@@ -29,9 +29,12 @@ const land ={
     },
     type: String,
     restrictions: [String],
-    sale: Boolean,
+    sale: {
+        onSale: Boolean,
+        price: Number, // this will be shown if and only if sale:true
+        dateOfListing: Date // this will be shown if and only if sale:true
+    },
     address: String,//Change here. there was no address field.
-    price: Number, //this will be shown if and only if sale: true
     approved: Boolean,
 }
 
