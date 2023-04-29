@@ -1,5 +1,5 @@
 import { getClient } from "../config/connection.js";
-import validation from "../Utils/validation.js";
+import validation from "../utils/validation.js";
 import userData from "./user.js";
 import transactionData from "./transactions.js";
 import landData from "./land.js";

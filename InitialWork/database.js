@@ -1,4 +1,3 @@
-import { stringPalindromes } from "../Utils/helpers"
 
 const users= { // buyers and sellers
     _id: new ObjectId(),

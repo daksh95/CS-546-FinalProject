@@ -1,5 +1,5 @@
-import validation from "../Utils/validation.js";
-import hash from "../Utils/encryption.js";
+import validation from "../utils/validation.js";
+import hash from "../utils/encryption.js";
 import { getClient } from "../config/connection.js";   
 
 //requies: typeOfUser, emailId, password
