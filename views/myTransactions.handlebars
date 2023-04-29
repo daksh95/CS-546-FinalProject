@@ -1,0 +1,57 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">WebSite Name</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="/land">Home</a></li>
+            <li><a href="/user/{{userId}}/land">My Property 1</a></li>
+            <li><a href="/user/{{userId}}/transactions">My Transactions</a></li>
+            <li><a href="/user/{{userId}}/profile">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+
+<h1>
+    Buyer Transactions
+</h1>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Land</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each buyerTransaction}}
+            <a href="#">
+                <td>{{this.name}}</td>
+                <td>{{this.status}}</td>
+            </a>
+        </tbody>
+    </table>
+</div>
+<hr>
+
+<h1>
+    Seller Transactions
+</h1>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Land</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each sellerTransaction}}
+            <a href="#">
+                <td>{{this.name}}</td>
+                <td>{{this.status}}</td>
+            </a>
+        </tbody>
+    </table>
+</div>

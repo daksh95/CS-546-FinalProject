@@ -84,6 +84,7 @@ const transaction ={
         status: Boolean,
         Comment: String,
     }, 
+    status: String ("pending, approved, rejected"),
 }
 
 
