@@ -24,10 +24,10 @@ const getUnapprovedAccounts = async () => {
       { projection: { _id: 1, name: 1, emailId: 1, type: 1 }}
     ).toArray();
   
-  const unapproved = [].concat(unapprovedUsers, unapprovedEntities);
-  unapproved = unapproved.map((account) => account._id = account._id.toString());
-  
-  return unapproved;
+  const unapprovedAccounts = [].concat(unapprovedUsers, unapprovedEntities);
+  unapprovedAccounts = unapprovedAccounts.map((account) => account._id = account._id.toString());
+
+  return unapprovedAccounts;
 };
 
 const getAccountById = async (accountId) => {
@@ -53,7 +53,19 @@ const getAccountById = async (accountId) => {
   return account;
 };
 
+const getUnapprovedLands = async () => {
+  const client = getClient();
 
+  const unapprovedLands = await client
+    .collection('land')
+    .find(
+      { approved: false },
+    ).toArray();
+
+  unapprovedLands = unapprovedLands.map((land) => land._id = land._id.toString());
+  
+  return unapprovedLands;
+}
 
 const approveUser = async (userId) => {
   userId = validation.validObjectId(userId);

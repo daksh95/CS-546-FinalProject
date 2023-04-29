@@ -1,5 +1,3 @@
-import { stringPalindromes } from "../Utils/helpers"
-
 const users= { // buyers and sellers
     _id: new ObjectId(),
     name: String,
@@ -40,7 +38,7 @@ const land ={
         line1: String,
         line2: String,
         city: String,
-        sate: String,
+        state: String,
         zipCode: Number,
     },//Change here. there was no address field.
     approved: Boolean,
