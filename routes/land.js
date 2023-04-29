@@ -10,7 +10,7 @@ import {
   postLandByState,
   postFilterArea,
   postFilterPrice,
-} from "../Controllers/land.js";
+} from "../controllers/land.js";
 
 routes.route("/").get(getLandByState).post(postLandByState);
 routes.route("/area/:state").post(postFilterArea);

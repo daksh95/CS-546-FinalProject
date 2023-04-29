@@ -1,7 +1,7 @@
 import express from "express";
 import "dotenv/config.js";
 import {connectDB, getClient} from "./config/connection.js"
-import constructorMethod from "./Routes/index.js";
+import constructorMethod from "./routes/index.js";
 
 const app = express();
 const port = 3000;
