@@ -32,25 +32,27 @@ const getAllLand = async () => {
 };
 
 const addNewLand = async (object) => {
-  let { dimensions, type, restrictions, sale, address, price, approved } =
+  let { dimensions, type, restrictions, sale, address, approved } =
     object;
   const queryData = {};
 
   //valid numbers
-  queryData.length = validation.validNumber(dimensions.length, "length");
-  queryData.breadth = validation.validNumber(dimensions.breadth, "breadth");
-  queryData.price = validation.validNumber(price, "price");
+  queryData.length = validation.validNumber(dimensions.length, "length", min=1);
+  queryData.breadth = validation.validNumber(dimensions.breadth, "breadth", min=1);
+  queryData.sale.price = validation.validNumber(sale.price, "price", min=1, );
+  queryData.address.zipCode = validation.validString(address.zipCode, "zipCode",min=501, max =99950);
 
   //valid string and string of array
-  queryData.type = validation.validString(type, "type of land");
-  queryData.address = validation.validString(address, "address");
-  queryData.restrictions = validation.validArrayOfStrings(
-    restrictions,
-    "restrictions"
-  );
+  queryData.type = validation.validString(type, "type of land",20);
+  queryData.restrictions = validation.validArrayOfStrings(restrictions,"restrictions");
+  queryData.sale.dateOfListing = validation.validString( sale.dateOfListing, "dateOfListing",10);
+  queryData.address.line1 = validation.validString(address.line1, "line1", 46);
+  queryData.address.line2 = validation.validString(address.line2, "line2", 46);
+  queryData.address.city = validation.validString(address.city, "city", 17);
+  queryData.address.state = validation.validString(address.state, "state",2);
 
   //valid bool
-  queryData.sale = validation.validBool(sale, "sale");
+  queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
   queryData.approved = validation.validBool(approved, "approved");
 
   //fetch db reference

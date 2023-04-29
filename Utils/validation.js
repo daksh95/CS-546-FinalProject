@@ -1,15 +1,20 @@
-import { ObjectId } from "mongodb";
+import { MinKey, ObjectId } from "mongodb";
 import { isValidObjectId } from "mongoose";
 import moment from "moment";
 
-const validString = (string, parameter = "input") => {
+const validString = (string, parameter = "input", maxLength=null) => {
     if (string === undefined || !string || typeof string !== "string")
         throw `${parameter} does not exist or is not a string`;
 
     string = string.trim();
     if (string.length == 0)
         throw `${parameter} cannot be an empty string or just spaces`;
-
+    
+    if(maxLength){
+        if(string.length>maxLength){
+            throw `${parameter} can be only ${maxLength} character long`
+        }
+    }
     return string;
 };
 
@@ -35,7 +40,7 @@ const validArrayOfStrings = (array, parameter = "input") => {
     return arr;
 };
 
-const validNumber =(num, parameter = "input") => {
+const validNumber =(num, parameter = "input", min=null, max = null) => {
     if(typeof num == "undefined"){
         throw `${parameter} should be provided`;
     }
@@ -44,6 +49,16 @@ const validNumber =(num, parameter = "input") => {
     }
     if(Number.isNaN(num)){
         throw `Valid number required for ${parameter}`;
+    }
+    if(min){
+        if(num<min){
+            throw `${parameter} can must be greater than ${min}`;
+        }
+    }
+    if(max){
+        if(num>max){
+            throw `${parameter} can must be less than ${max}`
+        }
     }
     return num;
 }
@@ -81,7 +96,7 @@ const validDOB = (dob, parameter="DOB") => {
 const validGenders = [
     'male',
     'female',
-    'non-binary'
+    'other'
 ]
 
 const validGender = (gender, parameter="gender") => {
@@ -100,6 +115,10 @@ const validBool = (bool, parameter="input") =>{
     if(typeof bool != "boolean"){
         throw `${parameter} should be a true or false`
     }
+}
+
+const nonNegative = (number, paramter = "input")=>{
+
 }
 
 const validation = {

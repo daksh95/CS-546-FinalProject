@@ -88,6 +88,7 @@ const updatePassword = async(password, emailId)=>{
     //validating password
     password = validation.validString(password);
     password = hash.generateHash(password);
+    
     //checking if new password is previously used
     let userInfo =  await getCredentialByEmailId(emailId);
     if(password == userInfo.password){
@@ -107,7 +108,6 @@ const updatePassword = async(password, emailId)=>{
     
     result = await client.collection("credential").findOneAndUpdate({_id: userInfo._id},{$push: {previousPassword: userInfo.password} }, {returnDocument: 'after'} ); 
     if (result.lastErrorObject.n === 0) throw 'Could not update';
-    
     return "updated";
 
 }
