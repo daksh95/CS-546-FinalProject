@@ -1,13 +1,13 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
-import validation from "../Utils/validation.js";
+import validation from "../utils/validation.js";
 import {
   exists,
   checkInputType,
   validStateCodes,
   arrayLength,
   inputValidation,
-} from "../Utils/helpers.js";
+} from "../utils/helpers.js";
 
 const getLand = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exists");

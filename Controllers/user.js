@@ -1,10 +1,10 @@
-import userData from "../Data/user.js";
+import userData from "../data/user.js";
 import {
   checkInputType,
   exists,
   validStateCodes,
   inputValidation,
-} from "../Utils/helpers.js";
+} from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
 const getPropertiesOfUser = async (req, res) => {
