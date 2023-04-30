@@ -11,22 +11,12 @@
         </ul>
     </div>
 </nav>
-<form action="/land/area/{{state}}" method="post" id="filter-area">
-    <label for="minAreaInput">Min Area</label>
-    <input type="text" name="minAreaInput" id="minAreaInput">
-    <label for="maxAreaInput">Max Area</label>
-    <input type="text" name="maxAreaInput" id="maxAreaInput">
+<form action="/land" method="post" id="get-state-form">
+    <label for="stateInput">State</label>
+    <input type="text" name="stateInput" id="stateInput">
     <button type="submit">Search</button>
 </form>
-<form action="/land/price/{{state}}" method="post" id="filter-price">
-    <label for="minPriceInput">Min Price</label>
-    <input type="number" name="minPriceInput" id="minPriceInput">
-    <label for="maxPriceInput">Max Price</label>
-    <input type="number" name="maxPriceInput" id="maxPriceInput">
-    <button type="submit">Search</button>
-</form>
-
-{{#if hasError}}
+{{#if hasSearchError}}
 <ul class="error">
     {{#each error}}
     <li>
@@ -36,16 +26,49 @@
 </ul>
 {{/if}}
 
-<header>
-    <h1>Lands</h1>
-</header>
-{{#each landByState}}
-<a href="/land/{{this.id}}">
-    <div>
-        Name: {{this.address}}
-        Dimensions: {{this.dimensions}}
-        Price: {{this.price}}
-        Sale: {{this.sale}}
+<div class="row">
+    <div class="col-md-8">
+        <header>
+            <h1>Lands</h1>
+        </header>
+        {{#each landByState}}
+        <a href="/land/{{this.id}}">
+            <div>
+                Name: {{this.address}}
+                Dimensions: {{this.dimensions}}
+                Price: {{this.price}}
+                Sale: {{this.sale}}
+            </div>
+        </a>
+        {{/each}}
     </div>
-</a>
-{{/each}}
+    <div class="col-md-4">
+        {{#if state}}
+        <form action="/land/area/{{state}}" method="post" id="filter-area">
+            <label for="minAreaInput">Min Area</label>
+            <input type="text" name="minAreaInput" id="minAreaInput">
+            <label for="maxAreaInput">Max Area</label>
+            <input type="text" name="maxAreaInput" id="maxAreaInput">
+            <button type="submit">Search</button>
+        </form>
+        <form action="/land/price/{{state}}" method="post" id="filter-price">
+            <label for="minPriceInput">Min Price</label>
+            <input type="number" name="minPriceInput" id="minPriceInput">
+            <label for="maxPriceInput">Max Price</label>
+            <input type="number" name="maxPriceInput" id="maxPriceInput">
+            <button type="submit">Search</button>
+        </form>
+        {{/if}}
+
+        {{#if hasError}}
+        <ul class="error">
+            {{#each error}}
+            <li>
+                {{this}}
+            </li>
+            {{/each}}
+        </ul>
+        {{/if}}
+
+    </div>
+</div>

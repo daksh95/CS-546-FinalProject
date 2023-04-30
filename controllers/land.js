@@ -55,7 +55,11 @@ const getAllLand = async (req, res) => {
 };
 
 const getLandByState = async (req, res) => {
-  res.status(200).render("getLandByState", { title: "Get Lands By State" });
+  res.status(200).render("displayLandByState", {
+    title: "Lands",
+    landByState: [],
+    state: undefined,
+  });
 };
 
 const postLandByState = async (req, res) => {
@@ -72,9 +76,11 @@ const postLandByState = async (req, res) => {
       "State parameter must be a valid statecode in abbreviations only"
     );
   if (error.length !== 0)
-    return res.status(400).render("getLandByState", {
-      title: "Get Lands By State",
-      hasError: true,
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: undefined,
+      hasSearchError: true,
       error: error,
     });
 
@@ -86,10 +92,12 @@ const postLandByState = async (req, res) => {
       state: state,
     });
   } catch (error) {
-    return res.status(400).render("getLandByState", {
-      title: "Get Lands By State",
-      hasError: true,
-      error: error.message,
+    return res.status(400).render("displayLandByState", {
+      title: "Lands",
+      landByState: [],
+      state: undefined,
+      hasSearchError: true,
+      error: [error.message],
     });
   }
 };
@@ -140,7 +148,7 @@ const postFilterPrice = async (req, res) => {
       landByState: [],
       state: state,
       hasError: true,
-      error: errors,
+      error: [error.message],
     });
   }
 };
@@ -191,7 +199,7 @@ const postFilterArea = async (req, res) => {
       landByState: [],
       state: state,
       hasError: true,
-      error: errors,
+      error: [error.message],
     });
   }
 };

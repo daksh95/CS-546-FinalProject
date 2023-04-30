@@ -15,6 +15,6 @@ import {
 routes.route("/").get(getLandByState).post(postLandByState);
 routes.route("/area/:state").post(postFilterArea);
 routes.route("/price/:state").post(postFilterPrice);
-routes.route("/:id").get(getLand).patch(updateLand).delete(removeLand);
+routes.route("/:id").get(getLand);
 
 export default routes;
