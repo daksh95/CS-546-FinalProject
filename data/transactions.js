@@ -126,7 +126,6 @@ const transactionData = {
   sellerApproved: sellerApproved,
   createTransaction: createTransaction,
   terminateTransaction: terminateTransaction,
-  updateBid: updateBid
 };
 
 export default transactionData;

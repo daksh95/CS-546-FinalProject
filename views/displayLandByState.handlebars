@@ -1,18 +1,19 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="#">WebSite Name</a>
         </div>
         <ul class="nav navbar-nav">
-            <li><a href="/land">Home</a></li>
-            <li><a href="/user/{{userId}}/land">My Property</a></li>
-            <li><a href="/user/{{userId}}/transactions">My Transactions</a></li>
+            <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link">My Property</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link">My Transactions</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="/user/{{userId}}/profile">Profile</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link">Profile</a></li>
         </ul>
     </div>
 </nav>
+<br>
 <form action="/land" method="post" id="get-state-form">
     <label for="stateInput">State</label>
     <input type="text" name="stateInput" id="stateInput">
@@ -35,13 +36,14 @@
     <div class="col-md-8" id="results">
         {{#each landByState}}
         <a href="/land/{{this.id}}">
-            <div>
+            <div class="card">
                 <p>Name: {{this.address}}</p>
                 <p>Dimensions: {{this.dimensions}}</p>
                 <p>Price: {{this.price}}</p>
                 <p>Sale: {{this.sale}}</p>
             </div>
         </a>
+        <br>
         {{/each}}
     </div>
     <div class="col-md-4">
