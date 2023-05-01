@@ -5,8 +5,10 @@
         </div>
         <ul class="nav navbar-nav">
             <li><a href="/land">Home</a></li>
-            <li><a href="/user/{{userId}}/land">My Property 1</a></li>
+            <li><a href="/user/{{userId}}/land">My Property</a></li>
             <li><a href="/user/{{userId}}/transactions">My Transactions</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
             <li><a href="/user/{{userId}}/profile">Profile</a></li>
         </ul>
     </div>
@@ -27,22 +29,32 @@
 {{/if}}
 
 <div class="row">
-    <div class="col-md-8">
-        <header>
-            <h1>Lands</h1>
-        </header>
+    <header>
+        <h1>Lands</h1>
+    </header>
+    <div class="col-md-8" id="results">
         {{#each landByState}}
         <a href="/land/{{this.id}}">
             <div>
-                Name: {{this.address}}
-                Dimensions: {{this.dimensions}}
-                Price: {{this.price}}
-                Sale: {{this.sale}}
+                <p>Name: {{this.address}}</p>
+                <p>Dimensions: {{this.dimensions}}</p>
+                <p>Price: {{this.price}}</p>
+                <p>Sale: {{this.sale}}</p>
             </div>
         </a>
         {{/each}}
     </div>
     <div class="col-md-4">
+        <div class="container">
+            <div class="d-flex justify-content-center" style="padding :20px;">
+                <p style="display:inline">Sort by Price : </p>
+                <select id="sort" class="form-select">
+                    <option value="priceAsc">A-Z</option>
+                    <option value="priceDesc">Z-A</option>
+                </select>
+            </div>
+        </div>
+
         {{#if state}}
         <form action="/land/area/{{state}}" method="post" id="filter-area">
             <label for="minAreaInput">Min Area</label>
@@ -72,3 +84,5 @@
 
     </div>
 </div>
+<div id="lands" data-landStates="{{json landByState}}"></div>
+<script src="/public/js/displayLandByState.js"></script>
