@@ -1,15 +1,15 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">WebSite Name</a>
+        <div class="navbar-header text-light">
+            WebSite Name
         </div>
         <ul class="nav navbar-nav">
-            <li><a href="/land">Home</a></li>
-            <li><a href="/user/{{userId}}/land">My Property</a></li>
-            <li><a href="/user/{{userId}}/transactions">My Transactions</a></li>
+            <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link">My Property</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link">My Transactions</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="/user/{{userId}}/profile">Profile</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link">Profile</a></li>
         </ul>
     </div>
 </nav>

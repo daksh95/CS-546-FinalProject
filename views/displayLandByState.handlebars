@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">WebSite Name</a>
+        <div class="navbar-header text-light">
+            WebSite Name
         </div>
         <ul class="nav navbar-nav">
             <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
@@ -14,76 +14,79 @@
     </div>
 </nav>
 <br>
-<form action="/land" method="post" id="get-state-form">
-    <label for="stateInput">State</label>
-    <input type="text" name="stateInput" id="stateInput">
-    <button type="submit">Search</button>
-</form>
-{{#if hasSearchError}}
-<ul class="error">
-    {{#each error}}
-    <li>
-        {{this}}
-    </li>
-    {{/each}}
-</ul>
-{{/if}}
-
-<div class="row">
-    <header>
-        <h1>Lands</h1>
-    </header>
-    <div class="col-md-8" id="results">
-        {{#each landByState}}
-        <a href="/land/{{this.id}}">
-            <div class="card">
-                <p>Name: {{this.address}}</p>
-                <p>Dimensions: {{this.dimensions}}</p>
-                <p>Price: {{this.price}}</p>
-                <p>Sale: {{this.sale}}</p>
-            </div>
-        </a>
-        <br>
-        {{/each}}
-    </div>
-    <div class="col-md-4">
-        <div class="container">
-            <div class="d-flex justify-content-center" style="padding :20px;">
-                <p style="display:inline">Sort by Price : </p>
+<div class="container-fluid">
+    <div class="row" id="mainResults">
+        <div class="col-sm-4">
+            <form action="/land" method="post" id="get-state-form">
+                <div class="form-group">
+                    <label for="stateInput">State:</label>
+                    <input type="text" name="stateInput" id="stateInput" placeholder="Enter state (XX format)">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+            <div id="stateError"></div>
+            {{#if hasSearchError}}
+            <ul class="error">
+                {{#each error}}
+                <li>
+                    {{this}}
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+            {{#if state}}
+            <div class="d-flex">
+                <p class="pr-1">Sort by Price: </p>
                 <select id="sort" class="form-select">
                     <option value="priceAsc">A-Z</option>
                     <option value="priceDesc">Z-A</option>
                 </select>
             </div>
+            <br>
+            <form action="/land/area/{{state}}" method="post" id="filter-area">
+                <label for="minAreaInput">Min Area</label>
+                <input type="text" name="minAreaInput" id="minAreaInput">
+                <br>
+                <label for="maxAreaInput">Max Area</label>
+                <input type="text" name="maxAreaInput" id="maxAreaInput">
+                <br>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+            <form action="/land/price/{{state}}" method="post" id="filter-price">
+                <label for="minPriceInput">Min Price</label>
+                <input type="number" name="minPriceInput" id="minPriceInput">
+                <br>
+                <label for="maxPriceInput">Max Price</label>
+                <input type="number" name="maxPriceInput" id="maxPriceInput">
+                <br>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+            {{/if}}
+            <div id="filterError"></div>
+            {{#if hasError}}
+            <ul class="error">
+                {{#each error}}
+                <li>
+                    {{this}}
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
         </div>
-
-        {{#if state}}
-        <form action="/land/area/{{state}}" method="post" id="filter-area">
-            <label for="minAreaInput">Min Area</label>
-            <input type="text" name="minAreaInput" id="minAreaInput">
-            <label for="maxAreaInput">Max Area</label>
-            <input type="text" name="maxAreaInput" id="maxAreaInput">
-            <button type="submit">Search</button>
-        </form>
-        <form action="/land/price/{{state}}" method="post" id="filter-price">
-            <label for="minPriceInput">Min Price</label>
-            <input type="number" name="minPriceInput" id="minPriceInput">
-            <label for="maxPriceInput">Max Price</label>
-            <input type="number" name="maxPriceInput" id="maxPriceInput">
-            <button type="submit">Search</button>
-        </form>
-        {{/if}}
-
-        {{#if hasError}}
-        <ul class="error">
-            {{#each error}}
-            <li>
-                {{this}}
-            </li>
+        <div class="col-sm-8" id="results">
+            {{#each landByState}}
+            <a href="/land/{{this.id}}" class="text-decoration-none text-info">
+                <div class="card border-info rounded-lg shadow-lg p-2">
+                    <p>Name: {{this.address}}</p>
+                    <p>Dimensions: {{this.dimensions}}</p>
+                    <p>Price: {{this.price}}</p>
+                    <p>Sale: {{this.sale}}</p>
+                </div>
+            </a>
+            <br>
             {{/each}}
-        </ul>
-        {{/if}}
-
+        </div>
     </div>
 </div>
 <div id="lands" data-landStates="{{json landByState}}"></div>
