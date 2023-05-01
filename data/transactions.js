@@ -118,6 +118,8 @@ const terminateTransaction = async (transactionId, adminComment) => {
   return result;
 };
 
+const updateBid = async (transactionId, bidAmount) => {};
+
 
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,

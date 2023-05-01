@@ -155,3 +155,22 @@ export const validStateCodes = [
   "WI",
   "WY",
 ];
+
+export let getFullAddress = (address) => {
+  // Takes in the address object, containing line1, line2, city, state and zipCode
+  // and returns the full address
+
+  for (let field in address) {
+    if (address[field]) address[field] = address[field].trim();
+  }
+
+  let fullAddress = '';
+  if (address['line1']) fullAddress += address['line1'];
+  if (address['line2']) fullAddress += ' ' + address['line2'];
+  fullAddress = fullAddress.trim();
+  if (address['city']) fullAddress += ', ' + address['city'];
+  if (address['state']) fullAddress += ', ' + address['state'];
+  if (address['zipCode']) fullAddress += ' ' + address['zipCode'];
+  fullAddress = fullAddress.trim();
+  return fullAddress;
+};
