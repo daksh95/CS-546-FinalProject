@@ -39,7 +39,7 @@ const land ={
         line2: String,
         city: String,
         state: String,
-        zipCode: Number,
+        zipCode: String,
     },//Change here. there was no address field.
     approved: Boolean,
 }
