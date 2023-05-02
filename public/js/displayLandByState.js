@@ -62,11 +62,11 @@
     let selectedValue = this.value;
     if (selectedValue === "priceAsc") {
       landByState.sort(function (a, b) {
-        return a["price"] - b["price"];
+        return a["sale"]["price"] - b["sale"]["price"];
       });
     } else if (selectedValue === "priceDesc") {
       landByState.sort(function (a, b) {
-        return b["price"] - a["price"];
+        return b["sale"]["price"] - a["sale"]["price"];
       });
     }
     resultsDiv.remove();
@@ -86,13 +86,21 @@
       divElement.classList.add("shadow-lg");
       divElement.classList.add("p-2");
       pElement = document.createElement("p");
-      pElement.textContent = "Name: " + landByState[i].address;
+      pElement.textContent =
+        landByState[i].address.line1 + " " + landByState[i].address.line2 + ",";
+      pElement.classList.add("m-0");
       pElement1 = document.createElement("p");
-      pElement1.textContent = "Dimensions: " + landByState[i].dimensions;
+      pElement1.textContent =
+        landByState[i].address.city +
+        ", " +
+        landByState[i].address.state +
+        " " +
+        landByState[i].address.zipCode;
       pElement2 = document.createElement("p");
-      pElement2.textContent = "Price: " + landByState[i].price;
+      pElement2.textContent = landByState[i].type + " Area";
       pElement3 = document.createElement("p");
-      pElement3.textContent = "Sale: " + landByState[i].sale;
+      if (landByState[i].sale.onSale) pElement3.textContent = "Sale: Yes";
+      else pElement3.textContent = "Sale: No";
       brElement = document.createElement("br");
       divElement.appendChild(pElement);
       divElement.appendChild(pElement1);

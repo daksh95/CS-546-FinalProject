@@ -76,12 +76,16 @@
         </div>
         <div class="col-sm-8" id="results">
             {{#each landByState}}
-            <a href="/land/{{this.id}}" class="text-decoration-none text-info">
+            <a href="/land/{{this._id}}" class="text-decoration-none text-info">
                 <div class="card border-info rounded-lg shadow-lg p-2">
-                    <p>Name: {{this.address}}</p>
-                    <p>Dimensions: {{this.dimensions}}</p>
-                    <p>Price: {{this.price}}</p>
-                    <p>Sale: {{this.sale}}</p>
+                    <p class="m-0">{{this.address.line1}} {{this.address.line2}},</p>
+                    <p>{{this.address.city}}, {{this.address.state}} {{this.address.zipCode}}</p>
+                    <p>{{this.type}} Area</p>
+                    {{#if this.sale.onSale}}
+                    <p>Sale: Yes</p>
+                    {{else}}
+                    <p>Sale: No</p>
+                    {{/if}}
                 </div>
             </a>
             <br>

@@ -14,33 +14,62 @@
     </div>
 </nav>
 
-<main>
+<main class="container-fluid">
     <div class="row">
-        <div class="col-md-8">
-            <h2>Name: {{land.address}}</h2>
-            <h2>Dimensions: {{land.dimensions.length}}x{{land.dimensions.breadth}}</h2>
-            <h2>Type: {{land.type}}</h2>
-            <h2>Restrictions: </h2>
+        <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
+            <p class="m-0">{{land.address.line1}} {{land.address.line2}},</p>
+            <p>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</p>
+            <p>Dimensions: {{land.dimensions.length}}ft x {{land.dimensions.breadth}}ft</p>
+            <p>Area: {{land.area}} sq ft</p>
+            <p>{{land.type}} Area</p>
+            <p class="m-0">Restrictions: </p>
             <ul>
                 {{#each land.restrictions}}
                 <li>{{this}}</li>
                 {{/each}}
             </ul>
-            <h2>Sale: {{land.sale.onSale}}</h2>
             {{#if land.sale.onSale}}
-            <h2>Price: {{land.sale.price}}</h2>
-            <h2>Date of Listing: {{land.sale.dateOfListing}}</h2>
+            <p>Sale: Yes</p>
+            <p>Price: ${{land.sale.price}}</p>
+            <p>Date of Listing: {{land.sale.dateOfListing}}</p>
+            {{else}}
+            <p>Sale: No</p>
             {{/if}}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
             {{#if isOwner}}
-            <a href="#"><button>Edit Property</button></a>
-            <a href="#"><button>View Transaction</button></a>
+            <a class="mx-auto my-auto" href="#"><button>Edit Property</button></a>
+            <br>
+            <a class="mx-auto my-auto" href="#"><button>View Transaction</button></a>
             {{else}}
-            <h2>Contact Info: {{owner.name}} ({{owner.phone}}) - {{owner.emailId}}</h2>
             {{#if land.sale.onSale}}
-            {{!-- Bid Form --}}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bidModal">
+                Place Bid
+            </button>
+            <div class="modal" id="bidModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Enter your bid amount. Please ensure it is in close range to the
+                                price (+/-1000)</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="#" method="post" id="bidForm">
+                                <label for="bidInput">Bid: </label>
+                                <input type="number" name="bidInput" id="bidInput">
+                                <button type="submit" class="btn btn-success" data-dismiss="modal">Place</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
             {{/if}}
+            <p class="font-weight-bold mx-auto my-auto">Contact Info: </p>
+            <p>{{owner.name}}</p>
+            <p>{{owner.phone}}</p>
+            <p>{{owner.emailId}}</p>
             {{/if}}
         </div>
     </div>

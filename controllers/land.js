@@ -1,5 +1,6 @@
 import landData from "../data/land.js";
 import userData from "../data/user.js";
+import transactionData from "../data/transactions.js";
 import {
   checkInputType,
   exists,
@@ -31,7 +32,12 @@ const getLand = async (req, res) => {
   } catch (error) {
     isOwner = false;
   }
-
+  let pendingTransaction = false;
+  try {
+    //check if transaction is already there between buyer and seller for this land (waiting for user id)
+  } catch (error) {
+    //
+  }
   try {
     const land = await landData.getLand(id);
     res.status(200).render("displayLandDetails", {

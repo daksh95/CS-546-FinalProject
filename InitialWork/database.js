@@ -34,6 +34,7 @@ const land ={
         price: Number, // this will be shown if and only if sale:true
         dateOfListing: Date // this will be shown if and only if sale:true
     },
+    area: String, //Length*Breadth
     address: {
         line1: String,
         line2: String,

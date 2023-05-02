@@ -65,6 +65,7 @@ const addNewLand = async (object) => {
     "dateOfListing",
     10
   );
+  queryData.area = (dimensions.length*dimensions.breadth).toString();
   queryData.address.line1 = validation.validString(address.line1, "line1", 46);
   queryData.address.line2 = validation.validString(address.line2, "line2", 46);
   queryData.address.city = validation.validString(address.city, "city", 17);
@@ -121,7 +122,7 @@ const getLandByState = async (state) => {
   const client = getClient();
   const result = await client
     .collection("land")
-    .find({ state: { $regex: regexState } })
+    .find({ "address.state": { $regex: regexState } })
     .toArray();
   return result;
 };
@@ -148,11 +149,15 @@ const filterByArea = async (state, minArea, maxArea) => {
     );
   if (Number(maxArea) < Number(minArea))
     throw new Error("maxArea cannot be less than minArea");
+  const regexState = new RegExp(state, "i");
   const client = getClient();
   const result = await client
     .collection("land")
     .find({
-      $and: [{ state: state }, { area: { $gte: minArea, $lte: maxArea } }],
+      $and: [
+        { "address.state": { $regex: regexState } },
+        { area: { $gte: minArea, $lte: maxArea } },
+      ],
     })
     .toArray();
   return result;
@@ -180,11 +185,15 @@ const filterByPrice = async (state, minPrice, maxPrice) => {
     );
   if (maxPrice < minPrice)
     throw new Error("maxPrice cannot be less than minPrice");
+  const regexState = new RegExp(state, "i");
   const client = getClient();
   const result = await client
     .collection("land")
     .find({
-      $and: [{ state: state }, { price: { $gte: minPrice, $lte: maxPrice } }],
+      $and: [
+        { "address.state": { $regex: regexState } },
+        { "sale.price": { $gte: minPrice, $lte: maxPrice } },
+      ],
     })
     .toArray();
   return result;
