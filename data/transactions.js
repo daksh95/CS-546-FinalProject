@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { inputValidation } from "../utils/helpers.js";
+import userData from "./user.js";
 
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByBuyerId = async (id) => {
@@ -51,7 +52,7 @@ const getTransactionsByLandId = async (id) => {
     throw "No transaction from that ID";
   }
   // Get users by ID.
-  const { name: buyerName } = await getUserById(result.buyer.id);
+  const { name: buyerName } = await userData.getUserById(result.buyer.id);
   //
   const data = {
     buyer: buyerName,
@@ -104,12 +105,16 @@ const terminateTransaction = async (transactionId, adminComment) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
   const client = getClient();
   const result = await client
-    .collection('transaction')
+    .collection("transaction")
     .findOneAndUpdate(
       { _id: new ObjectId(transactionId) },
-      { $set: { status: "Terminated",
-        'admin.status': false,
-        'admin.Comment': adminComment } },
+      {
+        $set: {
+          status: "Terminated",
+          "admin.status": false,
+          "admin.Comment": adminComment,
+        },
+      },
       { returnDocument: "after" }
     );
   if (result.lastErrorObject.n < 1) {
@@ -119,7 +124,6 @@ const terminateTransaction = async (transactionId, adminComment) => {
 };
 
 const updateBid = async (transactionId, bidAmount) => {};
-
 
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,

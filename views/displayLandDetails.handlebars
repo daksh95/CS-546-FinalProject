@@ -40,7 +40,7 @@
             {{#if isOwner}}
             <a class="mx-auto my-auto" href="#"><button>Edit Property</button></a>
             <br>
-            <a class="mx-auto my-auto" href="#"><button>View Transaction</button></a>
+            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button>View Transaction</button></a>
             {{else}}
             {{#if land.sale.onSale}}
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bidModal">
