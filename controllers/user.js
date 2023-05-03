@@ -132,4 +132,7 @@ const getTransactionsofUserID = async (req, res) => {
   }
 };
 
-export { getPropertiesOfUser, getProfile, getTransactionsofUserID };
+const setUpProfile = async(req, res) =>{
+ 
+}
+export { getPropertiesOfUser, getProfile, getTransactionsofUserID, setUpProfile };

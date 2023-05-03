@@ -18,6 +18,7 @@
 </header>
 <main>
     <div class="container">
+        {{#if createdProfile}}
         <a href="#"><button class="btn btn-success pull-right">Edit Profile</button></a>
         <p>Name: {{user.name}}</p>
         <p>Phone: {{user.phone}}</p>
@@ -25,5 +26,8 @@
         <p>DOB: {{user.DOB}}</p>
         <p>Gender: {{user.gender}}</p>
         <p>Rating: {{avgRating}} ({{user.rating.count}})</p>
+        {{else}}
+        <a href="#"><button class="btn btn-success pull-right">create Profile</button></a>
+        {{/if}}
     </div>
 </main>

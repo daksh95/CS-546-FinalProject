@@ -7,6 +7,9 @@ import constructorMethod from "./routes/index.js";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import exphbs from "express-handlebars";
+import session from "express-session";
+import { homeMiddleware } from "./middleware/middleware.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const staticDir = express.static(__dirname + "/public");
@@ -24,8 +27,17 @@ hbs.handlebars.registerHelper("json", function (val) {
 
 
 //middleware
-constructorMethod(app)
+app.use(session({
+    name: 'AuthCookie',
+    secret: "ThefamousSecretOfWebPrograming#$",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {maxAge: 6000000}
+}));
+app.use("/", homeMiddleware);
 
+//routing
+constructorMethod(app)
 
 const start = async() =>{
     try {

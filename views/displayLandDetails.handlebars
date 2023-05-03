@@ -55,10 +55,12 @@
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">
-                            <form action="#" method="post" id="bidForm">
+                            <form action="/land/{{land._id}}/{{owner._id}}" method="post" id="bidForm">
                                 <label for="bidInput">Bid: </label>
                                 <input type="number" name="bidInput" id="bidInput">
-                                <button type="submit" class="btn btn-success" data-dismiss="modal">Place</button>
+                                <label hidden for="price">Price</label>
+                                <input type="hidden" name="price" id="price" value="{{land.sale.price}}">
+                                <button type="submit" class="btn btn-success">Place</button>
                             </form>
                         </div>
                     </div>

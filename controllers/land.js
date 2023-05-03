@@ -55,17 +55,22 @@ const getLand = async (req, res) => {
   }
   // res.status(200).json({ data: result });/
 };
-const getAllLand = async (req, res) => {
-  const result = await landData.getAllLand();
-  res.status(200).json(result);
-};
 
 const getLandByState = async (req, res) => {
-  res.status(200).render("displayLandByState", {
-    title: "Lands",
-    landByState: [],
-    state: undefined,
-  });
+  try {
+    let lands = await landData.getAllLand();
+    res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: lands,
+      state: undefined,
+    });
+  } catch (error) {
+    res.status(404).redner("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
 };
 
 const postLandByState = async (req, res) => {
@@ -213,6 +218,50 @@ const postFilterArea = async (req, res) => {
   }
 };
 
+const placedBid = async (req, res) => {
+  let bid = req.body.bidInput;
+  let landId = req.params.landId;
+  let sellerId = req.params.sellerId;
+  let landPrice = req.body.price;
+  let error = [];
+  if (!exists(bid)) error.push("bid parameter does not exists");
+  if (!checkInputType(bid, "number") || bid === NaN || bid === Infinity)
+    error.push("bid must be of type number only");
+  if (!Number.isInteger(bid)) error.push("bid cannot be in decimal place");
+  if (bid < landPrice - 1000)
+    error.push("Difference between bid and price cannot be more than $1000");
+  if (!exists(sellerId)) error.push("sellerId parameter does not exists");
+  if (!checkInputType(sellerId, "string"))
+    error.push("sellerId must be of type string only");
+  if (sellerId.trim().length === 0)
+    error.push("sellerId cannot be of empty spaces");
+  sellerId = sellerId.trim();
+  if (!ObjectId.isValid(sellerId)) error.push("Invalid Object sellerId");
+  if (!exists(landId)) error.push("landId parameter does not exists");
+  if (!checkInputType(landId, "string"))
+    error.push("landId must be of type string only");
+  if (landId.trim().length === 0)
+    error.push("landId cannot be of empty spaces");
+  landId = landId.trim();
+  if (!ObjectId.isValid(landId)) error.push("Invalid Object landId");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+  try {
+    await transactionData.createTransaction(bid, landId, sellerId);
+    return res.status(200).redirect("/land/" + landId);
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
 const updateLand = async (req, res) => {};
 
 const postLand = async (req, res) => {};
@@ -220,7 +269,6 @@ const postLand = async (req, res) => {};
 const removeLand = async (id) => {};
 
 export {
-  getAllLand,
   getLand,
   updateLand,
   postLand,
@@ -229,4 +277,5 @@ export {
   postLandByState,
   postFilterArea,
   postFilterPrice,
+  placedBid,
 };

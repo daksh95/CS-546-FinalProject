@@ -117,8 +117,37 @@ const validBool = (bool, parameter="input") =>{
     }
 }
 
-const nonNegative = (number, paramter = "input")=>{
+const validPassword = (pass)=>{
+    pass = validString(pass, "password",15);
+    if(pass.length<8){
+        throw `Password length should be a minimum of 8`;
+    }
+    let upperCase =/.*[A-Z].*/g; 
+    let oneNumber = /.*[0-9].*/g;
+    let oneSpecial =/[^a-zA-Z0-9\s]/g;
+    let whiteSpace = /.*[\s].*/g
+    if(pass.match(whiteSpace)){
+        throw `Password should not contain any spaces`;
+    }
+    if(!pass.match(upperCase)){
+        throw `Password should have atleast one upercase character`;
+    }
+    if(!pass.match(oneNumber)){
+        throw `Password should have atleast one one number`;
+    }
+    if(!pass.match(oneSpecial)){
+        throw `Password should have atleast one special character`;
+    }
+    return pass;
+}
 
+const validTypeOfUser = (user)=>{
+    user = validString(user, "type of user", 16);
+    user = user.toLowerCase();
+    if(user != "admin" && user != "title company" && user != "government" && user != "user" && user != "user"){
+        throw `Please select correct type of user`;
+    }
+    return user;
 }
 
 const validation = {
@@ -130,7 +159,9 @@ const validation = {
     validEmail:validEmail,
     validDOB:validDOB,
     validGender:validGender,
-    validBool:validBool
+    validBool:validBool,
+    validPassword:validPassword,
+    validTypeOfUser:validTypeOfUser,
 };
 
 export default validation;
