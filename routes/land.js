@@ -10,11 +10,13 @@ import {
   postLandByState,
   postFilterArea,
   postFilterPrice,
+  placedBid,
 } from "../controllers/land.js";
 
 routes.route("/").get(getAllLand).post(postLandByState);
 routes.route("/area/:state").post(postFilterArea);
 routes.route("/price/:state").post(postFilterPrice);
-routes.route("/:id").get(getLand);
+routes.route("/:id").get(getLand)
+routes.route("/:landId/:sellerId").post(placedBid);
 
 export default routes;
