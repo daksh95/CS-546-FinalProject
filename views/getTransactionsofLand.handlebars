@@ -13,9 +13,16 @@
         </ul>
     </div>
 </nav>
-<main>
-    {{#each lands}}
-    <a href="/land/{{this.id}}">
-        <div>{{this.address}}</div>
+
+<div class="container-fluid">
+    {{#each transactions}}
+    <a href="#">
+        <div class="card mt-3 ml-3 border-info rounded-lg shadow-lg">
+            <div class="row">
+                <div class="col-md-4">{{this.buyerName}}</div>
+                <div class="col-md-4">${{this.bid}} placed</div>
+                <div class="col-md-4">{{this.status}}</div>
+            </div>
+        </div>
     </a>
-</main>
+</div>

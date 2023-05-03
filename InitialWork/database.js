@@ -1,4 +1,3 @@
-
 const users= { // buyers and sellers
     _id: new ObjectId(),
     name: String,
@@ -35,12 +34,13 @@ const land ={
         price: Number, // this will be shown if and only if sale:true
         dateOfListing: Date // this will be shown if and only if sale:true
     },
+    area: String, //Length*Breadth
     address: {
         line1: String,
         line2: String,
         city: String,
-        sate: String,
-        zipCode: Number,
+        state: String,
+        zipCode: String,
     },//Change here. there was no address field.
     approved: Boolean,
 }
@@ -85,6 +85,7 @@ const transaction ={
         status: Boolean,
         Comment: String,
     }, 
+    status: String ("pending, approved, rejected"),
 }
 
 

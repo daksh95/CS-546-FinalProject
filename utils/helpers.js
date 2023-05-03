@@ -13,7 +13,6 @@ export let stringPalindromes = (str) => {
 };
 
 export let isObjectDeepEqual = (object1, object2) => {
-  // console.log(object1, object2);
   if (object1 === object2) return true;
   if (typeof object1 === "string" || typeof object2 === "string") {
     if (object1.trim() === object2.trim()) return true;
@@ -62,14 +61,14 @@ export let checkInputType = (input, type) => {
   }
 };
 
-export let inputValidation = (input, type) => {
-  if (!exists(input)) throw new Error(`${input} parameter does not exists`);
+export let inputValidation = (name, input, type) => {
+  if (!exists(input)) throw new Error(`${name} parameter does not exists`);
   if (!checkInputType(input, type))
-    throw new Error(`${input} must be of type ${type} only`);
+    throw new Error(`${name} must be of type ${type} only`);
   if (type === "string" && input.trim().length === 0)
-    throw new Error(`${input} cannot contain empty spaces only`);
+    throw new Error(`${name} cannot contain empty spaces only`);
   if (type === "number" && (input === NaN || input === Infinity))
-    throw new Error(`${input} must be of type number only`);
+    throw new Error(`${name} must be of type number only`);
   return input;
 };
 
@@ -155,3 +154,22 @@ export const validStateCodes = [
   "WI",
   "WY",
 ];
+
+export let getFullAddress = (address) => {
+  // Takes in the address object, containing line1, line2, city, state and zipCode
+  // and returns the full address
+
+  for (let field in address) {
+    if (address[field]) address[field] = address[field].trim();
+  }
+
+  let fullAddress = "";
+  if (address["line1"]) fullAddress += address["line1"];
+  if (address["line2"]) fullAddress += " " + address["line2"];
+  fullAddress = fullAddress.trim();
+  if (address["city"]) fullAddress += ", " + address["city"];
+  if (address["state"]) fullAddress += ", " + address["state"];
+  if (address["zipCode"]) fullAddress += " " + address["zipCode"];
+  fullAddress = fullAddress.trim();
+  return fullAddress;
+};

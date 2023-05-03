@@ -3,6 +3,101 @@ import validation from "../utils/validation.js";
 import userData from "./user.js";
 import transactionData from "./transactions.js";
 import landData from "./land.js";
+import { ObjectId } from "mongodb";
+import { getFullAddress } from "../utils/helpers.js";
+
+const getUnapprovedAccounts = async () => {
+  const client = getClient();
+  
+  let unapprovedUsers = await client
+    .collection('users')
+    .find(
+      { approved: false },
+      { projection: { _id: 1, name: 1, emailId: 1 }}
+    ).toArray();
+
+  if (!unapprovedUsers) throw 'Not able to fetch unapproved users';
+  unapprovedUsers = unapprovedUsers.map((user) => user.type = 'User');
+
+  let unapprovedEntities = await client
+    .collection('entities')
+    .find({ approved: false },
+      { projection: { _id: 1, name: 1, emailId: 1, type: 1 }}
+    ).toArray();
+  
+  if (!unapprovedEntities) throw 'Not able to fetch unapproved entities';
+  let unapprovedAccounts = [].concat(unapprovedUsers, unapprovedEntities);
+  unapprovedAccounts = unapprovedAccounts.map((account) => account._id = account._id.toString());
+
+  return unapprovedAccounts;
+};
+
+const getAccountById = async (accountId) => {
+  const client = getClient();
+
+  const accountUser = await client
+    .collection('users')
+    .findOne(
+      { _id: ObjectId(accountId) }
+    );
+
+  const accountEntity = await client
+    .collection('entities')
+    .findOne(
+      { _id: ObjectId(accountId) }
+    );
+
+  if (!accountUser && !accountEntity) throw 'No account found for the given ID';
+
+  const account = accountUser ? accountUser : accountEntity;
+  
+  if (accountUser) account.type = 'User';
+
+  account._id = account._id.toString();
+
+  return account;
+};
+
+const getUnapprovedLands = async () => {
+  const client = getClient();
+
+  let unapprovedLands = await client
+    .collection('land')
+    .find(
+      { approved: false },
+    ).toArray();
+
+  if (!unapprovedLands) throw 'Unable to fetch unapproved lands';
+  
+  unapprovedLands = unapprovedLands.map((land) => {
+    land._id = land._id.toString();
+    land.address.fullAddress = getFullAddress(land.address);
+  });
+  
+  return unapprovedLands;
+}
+
+const getUnapprovedTransactions = async () => {
+  const client = getClient();
+
+  let unapprovedTransactions = await client
+    .collection('transaction')
+    .find (
+      { 'surveyor.status': true,
+        'titleCompany.status': true,
+        'government.status': true,
+        'admin.status': false
+      }
+    ).toArray();
+
+  if (!unapprovedTransactions) throw 'Unable to fetch unapproved transactions';
+
+  unapprovedTransactions = unapprovedTransactions.map(
+    (transaction) => transaction._id = transaction._id.toString()
+  );
+
+  return unapprovedTransactions;
+}
 
 const approveUser = async (userId) => {
   userId = validation.validObjectId(userId);
@@ -48,9 +143,13 @@ const approveLand = async (landId) => {
 const adminApproved = async (transactionId, buyerId, sellerId) => {};
 
 const adminData = {
-  approveUser: approveUser,
-  approveLand: approveLand,
-  adminApproved: adminApproved
+  approveUser,
+  approveLand,
+  adminApproved,
+  getUnapprovedAccounts,
+  getAccountById,
+  getUnapprovedLands,
+  getUnapprovedTransactions
 };
 
 export default adminData;
