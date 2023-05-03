@@ -75,6 +75,11 @@
 
         </div>
         <div class="col-sm-8" id="results">
+            {{#if empty_lands}}
+            <div class="card border-info rounded-lg shadow-lg p-2">
+                No Lands available to display
+            </div>
+            {{else}}
             {{#each landByState}}
             <a href="/land/{{this._id}}" class="text-decoration-none text-info">
                 <div class="card border-info rounded-lg shadow-lg p-2">
@@ -90,6 +95,7 @@
             </a>
             <br>
             {{/each}}
+            {{/if}}
         </div>
     </div>
 </div>
