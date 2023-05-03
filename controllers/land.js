@@ -61,11 +61,20 @@ const getAllLand = async (req, res) => {
 };
 
 const getLandByState = async (req, res) => {
-  res.status(200).render("displayLandByState", {
-    title: "Lands",
-    landByState: [],
-    state: undefined,
-  });
+  try {
+    let lands = await landData.getAllLand();
+    res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: lands,
+      state: undefined,
+    });
+  } catch (error) {
+    res.status(404).redner("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
 };
 
 const postLandByState = async (req, res) => {
