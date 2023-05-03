@@ -80,43 +80,22 @@ const sellerApproved = async (transactionId, sellersId) => {
   return result;
 };
 
-const createTransaction = async (
-  landId,
-  landPrice,
-  buyerPrice,
-  buyerId,
-  sellerId,
-  status,
-  surveyorId,
-  surveyorApproval,
-  surveyorComment,
-  titleCompanyId,
-  titleCompanyApproval,
-  titleCompanyComment,
-  governmentId,
-  governmentApproval,
-  governmentComment,
-  adminId,
-  adminApproval,
-  adminComment
-) => {};
+const createTransaction = async (bid, landId, sellerId) => {};
 
 const terminateTransaction = async (transactionId, adminComment) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
   const client = getClient();
-  const result = await client
-    .collection("transaction")
-    .findOneAndUpdate(
-      { _id: new ObjectId(transactionId) },
-      {
-        $set: {
-          status: "Terminated",
-          "admin.status": false,
-          "admin.Comment": adminComment,
-        },
+  const result = await client.collection("transaction").findOneAndUpdate(
+    { _id: new ObjectId(transactionId) },
+    {
+      $set: {
+        status: "Terminated",
+        "admin.status": false,
+        "admin.Comment": adminComment,
       },
-      { returnDocument: "after" }
-    );
+    },
+    { returnDocument: "after" }
+  );
   if (result.lastErrorObject.n < 1) {
     throw "transaction could not be terminated";
   }
