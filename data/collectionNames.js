@@ -1,6 +1,6 @@
-const user = "User";
-const admin = "Admin";
-const entity = "Entity";
-const transacs = "Transactions";
+const userCollection = "users";
+const entityCollection = "entity";
+const landCollection = "land";
+const transacsCollection = "transaction";
 
-export { user, admin, entity, transacs };
+export { userCollection, entityCollection, landCollection, transacsCollection };
