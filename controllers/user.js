@@ -6,6 +6,7 @@ import {
   exists,
   validStateCodes,
   inputValidation,
+  arrayLength,
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
@@ -26,10 +27,16 @@ const getPropertiesOfUser = async (req, res) => {
     });
 
   try {
-    const lands = await userData.getPropertiesOfUser();
+    const lands = await userData.getLandsOfUserID(id);
+    let emptyLands = false;
+    if (!arrayLength(lands, 1)) emptyLands = true;
     res
       .status(200)
-      .render("myProperties", { title: "Properties", lands: lands });
+      .render("myProperties", {
+        title: "Properties",
+        lands: lands,
+        emptyLands: emptyLands,
+      });
   } catch (error) {
     res.status(404).render("Error", {
       title: "Error",
@@ -132,7 +139,10 @@ const getTransactionsofUserID = async (req, res) => {
   }
 };
 
-const setUpProfile = async(req, res) =>{
- 
-}
-export { getPropertiesOfUser, getProfile, getTransactionsofUserID, setUpProfile };
+const setUpProfile = async (req, res) => {};
+export {
+  getPropertiesOfUser,
+  getProfile,
+  getTransactionsofUserID,
+  setUpProfile,
+};

@@ -1,6 +1,6 @@
 import validation from "../utils/validation.js";
 import { getClient } from "../config/connection.js";
-import { checkInputType, exists } from "../utils/helpers.js";
+import { arrayLength, checkInputType, exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 import hash from "../utils/encryption.js";
 const getOwnerByLandId = async (landID) => {
@@ -103,12 +103,6 @@ const getLandsOfUserID = async (id) => {
   if (id.trim().length === 0) throw new Error("ID cannot be of empty spaces");
   id = id.trim();
   if (!ObjectId.isValid(id)) throw new Error("Invalid Object ID");
-  let user;
-  try {
-    user = await getUserById(id);
-  } catch (error) {
-    throw new Error(error.message);
-  }
 
   const client = getClient();
   const result = await client
@@ -120,7 +114,7 @@ const getLandsOfUserID = async (id) => {
   result[0].land.forEach((element) => {
     landIds.push(element._id);
   });
-
+  if (!arrayLength(landIds, 1)) return [];
   const lands = await client
     .collection("land")
     .find({ _id: { $in: landIds } })
