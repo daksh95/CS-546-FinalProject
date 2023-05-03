@@ -2,22 +2,25 @@ import { Router } from "express";
 const router = Router();
 
 import {
-  getAccountsForApproval,
-  getLandsForApproval,
-  getTransactionsForApproval
+  getAccountsListForApproval,
+  getLandsListForApproval,
+  getTransactionsListForApproval,
+  getApprovalAccount,
+  getApprovalLand,
+  getApprovalTransaction
 } from "../controllers/admin.js";
 
 router.route('/profile').get((req, res) => {
   res.render('admin/adminHome', { title: 'Home' });
 });
 
-router.route('/approvals/account').get(getAccountsForApproval);
-router.route('/approvals/account/:accountId').get().post();
+router.route('/approvals/account').get(getAccountsListForApproval);
+router.route('/approvals/account/:accountId').get(getApprovalAccount).post();
 
-router.route('/approvals/land').get(getLandsForApproval);
-router.route('/approvals/land/:landId').get().post();
+router.route('/approvals/land').get(getLandsListForApproval);
+router.route('/approvals/land/:landId').get(getApprovalLand).post();
 
-router.route('/approvals/transaction').get(getTransactionsForApproval);
-router.route('/approvals/transaction/:transactionId').get().post();
+router.route('/approvals/transaction').get(getTransactionsListForApproval);
+router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post();
 
 export default router;

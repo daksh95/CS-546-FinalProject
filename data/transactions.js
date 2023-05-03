@@ -103,6 +103,20 @@ const terminateTransaction = async (transactionId, adminComment) => {
 
 const updateBid = async (transactionId, bidAmount) => {};
 
+const getTransactionById = async (transactionId) => {
+  transactionId = validation.validObjectId(transactionId, "transactionId");
+  
+  const client = getClient();
+  const result = await client
+    .collection('transaction')
+    .findOne({ _id: new ObjectId(transactionId) });
+
+  if (!result) throw `No transaction found for the given transactionId: ${transactionId}`;
+
+  result._id = result._id.toString();
+  return result;
+}
+
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,
   getTransactionsBySellerId: getTransactionsBySellerId,
@@ -110,6 +124,7 @@ const transactionData = {
   sellerApproved: sellerApproved,
   createTransaction: createTransaction,
   terminateTransaction: terminateTransaction,
+  getTransactionById: getTransactionById
 };
 
 export default transactionData;
