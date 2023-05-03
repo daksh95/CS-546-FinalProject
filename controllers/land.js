@@ -6,6 +6,7 @@ import {
   exists,
   validStateCodes,
   inputValidation,
+  arrayLength,
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
@@ -34,9 +35,17 @@ const getLand = async (req, res) => {
   }
   let pendingTransaction = false;
   try {
-    //check if transaction is already there between buyer and seller for this land (waiting for user id)
+    const buyerId = req.session.user.id;
+    let transactions = await transactionData.getTransactionsByLandId(id);
+    for (let i = 0; i < transactions.length; i++) {
+      if (
+        transactions[i].buyerId === buyerId &&
+        transactions[i].status === "pending"
+      )
+        pendingTransaction = true;
+    }
   } catch (error) {
-    //
+    pendingTransaction = false;
   }
   try {
     const land = await landData.getLand(id);
@@ -45,6 +54,7 @@ const getLand = async (req, res) => {
       land: land,
       owner: owner,
       isOwner: isOwner,
+      pendingTransaction: pendingTransaction,
     });
   } catch (error) {
     res.status(404).render("Error", {
@@ -59,13 +69,16 @@ const getLand = async (req, res) => {
 const getLandByState = async (req, res) => {
   try {
     let lands = await landData.getAllLand();
+    let empty_lands = false;
+    if (!arrayLength(lands, 1)) empty_lands = true;
     res.status(200).render("displayLandByState", {
       title: "Lands",
       landByState: lands,
       state: undefined,
+      empty_lands: empty_lands,
     });
   } catch (error) {
-    res.status(404).redner("Error", {
+    res.status(404).render("Error", {
       title: "Error",
       hasError: true,
       error: [error.message],
@@ -97,10 +110,13 @@ const postLandByState = async (req, res) => {
 
   try {
     let landByState = await landData.getLandByState(state);
+    let empty_lands = false;
+    if (!arrayLength(landByState, 1)) empty_lands = true;
     res.status(200).render("displayLandByState", {
       title: "Lands",
       landByState: landByState,
       state: state,
+      empty_lands: empty_lands,
     });
   } catch (error) {
     return res.status(400).render("displayLandByState", {
@@ -149,10 +165,13 @@ const postFilterPrice = async (req, res) => {
 
   try {
     let filteredLands = await landData.filterByPrice(state, minPrice, maxPrice);
+    let empty_lands = false;
+    if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
       title: "Lands",
       landByState: filteredLands,
       state: state,
+      empty_lands: empty_lands,
     });
   } catch (error) {
     return res.status(400).render("displayLandByState", {
@@ -202,10 +221,13 @@ const postFilterArea = async (req, res) => {
 
   try {
     let filteredLands = await landData.filterByArea(state, minArea, maxArea);
+    let empty_lands = false;
+    if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
       title: "Lands",
       landByState: filteredLands,
       state: state,
+      empty_lands: empty_lands,
     });
   } catch (error) {
     return res.status(400).render("displayLandByState", {

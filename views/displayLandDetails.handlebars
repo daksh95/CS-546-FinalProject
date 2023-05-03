@@ -43,9 +43,16 @@
             <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button>View Transaction</button></a>
             {{else}}
             {{#if land.sale.onSale}}
+            {{#if pendingTransaction}}
+            <button type="button" class="btn btn-primary" data-toggle="tooltip"
+                title="You already have a pending transaction" disabled>
+                Place Bid
+            </button>
+            {{else}}
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bidModal">
                 Place Bid
             </button>
+            {{/if}}
             <div class="modal" id="bidModal">
                 <div class="modal-dialog">
                     <div class="modal-content">

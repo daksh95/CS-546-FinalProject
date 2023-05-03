@@ -47,17 +47,23 @@ const getTransactionsByLandId = async (id) => {
     .collection("transaction")
     .find({ landId: new ObjectId(id) }, { _id: 0, buyer: 1, status: 1 })
     .toArray();
-  if (result.lenght < 1) {
+  if (result.length < 1) {
     throw "No transaction from that ID";
   }
-  // Get users by ID.
-  const { name: buyerName } = await userData.getUserById(result.buyer.id);
-  //
-  const data = {
-    buyer: buyerName,
-    bid: result.buyer.bid,
-    status: result.status,
-  };
+  let data = [];
+  for (let i = 0; i < result.length; i++) {
+    // Get users by ID.
+    const { name: buyerName } = await userData.getUserById(
+      result[i].buyer._id.toString()
+    );
+    data = {
+      buyerId: result[i].buyer._id.toString(),
+      buyer: buyerName,
+      bid: result[i].buyer.bid,
+      status: result[i].status,
+    };
+    //
+  }
   return data;
 };
 
@@ -105,17 +111,18 @@ const updateBid = async (transactionId, bidAmount) => {};
 
 const getTransactionById = async (transactionId) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
-  
+
   const client = getClient();
   const result = await client
-    .collection('transaction')
+    .collection("transaction")
     .findOne({ _id: new ObjectId(transactionId) });
 
-  if (!result) throw `No transaction found for the given transactionId: ${transactionId}`;
+  if (!result)
+    throw `No transaction found for the given transactionId: ${transactionId}`;
 
   result._id = result._id.toString();
   return result;
-}
+};
 
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,
@@ -124,7 +131,7 @@ const transactionData = {
   sellerApproved: sellerApproved,
   createTransaction: createTransaction,
   terminateTransaction: terminateTransaction,
-  getTransactionById: getTransactionById
+  getTransactionById: getTransactionById,
 };
 
 export default transactionData;
