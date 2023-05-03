@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { inputValidation } from "../utils/helpers.js";
-import userData from "./user.js";
 
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByBuyerId = async (id) => {

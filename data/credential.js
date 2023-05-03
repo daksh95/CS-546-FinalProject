@@ -5,7 +5,7 @@ import { getClient } from "../config/connection.js";
 //requies: typeOfUser, emailId, password
 const addCredential = async(object) =>{
     //initalizing variables
-    let {typeOfUser, emailId,password} = object; 
+    let {typeOfUser, emailId, password} = object; 
     let queryData ={};
     const client = getClient();
 
@@ -23,8 +23,9 @@ const addCredential = async(object) =>{
     }
 
     // Validating string
-    queryData.typeOfUser = validation.validString(typeOfUser, "typeOfUser");
-    queryData.password = validation.validString(password, "password");
+    queryData.typeOfUser = validation.validTypeOfUser(typeOfUser);
+    queryData.password = validation.validPassword(password);
+    queryData.approved = false;
     
     //hashing the password
     queryData.password = await hash.generateHash(queryData.password);
@@ -35,19 +36,17 @@ const addCredential = async(object) =>{
     
     //error handling, incase credential is not inserted
     if (!result.acknowledged || !result.insertedId) throw 'Could not create account';
-    return "Created";
+    return true;
 }
 const getCredentialByEmailId = async(emailId) =>{
     
     //validating emailId
     emailId = validation.validEmail(emailId);
-    
+
     //initializing db reference
     const client = getClient();
-
     //fetching credentials
-    let result = await client.collection("credential").findOne({"emailId": emailId}).Project({_id:1, password:1, typeof:1});
-    
+    let result = await client.collection("credential").findOne({"emailId": emailId});
     //Error handling
     if (result === null) throw "user not found";
    
@@ -81,7 +80,7 @@ const updateEmailId = async(emailId, newEmailId) =>{
     //Error handling
     if (result.lastErrorObject.n === 0) throw 'Could not update';
     
-    return "updated";
+    return true;
 }
 
 const updatePassword = async(password, emailId)=>{ 
@@ -108,7 +107,7 @@ const updatePassword = async(password, emailId)=>{
     
     result = await client.collection("credential").findOneAndUpdate({_id: userInfo._id},{$push: {previousPassword: userInfo.password} }, {returnDocument: 'after'} ); 
     if (result.lastErrorObject.n === 0) throw 'Could not update';
-    return "updated";
+    return true;
 
 }
 
