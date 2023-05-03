@@ -37,7 +37,7 @@ const postLogin = async (req, res) =>{
         {title: "Login Page", email: emailInput, pasword: passwordInput, error: "Invalid Email or Password"}); 
         return;
     }
-
+    
     //create session
     req.session.user = {email:emailInput, id: validUser.id, typeOfUser: validUser.typeOfUser};
     console.log("here i am in");

@@ -1,7 +1,6 @@
 import express from "express";
 const routes = express.Router();
 import {
-  getAllLand,
   getLand,
   updateLand,
   postLand,

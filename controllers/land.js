@@ -55,10 +55,6 @@ const getLand = async (req, res) => {
   }
   // res.status(200).json({ data: result });/
 };
-const getAllLand = async (req, res) => {
-  const result = await landData.getAllLand();
-  res.status(200).json(result);
-};
 
 const getLandByState = async (req, res) => {
   try {
@@ -273,7 +269,6 @@ const postLand = async (req, res) => {};
 const removeLand = async (id) => {};
 
 export {
-  getAllLand,
   getLand,
   updateLand,
   postLand,
