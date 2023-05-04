@@ -30,13 +30,11 @@ const getPropertiesOfUser = async (req, res) => {
     const lands = await userData.getLandsOfUserID(id);
     let emptyLands = false;
     if (!arrayLength(lands, 1)) emptyLands = true;
-    res
-      .status(200)
-      .render("myProperties", {
-        title: "Properties",
-        lands: lands,
-        emptyLands: emptyLands,
-      });
+    res.status(200).render("myProperties", {
+      title: "Properties",
+      lands: lands,
+      emptyLands: emptyLands,
+    });
   } catch (error) {
     res.status(404).render("Error", {
       title: "Error",
@@ -96,16 +94,21 @@ const getTransactionsofUserID = async (req, res) => {
     });
 
   let buyerTransaction = [];
+  let emptyBuyerTransaction = false;
   try {
     let data = await transactionData.getTransactionsByBuyerId(id);
-    data.forEach(async (element) => {
-      let land = await landData.getLand(element.landId);
-      buyerTransaction.push({
-        name: land.address,
-        landId: element.landId,
-        status: element.status,
+    if (!arrayLength(data, 1)) emptyBuyerTransaction = true;
+    else {
+      data.forEach(async (element) => {
+        let land = await landData.getLand(element.landId);
+        buyerTransaction.push({
+          transactionId: element.transactionId,
+          name: land.address,
+          landId: element.landId,
+          status: element.status,
+        });
       });
-    });
+    }
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",
@@ -115,20 +118,27 @@ const getTransactionsofUserID = async (req, res) => {
   }
 
   let sellerTransaction = [];
+  let emptySellerTransaction = false;
   try {
     let data = await transactionData.getTransactionsBySellerId(id);
-    data.forEach(async (element) => {
-      let land = await landData.getLand(element.landId);
-      sellerTransaction.push({
-        name: land.address,
-        landId: element.landId,
-        status: element.status,
+    if (!arrayLength(emptyBuyerTransaction, 1)) emptyBuyerTransaction = true;
+    else {
+      data.forEach(async (element) => {
+        let land = await landData.getLand(element.landId);
+        sellerTransaction.push({
+          transactionId: element.transactionId,
+          name: land.address,
+          landId: element.landId,
+          status: element.status,
+        });
       });
-    });
+    }
     return res.status(200).render("myTransactions", {
       title: "Transactions",
       sellerTransaction: sellerTransaction,
       buyerTransaction: buyerTransaction,
+      emptyBuyerTransaction: emptyBuyerTransaction,
+      emptySellerTransaction: emptySellerTransaction,
     });
   } catch (error) {
     return res.status(400).render("Error", {
@@ -139,10 +149,13 @@ const getTransactionsofUserID = async (req, res) => {
   }
 };
 
+const getTransactionDetails = async (req, res) => {};
+
 const setUpProfile = async (req, res) => {};
 export {
   getPropertiesOfUser,
   getProfile,
   getTransactionsofUserID,
   setUpProfile,
+  getTransactionDetails,
 };

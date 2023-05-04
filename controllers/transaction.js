@@ -1,9 +1,10 @@
-import transactionData from "../data/transactions.js";  
+import transactionData from "../data/transactions.js";
 import {
   checkInputType,
   exists,
   validStateCodes,
   inputValidation,
+  arrayLength,
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
@@ -24,9 +25,12 @@ const getAllTransactionsofLand = async (req, res) => {
     });
   try {
     let transactions = await transactionData.getTransactionsByLandId(landId);
+    let emptyTransactions = false;
+    if (!arrayLength(transactions, 1)) emptyTransactions = true;
     return res.status(200).render("getTransactionsofLand", {
       title: "Land Transactions",
       transactions: transactions,
+      emptyTransactions: emptyTransactions,
     });
   } catch (error) {
     return res.status(400).render("Error", {
