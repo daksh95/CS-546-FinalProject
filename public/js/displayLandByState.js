@@ -77,7 +77,7 @@
       resultsDiv.classList.add("col-sm-8");
       for (let i = 0; i < landByState.length; i++) {
         aElement = document.createElement("a");
-        aElement.href = "/land/" + landByState[i].id;
+        aElement.href = "/land/" + landByState[i]._id;
         aElement.classList.add("text-decoration-none");
         aElement.classList.add("text-info");
         divElement = document.createElement("div");

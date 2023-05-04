@@ -18,7 +18,7 @@ const getTransactionsByBuyerId = async (id) => {
     data.push({
       transactionId: result[i]._id,
       landId: result[i].landId,
-      status: result[i].buyer.status,
+      status: result[i].status,
     });
   }
 
@@ -39,7 +39,7 @@ const getTransactionsBySellerId = async (id) => {
     data.push({
       transactionId: result[i]._id,
       landId: result[i].landId,
-      status: result[i].seller.status
+      status: result[i].seller.status,
     });
   }
   return data;
@@ -73,22 +73,40 @@ const getTransactionsByLandId = async (id) => {
   return data;
 };
 
-const sellerApproved = async (transactionId, sellersId) => {
+const sellerApproved = async (transactionId, sellerId, value) => {
   //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
   transactionId = validation.validObjectId(transactionId, "transactionId");
-  sellersId = validation.validObjectId(sellersId, "sellersId");
+  sellerId = validation.validObjectId(sellerId, "sellersId");
+
+  //validate value field same as route validation
+
   const client = getClient();
-  const result = await client
-    .collection("transaction")
-    .findOneAndUpdate(
-      { _id: new ObjectId(transactionId), seller: new ObjectId(sellersId) },
-      { sellersStatus: true },
+  if (value === "approve") {
+    const result = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+        "seller._id": new ObjectId(sellerId),
+      },
+      { $set: { "seller.status": "approved" } },
       { returnDocument: "after" }
     );
-  if (result.lastErrorObject.n < 1) {
-    throw "could not be approved";
+    if (result.lastErrorObject.n < 1) {
+      throw "Could not be approved";
+    }
+  } else if (value === "reject") {
+    const result = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+        "seller._id": new ObjectId(sellerId),
+      },
+      { $set: { "seller.status": "rejected" } },
+      { returnDocument: "after" }
+    );
+    if (result.lastErrorObject.n < 1) {
+      throw "Could not be approved";
+    }
   }
-  return result;
+  return;
 };
 
 const createTransaction = async (bid, landId, sellerId) => {};

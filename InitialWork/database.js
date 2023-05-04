@@ -68,7 +68,7 @@ const transaction = {
   },
   seller: {
     _id: ObjectId(),
-    approvedStatus: Boolean,  //True or False, if empty then approval pending 
+    status: String("pending, approved, rejected"),   
   }, //change in structure
   priceSoldFor: Number,
   surveyor: {
