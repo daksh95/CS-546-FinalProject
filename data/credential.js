@@ -45,8 +45,11 @@ const getCredentialByEmailId = async(emailId) =>{
 
     //initializing db reference
     const client = getClient();
+    console.log(client);
+
     //fetching credentials
     let result = await client.collection("credential").findOne({"emailId": emailId});
+    console.log(result);
     //Error handling
     if (result === null) throw "user not found";
    

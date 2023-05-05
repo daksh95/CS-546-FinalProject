@@ -8,15 +8,16 @@ const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
 };
 
-const postLogin = async (req, res) => {
-  let { emailInput, passwordInput } = req.body;
-  //validation for email
-  emailInput = validation.validEmail(emailInput);
-
-  //validation for password
-  passwordInput = validation.validPassword(passwordInput);
-
-  let validUser;
+const postLogin = async (req, res) =>{
+    let {emailInput, passwordInput} = req.body;
+    //validation for email
+    emailInput = validation.validEmail(emailInput);
+    
+    //validation for password
+    passwordInput = validation.validPassword(passwordInput);
+    
+    let validUser;
+    console.log(emailInput);
 
   //check if user exist
   try {

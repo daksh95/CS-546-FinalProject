@@ -1,0 +1,48 @@
+<form action= "/user/{{id}}/land/add" method="POST" id = "addLand-form">
+        
+        <label for = "line1Input" id = "line1-text">Line1: </label>
+        <input type="text" name="line1Input" id = "line1Input"> <br>   
+        
+        <label for = "line2Input" id = "line2-text">Line2:</label>
+        <input type="text" name="line2Input" id = "line2Input">   
+        
+        <label for = "cityInput" id = "city-text">City:</label>
+        <input type="text" name="cityInput" id = "cityInput"> <br>
+
+        <label for = "stateInput" id = "state-text">State:</label>
+        <input type="text" name="stateInput" id = "stateInput">  
+
+        <label for = "zipCodeInput" id = "zipCode-num">Zip:</label>
+        <input type="number" name="zipCodeInput" id = "zipCodeInput"> <br>   
+        
+        <label for = "typeInput" id = "type-dropdown">Type of Property:</label>
+        <select name="typeInput" id="typeInput">
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>    
+            <option value="industrial">Industrial</option>    
+            <option value="agricultural">Agricultural</option>    
+        </select>
+        <br>  
+
+        <label for="dimensionsLengthInput" id = "dimensionsLength-num">Length</label>
+        <input type="number" name="dimensionsLengthInput" id = "dimensionsLengthInput">  <br>
+
+        <label for="dimensionsBreadthInput" id = "dimensionsB',.'readth-num">Breadth</label>
+        <input type="number" name="dimensionsBreadthInput" id = "dimensionsBreadthInput">   <br>
+        
+        {{!-- TODO dynamic restriction thing --}}
+        {{!-- for the time being --}}
+
+        <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
+        <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br> 
+     
+        <button type="submit" >submit </button>
+    </form>   
+
+<ul id = "error">
+    {{#if error}}
+        {{#each error}}
+        <li>{{this}}</li>
+    {{/each}}
+{{/if}}
+</ul>
