@@ -34,6 +34,7 @@ Data functions (for land surveyors/titleCompany/government): -- Tanya
 6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js
 7) filterByStatus (filter pending transactions) -- transaction.js
 8) assignEntity (assign entities based on how many pending transactions they have, max pending transactions can be ONLY 25) -- transaction.js
+9) createEntity (this'll create a new entity)
 
 Data functions (for admin): -- Daksh
 

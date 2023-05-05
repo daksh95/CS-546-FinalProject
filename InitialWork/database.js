@@ -50,11 +50,12 @@ const land = {
 const entity = {
   _id: new ObjectId(),
   name: String,
-  type: String,
+  role: String,
   contactInfo: String, //phone number
   emailId: String,
   Website: String,
   license: String,
+  transactions: Array,
   approved: Boolean,
 };
 
@@ -67,6 +68,7 @@ const transaction = {
     bid: Number,
   },
   sellerId: ObjectId(), //change in name
+  sellersStatus: Boolean,
   priceSoldFor: Number,
   surveyor: {
     _id: ObjectId(),

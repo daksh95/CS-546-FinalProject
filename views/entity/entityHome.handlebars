@@ -1,0 +1,12 @@
+ <h1>Wecome {{entityDetails.name}}!</h1>
+    <main>
+        <p>Below are transactions assigned to you:</p>
+        {{#each transactions}}
+        <li>
+            Transaction id is: {{transactions._id}}
+            <br>
+            {{#if entityDetails.role == "land surveyor"}}
+            Transaction status is: {{transactions.surveyorApproval}}
+        </li>
+    </main>
+    

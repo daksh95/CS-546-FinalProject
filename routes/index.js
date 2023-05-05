@@ -1,12 +1,15 @@
 import landRoutes from "./land.js";
 import userRoutes from "./user.js";
 import transactionRoutes from "./transaction.js";
-import adminRoutes from './admin.js';
-import {loginRoutes, signUpRoutes} from "./authentication.js";
+import adminRoutes from "./admin.js";
+import entityRoutes from "./entity.js";
+import { loginRoutes, signUpRoutes } from "./authentication.js";
+
 const constructorMethod = (app) => {
   app.use("/land", landRoutes);
   app.use("/user", userRoutes);
   app.use("/admin", adminRoutes);
+  app.use("/entity", entityRoutes);
   app.use("/transactions", transactionRoutes);
   app.use("/login", loginRoutes);
   app.use("/signup", signUpRoutes);
