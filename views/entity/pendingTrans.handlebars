@@ -17,7 +17,19 @@
 </header>
 
 <main>
-    <h1>Wecome {{name}}!</h1>
-    <p>Total transactions assigned to you (till date): {{total}}</p>  
-    <p>Total pending transactions: {{pending}}</p>  
+    <h3>Below are all the pending transactions on your account:</h3>
+    {{#forEach transactions}}
+    <ul class="transactions list">
+        <li class="transaction id">Transaction ID: <a href="/entity/transactionDetails/:{{transactions._id}}">{{transactions._id}}</a></li>
+        {{#if landSurveyor}}
+        <li class="transaction status">Transaction status: {{transactions.surveyor.status}}</li>
+        {{/if}}
+        {{#if titleC}}
+        <li class="transaction status">Transaction status: {{transactions.titleCompany.status}}</li>
+        {{/if}}
+        {{#if govt}}
+        <li class="transaction status">Transaction status: {{transactions.government.status}}</li>
+        {{/if}}
+    </ul>
+    {{/forEach}}
 </main>

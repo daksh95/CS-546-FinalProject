@@ -8,3 +8,4 @@
 - [ ] Ask professor or TAs about using XSS (whether we have to use only for forms, **or do we use it in GET /{id} routes too**)
 - [x] Generate json for zipcode or API
 - [ ] Change password functionality
+- [ ] Logout button on all pages

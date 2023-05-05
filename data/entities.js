@@ -4,13 +4,13 @@ import { entityCollection, transacsCollection } from "./collectionNames.js";
 
 const addNewEntity = async (
   name,
-  contactNumber,
+  role,
+  contactInfo,
   emailId,
-  website,
-  license,
-  role
+  Website,
+  license
 ) => {
-  if (!name || !contactNumber || !emailId || !website || !license || !role)
+  if (!name || !contactInfo || !emailId || !Website || !license || !role)
     throw `Recheck your inputs, one or more inputs are missing!`;
 
   if (typeof name !== "string") throw `Entity name must be a string!`;
@@ -18,9 +18,8 @@ const addNewEntity = async (
     throw `Entity name cannot be an empty string or just spaces!`;
   name = name.trim();
 
-  if (typeof contactNumber !== "number")
-    throw `Contact number must be a number!`;
-  let numStr = contactNumber.toString();
+  if (typeof contactInfo !== "number") throw `Contact number must be a number!`;
+  let numStr = contactInfo.toString();
   if (numStr.length !== 10) throw `Input a valid 10-digit contact number!`;
 
   if (typeof emailId !== "string") throw `Email address must be a string!`;
@@ -30,13 +29,13 @@ const addNewEntity = async (
   if (!bleh.test(emailId)) throw `Invalid email address!`;
   emailId = emailId.trim().toLowerCase();
 
-  if (typeof website !== "string") throw `Band website must be a string!`;
+  if (typeof Website !== "string") throw `Band website must be a string!`;
   if (website.trim().length === 0)
     throw `Band website cannot be an empty string or just spaces!`;
   if (
-    !website.includes("http://www.") ||
-    !website.includes(".com") ||
-    website.trim().length < 17
+    !Website.includes("http://www.") ||
+    !Website.includes(".com") ||
+    Website.trim().length < 17
   )
     throw `Invalid entity website!`;
   website = website.trim();
@@ -61,10 +60,11 @@ const addNewEntity = async (
 
   let newEntity = {
     name: name,
-    contactNumber: contactNumber,
-    emailId: emailId,
-    license: license,
     role: role,
+    contactInfo: contactInfo,
+    emailId: emailId,
+    Website: Website,
+    license: license,
     transactions: [],
     approved: false,
   };
@@ -142,7 +142,7 @@ const entityApproved = async (id, role) => {
       .collection(transacsCollection)
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
-        { $set: { "surveyor.status": true } },
+        { $set: { "surveyor.status": "approved" } },
         { returnDocument: "after" }
       );
   } else if (role === "title company") {
@@ -150,7 +150,7 @@ const entityApproved = async (id, role) => {
       .collection(transacsCollection)
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
-        { $set: { "titleCompany.status": true } },
+        { $set: { "titleCompany.status": "approved" } },
         { returnDocument: "after" }
       );
   } else if (role === "government") {
@@ -158,7 +158,7 @@ const entityApproved = async (id, role) => {
       .collection(transacsCollection)
       .findOneAndUpdate(
         { _id: new ObjectId(id) },
-        { $set: { "government.status": true } },
+        { $set: { "government.status": "approved" } },
         { returnDocument: "after" }
       );
   }
@@ -195,7 +195,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
       { _id: new ObjectId(id) },
       {
         $set: {
-          "surveyor.status": false,
+          "surveyor.status": "rejected",
           "surveyor.Comment": comment,
           status: "rejected",
         },
@@ -207,7 +207,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
       { _id: new ObjectId(id) },
       {
         $set: {
-          "titleCompany.status": false,
+          "titleCompany.status": "rejected",
           "titleCompany.Comment": comment,
           status: "rejected",
         },
@@ -219,7 +219,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
       { _id: new ObjectId(id) },
       {
         $set: {
-          "government.status": false,
+          "government.status": "rejected",
           "government.Comment": comment,
           status: "rejected",
         },
@@ -234,7 +234,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
   return result;
 };
 
-const filterByStatus = async (id) => {
+const pendingTransactionsByEntityId = async (id) => {
   // Change validations
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
@@ -246,21 +246,21 @@ const filterByStatus = async (id) => {
     if (entity.role === "land surveyor") {
       if (
         transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].surveyor.status === false
+        transactions[i].surveyor.status === "pending"
       ) {
         result.push(transactions[i]);
       }
     } else if (entity.role === "title company") {
       if (
         transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].titleCompany.status === false
+        transactions[i].titleCompany.status === "pending"
       ) {
         result.push(transactions[i]);
       }
     } else if (entity.role === "government") {
       if (
         transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].government.status === false
+        transactions[i].government.status === "pending"
       ) {
         result.push(transactions[i]);
       }
@@ -289,7 +289,7 @@ const assignEntity = async (id, role) => {
   const client = await getClient();
   const entityData = client.collection(entityCollection);
 
-  if (transaction.sellersStatus === true) {
+  if (transaction.seller.status === "approved") {
     let meh = await entityData.find({ role: role, approval: true }).toArray();
     const random = Math.floor(Math.random() * meh.length + 1);
     for (let i = 0; i < meh.length; i++) {
@@ -317,7 +317,7 @@ const assignEntity = async (id, role) => {
 };
 
 const pendingTransactionsCount = async (id) => {
-  const transactions = await this.filterByStatus(id);
+  const transactions = await this.pendingTransactionsByEntityId(id);
   return transactions.length;
 };
 
@@ -334,7 +334,7 @@ const entityData = {
   getTransactionsByEntityId,
   entityApproved,
   entityTerminateTransaction,
-  filterByStatus,
+  pendingTransactionsByEntityId,
   assignEntity,
   pendingTransactionsCount,
   totalTransactionsCount,

@@ -1,15 +1,21 @@
-import express from "express";
-const routes = express.Router();
-import //   getPropertiesOfUser,
-//   getProfile,
-//   getTransactionsofUserID,
-//   setUpProfile
+import { Router } from "express";
+const router = Router();
 
-"../controllers/entities.js";
-import { getTransactionsofUserID } from "../controllers/user.js";
+import {
+  getHome,
+  allTransacs,
+  pendingTransacs,
+  transDetails,
+} from "../controllers/entities";
 
-// routes.route("/").get(getTransactionsByEntityId);
-// routes.route("/:id/profile").get(getProfile).post(setUpProfile);
-// routes.route("/:id/transactions").get(getTransactionsofUserID).post();
+router.route("/entity").get(getHome);
 
-export default routes;
+router.route("/entity/myProfile").get((req, res) => {
+  res.render("entity/profile", { title: "My Profile" });
+});
+
+router.route("/entity/allTransactions/:entityId").get(allTransacs);
+router.route("/entity/pendingTransactions/:entityId").get(pendingTransacs);
+router.route("/entity/transactionDetails/:transactionId").get(transDetails);
+
+export default router;

@@ -74,17 +74,17 @@ const transaction = {
   priceSoldFor: Number,
   surveyor: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   titleCompany: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   government: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   admin: {
