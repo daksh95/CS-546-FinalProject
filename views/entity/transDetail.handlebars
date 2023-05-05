@@ -17,19 +17,18 @@
 </header>
 
 <main>
-    <h1>Welcome {{entity.name}} to your profile!</h1>
-    <div class="container">
-        {{#if createdProfile}}
-        <a href="#"><button class="btn btn-success pull-right">Edit Profile</button></a>
-        <p>ID: {{entity._id}}</p>
-        <p>Name: {{entity.name}}</p>
-        <p>Role: {{entity.role}}</p>
-        <p>Contact information: {{entity.contactInfo}}</p>
-        <p>EmailId: {{entity.emailId}}</p>
-        <p>Website: {{entity.Website}}</p>
-        <p>License: {{entity.license}}</p>
-        {{else}}
-        <a href="#"><button class="btn btn-success pull-right">Create profile</button></a>
-        {{/if}}
-    </div>
+    <h1>Below are all the required details:</h1>
+    <br>
+    <h3>Below are the land details:</h3>
+    <p>ID: {{land._id}}</p>
+    <p>Dimensions: {{entity.name}}</p>
+    <p>Role: {{entity.role}}</p>
+    <p>Contact information: {{entity.contactInfo}}</p>
+    <p>EmailId: {{entity.emailId}}</p>
+    <p>Website: {{entity.Website}}</p>
+    <p>License: {{entity.license}}</p>
+    <br><br>
+    <h3>Below are the seller details:</h3>
+    <br><br>
+    <h3>Below are the buyer details:</h3>
 </main>

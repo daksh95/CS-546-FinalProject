@@ -8,15 +8,16 @@ const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
 };
 
-const postLogin = async (req, res) => {
-  let { emailInput, passwordInput } = req.body;
-  //validation for email
-  emailInput = validation.validEmail(emailInput);
-
-  //validation for password
-  passwordInput = validation.validPassword(passwordInput);
-
-  let validUser;
+const postLogin = async (req, res) =>{
+    let {emailInput, passwordInput} = req.body;
+    //validation for email
+    emailInput = validation.validEmail(emailInput);
+    
+    //validation for password
+    passwordInput = validation.validPassword(passwordInput);
+    
+    let validUser;
+    console.log(emailInput);
 
   //check if user exist
   try {
@@ -53,12 +54,12 @@ const postLogin = async (req, res) => {
   };
   console.log("here i am in");
   // check if user is approved
-  if (!validUser.approved) {
-    //set up profile
-    res.status(200).redirect("/land");
-    // res.status(200).redirect(`/user/${userApproved.id}/profile`);
-    return;
-  }
+  // if (!validUser.approved) {
+  //   //set up profile
+  //   res.status(404).render("error", { Title: "Error", hasError });
+  //   // res.status(200).redirect(`/user/${userApproved.id}/profile`);
+  //   return;
+  // }
 
   const userApproved = await userData.getUserByEmail(emailInput);
   //Valid credential therfore, redirect them to appropriate pages;
@@ -74,16 +75,14 @@ const postLogin = async (req, res) => {
     return;
   }
 
-  //title company
-  if (validUser.typeOfUser == "titleCompany") {
-  }
-
-  //surveyor
-  if (validUser.typeOfUser == "surveyor") {
-  }
-
-  //government
-  if (validUser.typeOfUser == "government") {
+  //land surveyor or title company or government, basically, any entity
+  if (
+    validUser.typeOfUser == "landSurveyor" ||
+    validUser.typeOfUser == "titleCompany" ||
+    validUser.typeOfUser == "government"
+  ) {
+    res.status(200).redirect("/entity");
+    return;
   }
 };
 

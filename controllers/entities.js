@@ -1,8 +1,12 @@
 import entityData from "../data/entities.js";
+import transactionData from "../data/transactions.js";
+import userData from "../data/user.js";
+import landData from "../data/land.js";
+import { exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
 const getHome = async (req, res) => {
-  let id = req.session.user.id;
+  let id = req.session.user._id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
@@ -36,8 +40,34 @@ const getHome = async (req, res) => {
   }
 };
 
-const allTransacs = async (req, res) => {
+const getProfile = async (req, res) => {
   let id = req.session.user.id;
+  let error = [];
+  if (!exists(id)) error.push("ID parameter does not exists");
+  if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    let entity = await entityData.getEntityById(id);
+    res.render("entity/profile", {
+      entity: entity,
+    });
+  } catch (error) {
+    res.status(404).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const allTransacs = async (req, res) => {
+  let id = req.params.entityId;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
@@ -73,7 +103,7 @@ const allTransacs = async (req, res) => {
 };
 
 const pendingTransacs = async (req, res) => {
-  let id = req.session.user.id;
+  let id = req.params.entityId;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
@@ -111,6 +141,38 @@ const pendingTransacs = async (req, res) => {
 const transDetails = async (req, res) => {
   // get transaction by id -> ussmein se buyer id and seller id and land id nikal lo -> getUserById for both buyer and seller, getLandById -> print details of lands, buyer and seller
   // -> give radio or dropdown options of approve/rejected transaction and a comment box(compulsary) -> ajax/redirect-render(with red mein sentence "Your response has been sent!") same page again
+  let transactionId = req.params.transactionId;
+  let error = [];
+  if (!exists(id)) error.push("ID parameter does not exists");
+  if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    let transaction = await transactionData.getTransactionById(transactionId);
+    let sellerId = transaction.seller._id;
+    let buyerId = transaction.buyer._id;
+    let landId = transaction.land._id;
+    let seller = await userData.getUserById(sellerId);
+    let buyer = await userData.getUserById(buyerId);
+    let land = await landData.getLand(landId);
+    res.render("entity/transDetail", {
+      transaction: transactiontransaction,
+      seller: seller,
+      buyer: buyer,
+      land: land,
+    });
+  } catch (error) {
+    res.status(404).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
 };
 
-export { getHome, allTransacs, pendingTransacs, transDetails };
+export { getHome, getProfile, allTransacs, pendingTransacs, transDetails };

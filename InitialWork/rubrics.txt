@@ -1,0 +1,22 @@
+Rubric web
+1. no run 0 score
+2. start command forget 5
+3. node module 5
+4. 10 no client side js
+5. 5  if not atleast 1 ajax from,  both server and client stuff.
+6. 10 custom css
+7. 5 very low css [15 css rules or abve]
+8. 10 XXS 
+9. form validation and logically validation of data: 2 per field, and 5 cap per form. 
+10. package.json correct 2 per missing dependency
+11. access control 5
+12. 2 per page for invalid html and 6 cap her page
+11. totally issue same as above
+12. missing core feature 10 per feature
+13. core feature should be exact as doc 5 
+14. email repeat signup10 points
+15. bugs and usability issues 2 to 10 points[ if server crash 10 points per crash]
+16. 10 enough seed data. [no data entry by ta or prof]
+17. extra features 5 per extra. up to 3 extra features max. 
+18. complexity bonus  up to15 points.
+ so max can be 115 or 130. [ complexity bonus are rare]

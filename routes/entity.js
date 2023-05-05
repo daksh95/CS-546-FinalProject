@@ -3,19 +3,18 @@ const router = Router();
 
 import {
   getHome,
+  getProfile,
   allTransacs,
   pendingTransacs,
   transDetails,
 } from "../controllers/entities.js";
 
-router.route("/entity").get(getHome);
+router.route("/").get(getHome);
 
-router.route("/entity/myProfile").get((req, res) => {
-  res.render("entity/profile", { title: "My Profile" });
-});
+router.route("/myProfile").get(getProfile);
 
-router.route("/entity/allTransactions/:entityId").get(allTransacs);
-router.route("/entity/pendingTransactions/:entityId").get(pendingTransacs);
-router.route("/entity/transactionDetails/:transactionId").get(transDetails);
+router.route("/allTransactions/:entityId").get(allTransacs);
+router.route("/pendingTransactions/:entityId").get(pendingTransacs);
+router.route("/transactionDetails/:transactionId").get(transDetails).post();
 
 export default router;

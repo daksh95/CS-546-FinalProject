@@ -23,4 +23,4 @@ router.route('/approvals/land/:landId').get(getApprovalLand).post();
 router.route('/approvals/transaction').get(getTransactionsListForApproval);
 router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post();
 
-export default router;
+export default router; 

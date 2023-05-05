@@ -17,17 +17,24 @@ const getUnapprovedAccounts = async () => {
     ).toArray();
 
   if (!unapprovedUsers) throw 'Not able to fetch unapproved users';
-  unapprovedUsers = unapprovedUsers.map((user) => user.type = 'User');
+  unapprovedUsers = unapprovedUsers.map((user) => {
+    user.role = 'User';
+    return user;
+  });
 
   let unapprovedEntities = await client
-    .collection('entities')
+    .collection('entity')
     .find({ approved: false },
-      { projection: { _id: 1, name: 1, emailId: 1, type: 1 }}
+      { projection: { _id: 1, name: 1, emailId: 1, role: 1 }}
     ).toArray();
-  
+
   if (!unapprovedEntities) throw 'Not able to fetch unapproved entities';
   let unapprovedAccounts = [].concat(unapprovedUsers, unapprovedEntities);
-  unapprovedAccounts = unapprovedAccounts.map((account) => account._id = account._id.toString());
+
+  unapprovedAccounts = unapprovedAccounts.map((account) => {
+    account._id = account._id.toString();
+    return account;
+  });
 
   return unapprovedAccounts;
 };
@@ -72,6 +79,7 @@ const getUnapprovedLands = async () => {
   unapprovedLands = unapprovedLands.map((land) => {
     land._id = land._id.toString();
     land.address.fullAddress = getFullAddress(land.address);
+    return land;
   });
   
   return unapprovedLands;
@@ -92,8 +100,10 @@ const getUnapprovedTransactions = async () => {
 
   if (!unapprovedTransactions) throw 'Unable to fetch unapproved transactions';
 
-  unapprovedTransactions = unapprovedTransactions.map(
-    (transaction) => transaction._id = transaction._id.toString()
+  unapprovedTransactions = unapprovedTransactions.map((transaction) => {
+    transaction._id = transaction._id.toString()
+    return transaction;
+  } 
   );
 
   return unapprovedTransactions;

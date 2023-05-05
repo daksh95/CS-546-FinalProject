@@ -11,6 +11,7 @@ const getAccountsListForApproval = async (req, res) => {
     if (!accountList) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
     const accountsExist = accountList.length !== 0 ? true : false;
+    console.log(accountList);
     return res.render('admin/accountApprovalList', { title: 'Account Approvals', accountsExist, accountList });
   } catch (e) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [e] });
@@ -27,7 +28,7 @@ const getApprovalAccount = async (req, res) => {
 
     return res.json(account);
   } catch (error) {
-    return res.status(400).render('error', { title: 'Error', hasError: true, error: [e] });
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
 };
 
@@ -54,7 +55,7 @@ const getApprovalLand = async (req, res) => {
 
     return res.json(land);
   } catch (error) {
-    return res.status(400).render('error', { title: 'Error', hasError: true, error: [e] });
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
 }
 
@@ -81,7 +82,7 @@ const getApprovalTransaction = async (req, res) => {
 
     return res.json(transaction);
   } catch (error) {
-    return res.status(400).render('error', { title: 'Error', hasError: true, error: [e] });
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
 }
 
