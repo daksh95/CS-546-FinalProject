@@ -6,6 +6,7 @@ import {
   exists,
   validStateCodes,
   inputValidation,
+  arrayLength,
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 
@@ -26,10 +27,14 @@ const getPropertiesOfUser = async (req, res) => {
     });
 
   try {
-    const lands = await userData.getPropertiesOfUser();
-    res
-      .status(200)
-      .render("myProperties", { title: "Properties", lands: lands });
+    const lands = await userData.getLandsOfUserID(id);
+    let emptyLands = false;
+    if (!arrayLength(lands, 1)) emptyLands = true;
+    res.status(200).render("myProperties", {
+      title: "Properties",
+      lands: lands,
+      emptyLands: emptyLands,
+    });
   } catch (error) {
     res.status(404).render("Error", {
       title: "Error",
@@ -89,16 +94,21 @@ const getTransactionsofUserID = async (req, res) => {
     });
 
   let buyerTransaction = [];
+  let emptyBuyerTransaction = false;
   try {
     let data = await transactionData.getTransactionsByBuyerId(id);
-    data.forEach(async (element) => {
-      let land = await landData.getLand(element.landId);
-      buyerTransaction.push({
-        name: land.address,
-        landId: element.landId,
-        status: element.status,
+    if (!arrayLength(data, 1)) emptyBuyerTransaction = true;
+    else {
+      data.forEach(async (element) => {
+        let land = await landData.getLand(element.landId);
+        buyerTransaction.push({
+          transactionId: element.transactionId,
+          name: land.address,
+          landId: element.landId,
+          status: element.status,
+        });
       });
-    });
+    }
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",
@@ -108,20 +118,27 @@ const getTransactionsofUserID = async (req, res) => {
   }
 
   let sellerTransaction = [];
+  let emptySellerTransaction = false;
   try {
     let data = await transactionData.getTransactionsBySellerId(id);
-    data.forEach(async (element) => {
-      let land = await landData.getLand(element.landId);
-      sellerTransaction.push({
-        name: land.address,
-        landId: element.landId,
-        status: element.status,
+    if (!arrayLength(emptyBuyerTransaction, 1)) emptyBuyerTransaction = true;
+    else {
+      data.forEach(async (element) => {
+        let land = await landData.getLand(element.landId);
+        sellerTransaction.push({
+          transactionId: element.transactionId,
+          name: land.address,
+          landId: element.landId,
+          status: element.status,
+        });
       });
-    });
+    }
     return res.status(200).render("myTransactions", {
       title: "Transactions",
       sellerTransaction: sellerTransaction,
       buyerTransaction: buyerTransaction,
+      emptyBuyerTransaction: emptyBuyerTransaction,
+      emptySellerTransaction: emptySellerTransaction,
     });
   } catch (error) {
     return res.status(400).render("Error", {
@@ -132,7 +149,68 @@ const getTransactionsofUserID = async (req, res) => {
   }
 };
 
-const setUpProfile = async(req, res) =>{
- 
-}
-export { getPropertiesOfUser, getProfile, getTransactionsofUserID, setUpProfile };
+const getTransactionDetails = async (req, res) => {
+  let transactionId = req.params.transactionId;
+  let error = [];
+  if (!exists(transactionId)) error.push("ID parameter does not exists");
+  if (!checkInputType(transactionId, "string"))
+    error.push("ID must be of type string only");
+  if (transactionId.trim().length === 0)
+    error.push("ID cannot be of empty spaces");
+  transactionId = transactionId.trim();
+  if (!ObjectId.isValid(transactionId)) error.push("Invalid Object ID");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+  let role = req.session.user.typeOfUser;
+  let transaction = undefined;
+  try {
+    transaction = await transactionData.getTransactionById(transactionId);
+    if (transaction.buyer._id === req.session.user.id) role = "buyer";
+    else if (transaction.seller._id === req.session.user.id) role = "seller";
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+  let buyerInfo = undefined;
+  try {
+    buyerInfo = await userData.getUserById(transaction.buyer._id);
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+  try {
+    let land = await landData.getLand(transaction.landId);
+    res.status(200).render("transactionDetails", {
+      title: "Transaction Details",
+      transaction: transaction,
+      role: role,
+      land: land,
+      buyerInfo: buyerInfo,
+    });
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const setUpProfile = async (req, res) => {};
+export {
+  getPropertiesOfUser,
+  getProfile,
+  getTransactionsofUserID,
+  setUpProfile,
+  getTransactionDetails,
+};

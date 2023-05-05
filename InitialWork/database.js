@@ -67,8 +67,10 @@ const transaction = {
     _id: ObjectId(),
     bid: Number,
   },
-  sellerId: ObjectId(), //change in name
-  sellersStatus: Boolean,
+  seller: {
+    _id: ObjectId(),
+    status: String("pending, approved, rejected"),
+  }, //change in structure
   priceSoldFor: Number,
   surveyor: {
     _id: ObjectId(),

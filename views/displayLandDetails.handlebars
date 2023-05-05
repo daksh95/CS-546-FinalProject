@@ -38,9 +38,10 @@
         </div>
         <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
             {{#if isOwner}}
-            <a class="mx-auto my-auto" href="#"><button>Edit Property</button></a>
+            <a class="mx-auto my-auto" href="#"><button type="button" class="btn btn-primary">Edit Property</button></a>
             <br>
-            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button>View Transaction</button></a>
+            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button type="button"
+                    class="btn btn-primary">View Transaction</button></a>
             {{else}}
             {{#if land.sale.onSale}}
             {{#if pendingTransaction}}

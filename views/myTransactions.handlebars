@@ -17,6 +17,11 @@
 <h1>
     Buyer Transactions
 </h1>
+{{#if emptyBuyerTransaction}}
+<div>
+    You haven't placed bid for any properties!
+</div>
+{{else}}
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -27,19 +32,24 @@
         </thead>
         <tbody>
             {{#each buyerTransaction}}
-            <a href="#">
+            <a href="/user/transaction/{{this.transactionId}}">
                 <td>{{this.name}}</td>
                 <td>{{this.status}}</td>
             </a>
         </tbody>
     </table>
 </div>
+{{/if}}
 <hr>
 
 <h1>
     Seller Transactions
 </h1>
-
+{{#if emptySellerTransaction}}
+<div>
+    You haven't received any bids for your property!
+</div>
+{{else}}
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -50,10 +60,14 @@
         </thead>
         <tbody>
             {{#each sellerTransaction}}
-            <a href="#">
+            <a href="/user/transaction/{{this.transactionId}}">
                 <td>{{this.name}}</td>
+                {{#if this.status}}
                 <td>{{this.status}}</td>
+                {{else}}
+                <td>Pending approval</td>
             </a>
         </tbody>
     </table>
 </div>
+{{/if}}

@@ -15,8 +15,13 @@
 </nav>
 
 <div class="container-fluid">
+    {{#if emptyTransactions}}
+    <div>
+        You have no transactions for this property!
+    </div>
+    {{else}}
     {{#each transactions}}
-    <a href="#">
+    <a href="/user/transaction/{{this._id}}">
         <div class="card mt-3 ml-3 border-info rounded-lg shadow-lg">
             <div class="row">
                 <div class="col-md-4">{{this.buyerName}}</div>
@@ -25,4 +30,6 @@
             </div>
         </div>
     </a>
+    {{/each}}
+    {{/if}}
 </div>

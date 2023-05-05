@@ -9,16 +9,17 @@ const getTransactionsByBuyerId = async (id) => {
   const client = getClient();
   const result = client
     .collection("transaction")
-    .find({ buyer: new ObjectId(id) })
+    .find({ "buyer._id": new ObjectId(id) })
     .toArray();
   //get land by Id,
   //get status;
-  const data = [];
+  let data = [];
   for (let i = 0; i < result.length; i++) {
-    data[i] = {
+    data.push({
+      transactionId: result[i]._id,
       landId: result[i].landId,
       status: result[i].status,
-    };
+    });
   }
 
   return data;
@@ -29,14 +30,18 @@ const getTransactionsBySellerId = async (id) => {
   const client = getClient();
   const result = client
     .collection("transaction")
-    .find({ seller: new ObjectId(id) })
+    .find({ "seller._id": new ObjectId(id) })
     .toArray();
   //get land by Id,
   //get status;
-  const data = {
-    landId: result.landId,
-    status: result.status,
-  };
+  let data = [];
+  for (let i = 0; i < result.length; i++) {
+    data.push({
+      transactionId: result[i]._id,
+      landId: result[i].landId,
+      status: result[i].seller.status,
+    });
+  }
   return data;
 };
 
@@ -45,7 +50,7 @@ const getTransactionsByLandId = async (id) => {
   const client = getClient();
   const result = client
     .collection("transaction")
-    .find({ landId: new ObjectId(id) }, { _id: 0, buyer: 1, status: 1 })
+    .find({ landId: new ObjectId(id) })
     .toArray();
   if (result.length < 1) {
     throw "No transaction from that ID";
@@ -56,33 +61,52 @@ const getTransactionsByLandId = async (id) => {
     const { name: buyerName } = await userData.getUserById(
       result[i].buyer._id.toString()
     );
-    data = {
+    data.push({
+      transactionId: result[i]._id,
       buyerId: result[i].buyer._id.toString(),
       buyer: buyerName,
       bid: result[i].buyer.bid,
       status: result[i].status,
-    };
+    });
     //
   }
   return data;
 };
 
-const sellerApproved = async (transactionId, sellersId) => {
+const sellerApproved = async (transactionId, sellerId, value) => {
   //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
   transactionId = validation.validObjectId(transactionId, "transactionId");
-  sellersId = validation.validObjectId(sellersId, "sellersId");
+  sellerId = validation.validObjectId(sellerId, "sellersId");
+
+  //validate value field same as route validation
+
   const client = getClient();
-  const result = await client
-    .collection("transaction")
-    .findOneAndUpdate(
-      { _id: new ObjectId(transactionId), seller: new ObjectId(sellersId) },
-      { sellersStatus: true },
+  if (value === "approve") {
+    const result = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+        "seller._id": new ObjectId(sellerId),
+      },
+      { $set: { "seller.status": "approved" } },
       { returnDocument: "after" }
     );
-  if (result.lastErrorObject.n < 1) {
-    throw "could not be approved";
+    if (result.lastErrorObject.n < 1) {
+      throw "Could not be approved";
+    }
+  } else if (value === "reject") {
+    const result = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+        "seller._id": new ObjectId(sellerId),
+      },
+      { $set: { "seller.status": "rejected" } },
+      { returnDocument: "after" }
+    );
+    if (result.lastErrorObject.n < 1) {
+      throw "Could not be approved";
+    }
   }
-  return result;
+  return;
 };
 
 const createTransaction = async (bid, landId, sellerId) => {};

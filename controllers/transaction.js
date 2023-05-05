@@ -1,10 +1,12 @@
-import transactionData from "../data/transactions.js";  
+import transactionData from "../data/transactions.js";
 import {
   checkInputType,
   exists,
   validStateCodes,
   inputValidation,
+  arrayLength,
 } from "../utils/helpers.js";
+import validation from "../utils/validation.js";
 import { ObjectId } from "mongodb";
 
 const getAllTransactionsofLand = async (req, res) => {
@@ -24,9 +26,12 @@ const getAllTransactionsofLand = async (req, res) => {
     });
   try {
     let transactions = await transactionData.getTransactionsByLandId(landId);
+    let emptyTransactions = false;
+    if (!arrayLength(transactions, 1)) emptyTransactions = true;
     return res.status(200).render("getTransactionsofLand", {
       title: "Land Transactions",
       transactions: transactions,
+      emptyTransactions: emptyTransactions,
     });
   } catch (error) {
     return res.status(400).render("Error", {
@@ -37,4 +42,25 @@ const getAllTransactionsofLand = async (req, res) => {
   }
 };
 
-export { getAllTransactionsofLand };
+const sellerApproved = async (req, res) => {
+  let transactionId = req.params.transactionId;
+  let sellerId = req.params.sellerId;
+  let value = req.params.value;
+  transactionId = validation.validObjectId(transactionId, "transactionId");
+  sellerId = validation.validObjectId(sellerId, "sellersId");
+
+  // validate value field, can only be approve reject
+
+  try {
+    await transactionData.sellerApproved(transactionId, sellerId, value);
+    res.status(200).redirect("/user/transaction/" + transactionId);
+  } catch (error) {
+    return res.status(500).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+export { getAllTransactionsofLand, sellerApproved };
