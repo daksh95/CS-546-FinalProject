@@ -36,12 +36,12 @@ const addNewLand = async (object) => {
   const queryData = {};
 
   //valid numbers
-  queryData.length = validation.validNumber(
+  queryData.dimensions.length = validation.validNumber(
     dimensions.length,
     "length",
     (min = 1)
   );
-  queryData.breadth = validation.validNumber(
+  queryData.dimensions.breadth = validation.validNumber(
     dimensions.breadth,
     "breadth",
     (min = 1)

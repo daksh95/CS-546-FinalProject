@@ -286,14 +286,95 @@ const placedBid = async (req, res) => {
 
 const updateLand = async (req, res) => {};
 
-const postLand = async (req, res) => {};
+const addNewLand = async (req, res) => {
+  let { dimensionsLengthInput: length, dimensionsBreadthInput: breadth, typeInput:type, restrictionsInput: restrictions, 
+    addressInput:address, line1Input:line1, line2Input:line2, zipCodeInput: zipCode, cityInput: city, stateInput:state} = req.body; //elaborated address
+  const queryData = {};
+
+  //valid numbers
+  queryData.dimensions.length = validation.validNumber(
+    length,
+    "length",
+    (min = 1)
+  );
+  queryData.dimensions.breadth = validation.validNumber(
+    breadth,
+    "breadth",
+    (min = 1)
+  );
+
+  //default behaviour
+  queryData.sale.price = 1;
+  queryData.sale.dateOfListing = "11/11/1234" // TODO: to be updated
+  queryData.sale.onSale = false
+  queryData.approved = false;
+  queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
+
+  
+  //valid string and string of array
+  queryData.type = validation.validString(type, "type of land", 20);
+  
+  //if not default then validation
+  queryData.restrictions = validation.validArrayOfStrings(restrictions,"restrictions");
+
+  // valid address
+  queryData.address.line1 = validation.validString(line1, "line1", 46);
+  queryData.address.line2 = validation.validString(line2, "line2", 46);
+  queryData.address.city = validation.validString(city, "city", 17);
+  queryData.address.state = validation.validString(state, "state", 2);
+  queryData.address.zipCode = validation.validString(zipCode, "zipCode", (min = 501),(max = 99950));
+
+  // Calculated field
+  queryData.area = (dimensions.length*dimensions.breadth).toString();
+
+  /*
+  queryData has following structure
+  queryDate = {
+    dimensions:{
+      lenght, 
+      breadth
+    },
+    sale:{
+      price,
+      dateOfListing,
+      onSale,
+    },
+    approved,
+    restrictions:[],
+    type,
+    address:{
+      line1,
+      line2,
+      city,
+      state,
+      zipCode
+    },
+    area
+  }
+  */
+  let addLand;
+  try {
+    addLand = await landData.addNewLand(queryData);
+  } catch (error) {
+      if(error == "Could not add land"){
+        res.status(500).render("error", {title:"Server Error", error: [error]});
+        return;
+      }else{
+          res.status(400).render("")//TODO: to be decided
+          return;
+      }
+  }
+
+  //if successfully added then redirect to my land wala page
+  res.status(200).redirect(`/${req.session.user.id}/land`);
+};
 
 const removeLand = async (id) => {};
 
 export {
   getLand,
   updateLand,
-  postLand,
+  addNewLand,
   removeLand,
   getLandByState,
   postLandByState,
