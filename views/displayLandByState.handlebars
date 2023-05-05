@@ -1,0 +1,103 @@
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+    <div class="container-fluid">
+        <div class="navbar-header text-light">
+            WebSite Name
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link">My Property</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link">My Transactions</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+<br>
+<div class="container-fluid">
+    <div class="row" id="mainResults">
+        <div class="col-sm-4">
+            <form action="/land" method="post" id="get-state-form">
+                <div class="form-group">
+                    <label for="stateInput">State:</label>
+                    <input type="text" name="stateInput" id="stateInput" placeholder="Enter state (XX format)">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+            <div id="stateError"></div>
+            {{#if hasSearchError}}
+            <ul class="error">
+                {{#each error}}
+                <li>
+                    {{this}}
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+            {{#if state}}
+            <div class="d-flex">
+                <p class="pr-1">Sort by Price: </p>
+                <select id="sort" class="form-select">
+                    <option value="priceAsc">A-Z</option>
+                    <option value="priceDesc">Z-A</option>
+                </select>
+            </div>
+            <br>
+            <form action="/land/area/{{state}}" method="post" id="filter-area">
+                <label for="minAreaInput">Min Area</label>
+                <input type="text" name="minAreaInput" id="minAreaInput">
+                <br>
+                <label for="maxAreaInput">Max Area</label>
+                <input type="text" name="maxAreaInput" id="maxAreaInput">
+                <br>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+            <form action="/land/price/{{state}}" method="post" id="filter-price">
+                <label for="minPriceInput">Min Price</label>
+                <input type="number" name="minPriceInput" id="minPriceInput">
+                <br>
+                <label for="maxPriceInput">Max Price</label>
+                <input type="number" name="maxPriceInput" id="maxPriceInput">
+                <br>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </form>
+            {{/if}}
+            <div id="filterError"></div>
+            {{#if hasError}}
+            <ul class="error">
+                {{#each error}}
+                <li>
+                    {{this}}
+                </li>
+                {{/each}}
+            </ul>
+            {{/if}}
+
+        </div>
+        <div class="col-sm-8" id="results">
+            {{#if empty_lands}}
+            <div class="card border-info rounded-lg shadow-lg p-2">
+                No Lands available to display
+            </div>
+            {{else}}
+            {{#each landByState}}
+            <a href="/land/{{this._id}}" class="text-decoration-none text-info">
+                <div class="card border-info rounded-lg shadow-lg p-2">
+                    <p class="m-0">{{this.address.line1}} {{this.address.line2}},</p>
+                    <p>{{this.address.city}}, {{this.address.state}} {{this.address.zipCode}}</p>
+                    <p>{{this.type}} Area</p>
+                    {{#if this.sale.onSale}}
+                    <p>Sale: Yes</p>
+                    {{else}}
+                    <p>Sale: No</p>
+                    {{/if}}
+                </div>
+            </a>
+            <br>
+            {{/each}}
+            {{/if}}
+        </div>
+    </div>
+</div>
+<div id="lands" data-landStates="{{json landByState}}"></div>
+<script src="/public/js/displayLandByState.js"></script>

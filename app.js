@@ -1,25 +1,52 @@
 import express from "express";
-import "dotenv/config.js";
-import {connectDB} from "./Data/connectDB.js"
-import  landRoutes from "./Routes/land.js"
-
 const app = express();
 const port = 3000;
+import "dotenv/config.js";
+import {connectDB, getClient} from "./config/connection.js"
+import constructorMethod from "./routes/index.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import exphbs from "express-handlebars";
+import session from "express-session";
+import { homeMiddleware } from "./middleware/middleware.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const staticDir = express.static(__dirname + "/public");
+
+app.use("/public", staticDir);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.engine("handlebars", exphbs.engine({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+var hbs = exphbs.create({});
+hbs.handlebars.registerHelper("json", function (val) {
+  return JSON.stringify(val);
+});
 
 
 //middleware
-app.use(express.json());
+app.use(session({
+    name: 'AuthCookie',
+    secret: "ThefamousSecretOfWebPrograming#$",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {maxAge: 6000000}
+}));
+app.use("/", homeMiddleware);
 
-app.use('/land',landRoutes)
+//routing
+constructorMethod(app)
 
-
-const start = async(req,res) =>{
+const start = async() =>{
     try {
-        // await connectDB(process.env.MONGO_URL);
-        // console.log("Database is connected");
+        await connectDB(process.env.MONGO_URI);
+        console.log("Database is connected");
         app.listen(port, ()=>{console.log("Server is listening on port 3000..")})
+        
     } catch (error) {
-       res.status(500).json(error);
+        console.log(error);
     }
 }
 start()

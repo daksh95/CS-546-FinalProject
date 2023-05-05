@@ -1,0 +1,30 @@
+<header>
+  <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+      <div class="container-fluid">
+          <div class="navbar-header text-light">
+              <a class="navbar-brand" href="#">WebSite Name</a>
+          </div>
+          <ul class="nav navbar-nav">
+              <li class="nav-item"><a href="/home" class="nav-link text-light">Home</a></li>
+              <li class="nav-item"><a href="/admin/approvals/account" class="nav-link text-light">Account Approvals</a></li>
+              <li class="nav-item"><a href="/admin/approvals/land" class="nav-link text-light">Land Approvals</a></li>
+              <li class="nav-item"><a href="/admin/approvals/transaction" class="nav-link text-light">Transaction Approvals</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
+          </ul>
+      </div>
+  </nav>
+</header>
+<main>
+  {{#if landsExist}}
+  <ul class="approval-list"></ul>
+    {{#each landList}}
+      <a href="/admin/approvals/land/{{this._id}}">
+        <li>{{this.name}} {{this.emailId}}</li>
+      </a>
+    {{/each}}
+  {{else}}
+    <div class="empty-list">No lands to be approved</div>
+  {{/if}}
+</main>

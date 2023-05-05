@@ -1,0 +1,73 @@
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+    <div class="container-fluid">
+        <div class="navbar-header text-light">
+            WebSite Name
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link">My Property</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link">My Transactions</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+
+<h1>
+    Buyer Transactions
+</h1>
+{{#if emptyBuyerTransaction}}
+<div>
+    You haven't placed bid for any properties!
+</div>
+{{else}}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Land</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each buyerTransaction}}
+            <a href="/user/transaction/{{this.transactionId}}">
+                <td>{{this.name}}</td>
+                <td>{{this.status}}</td>
+            </a>
+        </tbody>
+    </table>
+</div>
+{{/if}}
+<hr>
+
+<h1>
+    Seller Transactions
+</h1>
+{{#if emptySellerTransaction}}
+<div>
+    You haven't received any bids for your property!
+</div>
+{{else}}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Land</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each sellerTransaction}}
+            <a href="/user/transaction/{{this.transactionId}}">
+                <td>{{this.name}}</td>
+                {{#if this.status}}
+                <td>{{this.status}}</td>
+                {{else}}
+                <td>Pending approval</td>
+            </a>
+        </tbody>
+    </table>
+</div>
+{{/if}}
