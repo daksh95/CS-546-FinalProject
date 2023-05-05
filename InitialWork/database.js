@@ -2,13 +2,13 @@ const users = {
   // buyers and sellers
   _id: new ObjectId(),
   name: String,
-  Phone: String,
+  phone: String,
   emailId: String,
-  Government_id: {
+  government_id: {
     typeOfId: String,
     Id: String,
   },
-  DOB: String,
+  dob: String,
   gender: String,
   approved: Boolean, // to be discussed.
   rating: {

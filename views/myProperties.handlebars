@@ -14,21 +14,26 @@
     </div>
 </nav>
 <div class="continer-fluid">
-    <a class="float-sm-right mr=3 mt-3" href="#"><button type="button" class="btn btn-primary">Add
-            Land</button></a>
-    {{#if emptyLands}}
-    <div class="card border-info rounded-lg shadow-lg p-2">
-        You do not own any property!
-    </div>
-    {{else}}
-    {{#each lands}}
-    <a href="/land/{{this._id}}" class="text-decoration-none text-info">
-        <div class="card border-info rounded-lg shadow-lg p-2">
-            <p class="m-0">{{this.address.line1}} {{this.address.line2}}, {{this.address.city}}, {{this.address.state}}
-                {{this.address.zipCode}}</p>
+    <div class="row">
+        <div class="col-md-9 mt-5 mr-3 ml-4">
+            {{#if emptyLands}}
+            <div class="card border-info rounded-lg shadow-lg p-2">
+                You do not own any property!
+            </div>
+            {{else}}
+            {{#each lands}}
+            <a href="/land/{{this._id}}" class="text-decoration-none text-info">
+                <div class="card border-info rounded-lg shadow-lg p-2">
+                    <p class="m-0">{{this.address.line1}} {{this.address.line2}}, {{this.address.city}},
+                        {{this.address.state}}
+                        {{this.address.zipCode}}</p>
+                </div>
+            </a>
+            <br>
+            {{/each}}
+            {{/if}}
         </div>
-    </a>
-    <br>
-    {{/each}}
-    {{/if}}
+        <a class="col-md-2 float-md-right ml-2 mt-2" href="#"><button type="button" class="btn btn-primary">Add
+                Land</button></a>
+    </div>
 </div>

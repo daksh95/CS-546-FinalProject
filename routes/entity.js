@@ -6,7 +6,7 @@ import {
   allTransacs,
   pendingTransacs,
   transDetails,
-} from "../controllers/entities";
+} from "../controllers/entities.js";
 
 router.route("/entity").get(getHome);
 
