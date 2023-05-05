@@ -3,6 +3,7 @@ import { getClient } from "../config/connection.js";
 import { arrayLength, checkInputType, exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 import hash from "../utils/encryption.js";
+
 const getOwnerByLandId = async (landID) => {
   if (!exists(id)) throw new Error("ID parameter does not exist");
   if (!checkInputType(id, "string"))

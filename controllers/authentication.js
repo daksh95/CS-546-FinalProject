@@ -75,16 +75,14 @@ const postLogin = async (req, res) =>{
     return;
   }
 
-  //title company
-  if (validUser.typeOfUser == "titleCompany") {
-  }
-
-  //surveyor
-  if (validUser.typeOfUser == "surveyor") {
-  }
-
-  //government
-  if (validUser.typeOfUser == "government") {
+  //land surveyor or title company or government, basically, any entity
+  if (
+    validUser.typeOfUser == "landSurveyor" ||
+    validUser.typeOfUser == "titleCompany" ||
+    validUser.typeOfUser == "government"
+  ) {
+    res.status(200).redirect("/entity");
+    return;
   }
 };
 
