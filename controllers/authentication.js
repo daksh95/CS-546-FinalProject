@@ -54,12 +54,12 @@ const postLogin = async (req, res) =>{
   };
   console.log("here i am in");
   // check if user is approved
-  if (!validUser.approved) {
-    //set up profile
-    res.status(200).redirect("/land");
-    // res.status(200).redirect(`/user/${userApproved.id}/profile`);
-    return;
-  }
+  // if (!validUser.approved) {
+  //   //set up profile
+  //   res.status(404).render("error", { Title: "Error", hasError });
+  //   // res.status(200).redirect(`/user/${userApproved.id}/profile`);
+  //   return;
+  // }
 
   const userApproved = await userData.getUserByEmail(emailInput);
   //Valid credential therfore, redirect them to appropriate pages;
