@@ -21,7 +21,7 @@ const addCredential = async(object) =>{
             throw `EmailId is already registered. Please login`;
        }
     }catch(e){
-        throw e;
+       
     }
     
     // Validating string
@@ -121,7 +121,7 @@ const updatePassword = async(password, emailId)=>{
 const updateProfileStatus = async(profileSetUpDone)=>{
     profileSetUpDone = validation.validBool(profileSetUpDone, "Profile set up status");
     const client = getClient();
-    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(req.session.user.id)}, {"profileSetUpDone": profileSetUpDone}, { returnDocument: "after" });
+    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(req.session.user.credentialId)}, {"profileSetUpDone": profileSetUpDone}, { returnDocument: "after" });
     if (result.lastErrorObject.n < 1) {
         throw `Could not update profile set up status`;
     }

@@ -123,6 +123,34 @@ const getLandsOfUserID = async (id) => {
   return lands;
 };
 
+const initializeProfile = async(email)=>{
+  email = validation.validEmail(email);
+  let newUser = {
+      name: "",
+      phone: "",
+      emailId: email,
+      governmentId: {
+        typeofId: "",
+        id: "",
+      },
+      dob: "",
+      gender: "",
+      approved: false,
+      rating: {
+        totalRating: 0,
+        noOfRating: 0,
+      },
+      land: [],
+    };
+
+  const client = getClient();
+  const result = await client.collection("users").insertOne(newUser);
+
+  if (!result.ackowledged || !result.insertedId) throw `failed to insert user`;
+  
+  return true;
+}
+
 const userData = {
   getOwnerByLandId: getOwnerByLandId,
   getUserByEmail: getUserByEmail,
@@ -130,6 +158,7 @@ const userData = {
   getUserById: getUserById,
   createUser: createUser,
   getLandsOfUserID: getLandsOfUserID,
+  initializeProfile:initializeProfile
 };
 
 export default userData;

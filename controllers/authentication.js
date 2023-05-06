@@ -28,7 +28,12 @@ const postLogin = async (req, res) => {
   }
 
   if(errors.length>0){
-      res.status(400).render("authentication/login", {title:"Login Page", email:emailInput, password:passwordInput, error:errors});
+      res.status(400).render("authentication/login", {
+        title:"Login Page", 
+        email:emailInput, 
+        password:passwordInput, 
+        hasError:true,
+        error:[errors]});
       return;
   }
 
@@ -42,7 +47,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
-      error: "Invalid Email or Password",
+      hasError: true,
+      error: ["Invalid Email or Password"],
     });
     return;
   }
@@ -55,7 +61,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
-      error: "Invalid Email or Password",
+      hasError: true,
+      error: ["Invalid Email or Password"],
     });
     return;
   }
@@ -86,14 +93,14 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  // if(!validUser.profileSetUpDone){
-  //   res.status(200).render("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
-  //   return;
-  // }
+  if(!validUser.profileSetUpDone){
+    res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
+    return;
+  }
 
-  // if(validUser.isApproved == false){
-  //   res.status(200).render("", {title: "Approval waiting"}); //TODO create HTML page for this
-  // }
+  if(validUser.isApproved == false){
+    res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
+  }
 
   //If profile is set up then we will redirect them to their appropriate pages
   // For admin
@@ -159,11 +166,17 @@ const postSignUp = async (req, res) => {
   } catch (e) {
     errors.push(e)
   }
-  
-  //default values
-  queryData.isApproved = false;
-  queryData.profileSetUpDone= false;
 
+  if(errors.length>0){
+    res.status(400).render("authentication/signUp", {
+      title:"Registration Page", 
+      email:emailInput, 
+      password:passwordInput, 
+      hasError:true, 
+      error:errors});
+    return;
+}
+  
   //add new credentials
   let signup;
   try {
@@ -171,24 +184,26 @@ const postSignUp = async (req, res) => {
   } catch (error) {
     //error due to server issue
     if (error == "Could not create account") {
-      res.status(500).render("error", { title: "Error Page", error: error });
+      res.status(500).render("error", { title: "Error Page", hasError:true, error: [error] });
       return;
     }
 
     //error due to bad data or email already getting used
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
-      hasError:true, //TODO add {{#if hasError}}
+      hasError:true, 
       error: errors, 
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
+
     return;
   }
 
   //add user to user collection
-  //TODO create a new function for initial set up in users.js;
-
+  //TODO create a new function for initial set up in users.js && entities.js;
+  
+  
   //successful creation
   if (signup) {
     // redirect user to login page
