@@ -57,7 +57,7 @@ const getProfile = async (req, res) => {
       .status(400)
       .render("error", { title: "Error", hasError: true, error: error });
 
-  const profileSetUp = await auth.getCredentialByEmailId(
+  const profileSetUp = await credentialData.getCredentialByEmailId(
     req.session.user.email
   );
 
@@ -253,7 +253,8 @@ const setUpProfile = async (req, res) => {
     });
 
   try {
-    const { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
+    let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
+    phoneInput = parseInt(phoneInput);
     await entityData.addNewEntity(
       nameInput,
       phoneInput,

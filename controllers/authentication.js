@@ -84,6 +84,7 @@ const postLogin = async (req, res) => {
       error: [error.message],
     });
   }
+
   //create session
   req.session.user = {
     email: emailInput,
@@ -103,8 +104,11 @@ const postLogin = async (req, res) => {
       return;
     }
   }
+
   if (validUser.isApproved == false) {
-    res.status(200).redirect("", { title: "Approval waiting" }); //TODO create HTML page for this
+    return res
+      .status(200)
+      .render("approvalWaiting", { title: "Approval waiting" }); //TODO create HTML page for this
   }
 
   //If profile is set up then we will redirect them to their appropriate pages
@@ -122,8 +126,8 @@ const postLogin = async (req, res) => {
 
   // For land surveyor or title company or government, basically, any entity
   if (
-    validUser.typeOfUser == "landSurveyor" ||
-    validUser.typeOfUser == "titleCompany" ||
+    validUser.typeOfUser == "landsurveyor" ||
+    validUser.typeOfUser == "titlecompany" ||
     validUser.typeOfUser == "government"
   ) {
     res.status(200).redirect("/entity");
