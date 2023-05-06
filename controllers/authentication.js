@@ -2,6 +2,7 @@ import auth from "../data/credential.js";
 import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import userData from "../data/user.js";
+import entityData from "../data/entities.js";
 
 //Login
 const getLogin = async (req, res) => {
@@ -44,11 +45,28 @@ const postLogin = async (req, res) => {
     });
     return;
   }
-
+  let id = undefined;
+  try {
+    if (validUser.typeOfUser === "user") {
+      let userObj = await userData.getUserByEmail(emailInput);
+      id = userObj._id;
+    } else if (validUser.typeOfUser === "admin") id = undefined;
+    else {
+      let entityObj = await entityData.getEntityByEmail(emailInput);
+      id = entityObj._id;
+    }
+  } catch (error) {
+    res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
   //create session
   req.session.user = {
     email: emailInput,
-    id: validUser._id,
+    id: id,
+    credentialId: validUser._id,
     typeOfUser: validUser.typeOfUser,
   };
 

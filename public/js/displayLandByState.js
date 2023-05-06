@@ -117,18 +117,18 @@
     });
   }
 
-  function stateValidation(state) {
-    if (!state && !(state == false))
-      throw new Error("State parameter does not exists");
-    if (state.trim().length === 0)
-      throw new Error("State cannot contain empty spaces only");
-    state = state.trim();
-    if (!validStateCodes.includes(state.toUpperCase()))
-      throw new Error(
-        "State parameter must be a valid statecode in abbreviations only"
-      );
-    return state;
-  }
+  // function stateValidation(state) {
+  //   if (!state && !(state == false))
+  //     throw new Error("State parameter does not exists");
+  //   if (state.trim().length === 0)
+  //     throw new Error("State cannot contain empty spaces only");
+  //   state = state.trim();
+  //   if (!validStateCodes.includes(state.toUpperCase()))
+  //     throw new Error(
+  //       "State parameter must be a valid statecode in abbreviations only"
+  //     );
+  //   return state;
+  // }
 
   function areaValidation(minArea, maxArea) {
     if (!minArea && !(minArea == false))
@@ -156,22 +156,22 @@
     return [minPrice, maxPrice];
   }
 
-  const stateForm = document.getElementById("get-state-form");
-  if (stateForm) {
-    stateForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      let state = document.getElementById("stateInput");
-      const errorDiv = document.getElementById("stateError");
-      try {
-        errorDiv.hidden = true;
-        stateValidation(state.value);
-        event.target.submit();
-      } catch (error) {
-        errorDiv.textContent = error.message;
-        errorDiv.hidden = false;
-      }
-    });
-  }
+  // const stateForm = document.getElementById("get-state-form");
+  // if (stateForm) {
+  //   stateForm.addEventListener("submit", (event) => {
+  //     event.preventDefault();
+  //     let state = document.getElementById("stateInput");
+  //     const errorDiv = document.getElementById("stateError");
+  //     try {
+  //       errorDiv.hidden = true;
+  //       stateValidation(state.value);
+  //       event.target.submit();
+  //     } catch (error) {
+  //       errorDiv.textContent = error.message;
+  //       errorDiv.hidden = false;
+  //     }
+  //   });
+  // }
 
   const areaForm = document.getElementById("filter-area");
   if (areaForm) {

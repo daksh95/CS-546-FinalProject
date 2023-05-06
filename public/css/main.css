@@ -1,1 +1,19 @@
 /* CSS file */
+/* body {
+    background-image: url("../background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto;
+    position: relative;
+    z-index: 0;
+}
+
+.navbar {
+    position: relative;
+    z-index: 1;
+} */
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}

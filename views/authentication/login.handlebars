@@ -1,18 +1,28 @@
-<main>
-        <form action="/login" method="POST" id = "login-form">
-        <label for = "emailInput" id = "email-text">
-            Email Address:
-                </label>
-              <input type="email" name="emailInput" id = "emailInput">
-          <br>  
-         <label for = "passwordInput" id = "password-text">
-            Password:
-                </label>
-              <input type="password" name="passwordInput" id = "passwordInput">
-        <br>  
-        <button type="submit">Submit </button>
-    </form>
-    <div id="links">
-    <a href="/signUp" id="signUpLink">Click here to sign up!</a>
+<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top mb-4">
+    <div class="container-fluid">
+        <h1 class="navbar-header text-light mx-auto">
+            WebSite Name
+        </h1>
     </div>
-</main>
+</nav>
+
+<div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
+    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
+        <form action="/login" method="POST" id="login-form">
+            <label for="emailInput" id="email-text">
+                Email Address:
+            </label>
+            <input type="email" name="emailInput" id="emailInput">
+            <br>
+            <label for="passwordInput" id="password-text">
+                Password:
+            </label>
+            <input type="password" name="passwordInput" id="passwordInput">
+            <br>
+            <button type="submit">Submit </button>
+        </form>
+        <div id="links">
+            <a href="/signUp" id="signUpLink">Click here to sign up!</a>
+        </div>
+    </main>
+</div>

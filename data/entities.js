@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
 import { entityCollection, transacsCollection } from "./collectionNames.js";
+import validation from "../utils/validation.js";
 
 const addNewEntity = async (
   name,
@@ -38,7 +39,7 @@ const addNewEntity = async (
     Website.trim().length < 17
   )
     throw `Invalid entity website!`;
-  website = website.trim();
+  Website = Website.trim();
 
   if (typeof license !== "string") throw `Entity license must be a string!`;
   if (license.trim().length === 0)
@@ -98,6 +99,13 @@ const getEntityById = async (id) => {
   if (meh === null) throw `No entity with given email address!`;
   meh._id = meh._id.toString();
   return meh;
+};
+
+const getEntityByEmail = async (emailInput) => {
+  let email = validation.validEmail(emailInput);
+  const client = getClient();
+  const result = await client.collection("entity").findOne({ emailId: email });
+  return result;
 };
 
 const updateEntity = async (emailId) => {};
@@ -338,6 +346,7 @@ const entityData = {
   assignEntity,
   pendingTransactionsCount,
   totalTransactionsCount,
+  getEntityByEmail,
 };
 
 export default entityData;

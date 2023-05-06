@@ -34,6 +34,7 @@ const getPropertiesOfUser = async (req, res) => {
       title: "Properties",
       lands: lands,
       emptyLands: emptyLands,
+      userId: req.session.user.id,
     });
   } catch (error) {
     res.status(404).render("Error", {
@@ -67,6 +68,7 @@ const getProfile = async (req, res) => {
       title: "Profile",
       user: user,
       avgRating: avgRating,
+      userId: req.session.user.id,
     });
   } catch (error) {
     res.status(404).render("Error", {
@@ -121,7 +123,7 @@ const getTransactionsofUserID = async (req, res) => {
   let emptySellerTransaction = false;
   try {
     let data = await transactionData.getTransactionsBySellerId(id);
-    if (!arrayLength(emptyBuyerTransaction, 1)) emptyBuyerTransaction = true;
+    if (!arrayLength(data, 1)) emptySellerTransaction = true;
     else {
       data.forEach(async (element) => {
         let land = await landData.getLand(element.landId);
@@ -139,6 +141,7 @@ const getTransactionsofUserID = async (req, res) => {
       buyerTransaction: buyerTransaction,
       emptyBuyerTransaction: emptyBuyerTransaction,
       emptySellerTransaction: emptySellerTransaction,
+      userId: req.session.user.id,
     });
   } catch (error) {
     return res.status(400).render("Error", {
@@ -196,6 +199,7 @@ const getTransactionDetails = async (req, res) => {
       role: role,
       land: land,
       buyerInfo: buyerInfo,
+      userId: req.session.user.id,
     });
   } catch (error) {
     return res.status(400).render("Error", {

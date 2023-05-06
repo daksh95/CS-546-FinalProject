@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
     <div class="container-fluid">
         <div class="navbar-header text-light">
             WebSite Name
@@ -26,7 +26,7 @@
                 </div>
             </form>
             <div id="stateError"></div>
-            {{#if hasSearchError}}
+            {{!-- {{#if hasSearchError}}
             <ul class="error">
                 {{#each error}}
                 <li>
@@ -34,7 +34,7 @@
                 </li>
                 {{/each}}
             </ul>
-            {{/if}}
+            {{/if}} --}}
             {{#if state}}
             <div class="d-flex">
                 <p class="pr-1">Sort by Price: </p>
@@ -75,7 +75,8 @@
             {{/if}}
 
         </div>
-        <div class="col-sm-8" id="results">
+        <div class="col-sm-8" id="result"></div>
+        {{!-- <div class="col-sm-8" id="results">
             {{#if empty_lands}}
             <div class="card border-info rounded-lg shadow-lg p-2">
                 No Lands available to display
@@ -96,9 +97,12 @@
             </a>
             <br>
             {{/each}}
-            {{/if}}
         </div>
-    </div>
+        {{/if}}
+    </div> --}}
+</div>
 </div>
 <div id="lands" data-landStates="{{json landByState}}"></div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/public/js/displayLandByStateAjax.js"></script>
 <script src="/public/js/displayLandByState.js"></script>

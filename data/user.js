@@ -4,7 +4,7 @@ import { arrayLength, checkInputType, exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 import hash from "../utils/encryption.js";
 
-const getOwnerByLandId = async (landID) => {
+const getOwnerByLandId = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exist");
   if (!checkInputType(id, "string"))
     throw new Error("ID must be of type string only");
@@ -15,10 +15,10 @@ const getOwnerByLandId = async (landID) => {
   const client = getClient();
   const result = await client
     .collection("users")
-    .findOne({ landId: new ObjectId(landID) });
+    .findOne({ "land._id": new ObjectId(id) });
   if (result === null) throw new Error("No user found for this Land ID");
   result._id = result._id.toString();
-  return result[0];
+  return result;
 };
 
 const getUserByEmail = async (email) => {

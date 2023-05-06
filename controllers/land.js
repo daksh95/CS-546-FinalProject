@@ -12,6 +12,7 @@ import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
 
 const getLand = async (req, res) => {
+  // console.log("here");
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -30,7 +31,7 @@ const getLand = async (req, res) => {
   let owner = undefined;
   try {
     owner = await userData.getOwnerByLandId(id);
-    isOwner = true;
+    if (owner._id === req.session.user.id) isOwner = true;
   } catch (error) {
     isOwner = false;
   }
@@ -56,6 +57,7 @@ const getLand = async (req, res) => {
       owner: owner,
       isOwner: isOwner,
       pendingTransaction: pendingTransaction,
+      userId: req.session.user.id,
     });
   } catch (error) {
     res.status(404).render("Error", {
@@ -77,7 +79,7 @@ const getLandByState = async (req, res) => {
       landByState: lands,
       state: undefined,
       empty_lands: empty_lands,
-      userId:req.session.user.id
+      userId: req.session.user.id,
     });
   } catch (error) {
     res.status(404).render("Error", {
@@ -89,7 +91,7 @@ const getLandByState = async (req, res) => {
 };
 
 const postLandByState = async (req, res) => {
-  let state = req.body.stateInput;
+  let state = req.body.state;
   let error = [];
   if (!exists(state)) error.push("State is not entered");
   if (!checkInputType(state, "string"))
@@ -108,18 +110,21 @@ const postLandByState = async (req, res) => {
       state: undefined,
       hasSearchError: true,
       error: error,
+      userId: req.session.user.id,
     });
 
   try {
     let landByState = await landData.getLandByState(state);
     let empty_lands = false;
     if (!arrayLength(landByState, 1)) empty_lands = true;
-    res.status(200).render("displayLandByState", {
-      title: "Lands",
-      landByState: landByState,
-      state: state,
-      empty_lands: empty_lands,
-    });
+    // res.status(200).render("displayLandByState", {
+    //   title: "Lands",
+    //   landByState: landByState,
+    //   state: state,
+    //   empty_lands: empty_lands,
+    //   userId: req.session.user.id,
+    // });
+    return res.json(landByState);
   } catch (error) {
     return res.status(400).render("displayLandByState", {
       title: "Lands",
@@ -127,6 +132,7 @@ const postLandByState = async (req, res) => {
       state: undefined,
       hasSearchError: true,
       error: [error.message],
+      userId: req.session.user.id,
     });
   }
 };
@@ -163,6 +169,7 @@ const postFilterPrice = async (req, res) => {
       state: state,
       hasError: true,
       error: errors,
+      userId: req.session.user.id,
     });
 
   try {
@@ -174,6 +181,7 @@ const postFilterPrice = async (req, res) => {
       landByState: filteredLands,
       state: state,
       empty_lands: empty_lands,
+      userId: req.session.user.id,
     });
   } catch (error) {
     return res.status(400).render("displayLandByState", {
@@ -182,6 +190,7 @@ const postFilterPrice = async (req, res) => {
       state: state,
       hasError: true,
       error: [error.message],
+      userId: req.session.user.id,
     });
   }
 };
@@ -219,6 +228,7 @@ const postFilterArea = async (req, res) => {
       state: state,
       hasError: true,
       error: errors,
+      userId: req.session.user.id,
     });
 
   try {
@@ -230,6 +240,7 @@ const postFilterArea = async (req, res) => {
       landByState: filteredLands,
       state: state,
       empty_lands: empty_lands,
+      userId: req.session.user.id,
     });
   } catch (error) {
     return res.status(400).render("displayLandByState", {
@@ -238,6 +249,7 @@ const postFilterArea = async (req, res) => {
       state: state,
       hasError: true,
       error: [error.message],
+      userId: req.session.user.id,
     });
   }
 };
@@ -290,16 +302,30 @@ const updateLand = async (req, res) => {
   let landId = req.params.id;
   landId = validation.validObjectId(id);
 
-  if(req.method  == "get"){
+  if (req.method == "get") {
     const result = await landData.getLand(landId);
-    res.staus(200).render("editLand", {title: "Edit Land Information", result, id:landId});
+    res.staus(200).render("editLand", {
+      title: "Edit Land Information",
+      result,
+      id: landId,
+    });
     return;
-  }else{
+  } else {
+    let {
+      dimensionsLengthInput: length,
+      dimensionsBreadthInput: breadth,
+      typeInput: type,
+      restrictionsInput: restrictions,
+      line1Input: line1,
+      line2Input: line2,
+      zipCodeInput: zipCode,
+      cityInput: city,
+      stateInput: state,
+      priceInput: price,
+      onSaleInput: onSale,
+    } = req.body;
+    const queryData = {};
 
-    let { dimensionsLengthInput: length, dimensionsBreadthInput: breadth, typeInput:type, restrictionsInput: restrictions, 
-       line1Input:line1, line2Input:line2, zipCodeInput: zipCode, cityInput: city, stateInput:state, priceInput:price, onSaleInput: onSale} = req.body; 
-    const queryData = {}; 
-  
     //valid numbers
     queryData.dimensions.length = validation.validNumber(
       length,
@@ -311,35 +337,41 @@ const updateLand = async (req, res) => {
       "breadth",
       (min = 1)
     );
-    queryData.sale.price = validation.validNumber(price, "Price", min = 1);
+    queryData.sale.price = validation.validNumber(price, "Price", (min = 1));
     validation.validBool(onSale, "On sale");
     queryData.sale.onSale = onSale;
-    
+
     //default behaviour
     queryData.landId = landId;
-    
-    if(onSale){
-      queryData.sale.dateOfListing = "11/11/1234" // TODO: to be updated
-    }  
-    
+
+    if (onSale) {
+      queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
+    }
+
     //valid string and string of array
     queryData.type = validation.validString(type, "type of land", 20);
-    
-    //if not default then validation
-    queryData.restrictions = validation.validArrayOfStrings(restrictions,"restrictions");
 
-  
+    //if not default then validation
+    queryData.restrictions = validation.validArrayOfStrings(
+      restrictions,
+      "restrictions"
+    );
+
     // valid address
     queryData.address.line1 = validation.validString(line1, "line1", 46);
     queryData.address.line2 = validation.validString(line2, "line2", 46);
     queryData.address.city = validation.validString(city, "city", 17);
     queryData.address.state = validation.validString(state, "state", 2);
-    queryData.address.zipCode = validation.validString(zipCode, "zipCode", (min = 501),(max = 99950));
- 
-  
+    queryData.address.zipCode = validation.validString(
+      zipCode,
+      "zipCode",
+      (min = 501),
+      (max = 99950)
+    );
+
     // Calculated field
-    queryData.area = (dimensions.length*dimensions.breadth).toString();
-  
+    queryData.area = (dimensions.length * dimensions.breadth).toString();
+
     /*
     queryData has following structure
     queryDate = {
@@ -369,24 +401,38 @@ const updateLand = async (req, res) => {
     try {
       addLand = await landData.updateLand(queryData);
     } catch (error) {
-        if(error == "Could not add land"){
-          res.status(500).render("error", {title:"Server Error", error: [error]});
-          return;
-        }else{
-            res.status(400).render("editLand",{title: "Edit Land Information", id:landId, error:[error]} )//TODO: to be decided
-            return;
-        }
+      if (error == "Could not add land") {
+        res
+          .status(500)
+          .render("error", { title: "Server Error", error: [error] });
+        return;
+      } else {
+        res.status(400).render("editLand", {
+          title: "Edit Land Information",
+          id: landId,
+          error: [error],
+        }); //TODO: to be decided
+        return;
+      }
     }
     //if successfully added then redirect to my lands wala page
     res.status(200).redirect(`/land/${landId}`);
   }
- 
 };
 
 const addNewLand = async (req, res) => {
-  let { dimensionsLengthInput: length, dimensionsBreadthInput: breadth, typeInput:type, restrictionsInput: restrictions, 
-     line1Input:line1, line2Input:line2, zipCodeInput: zipCode, cityInput: city, stateInput:state} = req.body; //elaborated address
-  const queryData = {}; 
+  let {
+    dimensionsLengthInput: length,
+    dimensionsBreadthInput: breadth,
+    typeInput: type,
+    restrictionsInput: restrictions,
+    line1Input: line1,
+    line2Input: line2,
+    zipCodeInput: zipCode,
+    cityInput: city,
+    stateInput: state,
+  } = req.body; //elaborated address
+  const queryData = {};
 
   //valid numbers
   queryData.dimensions.length = validation.validNumber(
@@ -402,28 +448,35 @@ const addNewLand = async (req, res) => {
 
   //default behaviour
   queryData.sale.price = 1;
-  queryData.sale.dateOfListing = "11/11/1234" // TODO: to be updated
-  queryData.sale.onSale = false
+  queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
+  queryData.sale.onSale = false;
   queryData.approved = false;
   queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
 
-  
   //valid string and string of array
   queryData.type = validation.validString(type, "type of land", 20);
-  
+
   //if not default then validation
-  queryData.restrictions = validation.validArrayOfStrings(restrictions,"restrictions");
+  queryData.restrictions = validation.validArrayOfStrings(
+    restrictions,
+    "restrictions"
+  );
 
   // valid address
   queryData.address.line1 = validation.validString(line1, "line1", 46);
   queryData.address.line2 = validation.validString(line2, "line2", 46);
   queryData.address.city = validation.validString(city, "city", 17);
   queryData.address.state = validation.validString(state, "state", 2);
-  queryData.address.zipCode = validation.validString(zipCode, "zipCode", (min = 501),(max = 99950));
+  queryData.address.zipCode = validation.validString(
+    zipCode,
+    "zipCode",
+    (min = 501),
+    (max = 99950)
+  );
 
   // Calculated field
-  queryData.area = (dimensions.length*dimensions.breadth).toString();
-  console.log(queryData);  
+  queryData.area = (dimensions.length * dimensions.breadth).toString();
+  console.log(queryData);
   /*
   queryData has following structure
   queryDate = {
@@ -453,20 +506,28 @@ const addNewLand = async (req, res) => {
   try {
     addLand = await landData.addNewLand(queryData);
   } catch (error) {
-      if(error == "Could not add land"){
-        res.status(500).render("error", {title:"Server Error", error: [error]});
-        return;
-      }else{
-          res.status(400).render("addNewLand",{title: "Add Land", id: req.session.user.id, error:[error]} )//TODO: to be decided
-          return;
-      }
+    if (error == "Could not add land") {
+      res
+        .status(500)
+        .render("error", { title: "Server Error", error: [error] });
+      return;
+    } else {
+      res.status(400).render("addNewLand", {
+        title: "Add Land",
+        id: req.session.user.id,
+        error: [error],
+      }); //TODO: to be decided
+      return;
+    }
   }
   //if successfully added then redirect to my lands wala page
   res.status(200).redirect(`/${req.session.user.id}/land`);
 };
-const addNewLandForm = async(req, res) =>{
+const addNewLandForm = async (req, res) => {
   console.log(req.session.user.id);
-    res.status(200).render("addNewLand", {title: "Add Land", id: req.session.user.id});
+  res
+    .status(200)
+    .render("addNewLand", { title: "Add Land", id: req.session.user.id });
 };
 
 export {

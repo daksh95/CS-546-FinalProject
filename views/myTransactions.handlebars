@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
     <div class="container-fluid">
         <div class="navbar-header text-light">
             WebSite Name
@@ -14,16 +14,15 @@
         </ul>
     </div>
 </nav>
-
-<h1>
+<h2 class="font-italic p-3">
     Buyer Transactions
-</h1>
+</h2>
 {{#if emptyBuyerTransaction}}
-<div>
+<div class="p-3">
     You haven't placed bid for any properties!
 </div>
 {{else}}
-<div class="table-responsive">
+<div class="table-responsive p-3">
     <table class="table">
         <thead>
             <tr>
@@ -37,21 +36,22 @@
                 <td>{{this.name}}</td>
                 <td>{{this.status}}</td>
             </a>
+            {{/each}}
         </tbody>
     </table>
 </div>
 {{/if}}
 <hr>
 
-<h1>
+<h2 class="font-italic p-3">
     Seller Transactions
-</h1>
+</h2>
 {{#if emptySellerTransaction}}
-<div>
+<div class="p-3">
     You haven't received any bids for your property!
 </div>
 {{else}}
-<div class="table-responsive">
+<div class="table-responsive p-3">
     <table class="table">
         <thead>
             <tr>
@@ -67,7 +67,9 @@
                 <td>{{this.status}}</td>
                 {{else}}
                 <td>Pending approval</td>
+                {{/if}}
             </a>
+            {{/each}}
         </tbody>
     </table>
 </div>

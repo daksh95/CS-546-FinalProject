@@ -32,6 +32,7 @@ const getAllTransactionsofLand = async (req, res) => {
       title: "Land Transactions",
       transactions: transactions,
       emptyTransactions: emptyTransactions,
+      userId: req.session.user.id,
     });
   } catch (error) {
     return res.status(400).render("Error", {
