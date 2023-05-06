@@ -12,25 +12,28 @@ const addCredential = async(object) =>{
     const client = getClient();
 
     //valid email
-    emailId = validation.validEmail(emailId); 
+    queryData.emailId  = validation.validEmail(emailId); 
     
     //Checking if emailId already exists
     try {
-       let ans = await getCredentialByEmailId(emailId);
+       let ans = await getCredentialByEmailId( queryData.emailId);
        if(ans){
-            throw  `EmailId is already registered. Please login`;
+            throw `EmailId is already registered. Please login`;
        }
     }catch(e){
-        queryData.emailId = emailId;    
+        throw e;
     }
-
+    
     // Validating string
     queryData.typeOfUser = validation.validTypeOfUser(typeOfUser);
     queryData.password = validation.validPassword(password);
-    queryData.approved = false;
     
     //hashing the password
     queryData.password = await hash.generateHash(queryData.password);
+    
+    //default values
+    queryData.isApproved = false;
+    queryData.profileSetUpDon = false;
     queryData.previousPassword =[];
 
     //inserting credential

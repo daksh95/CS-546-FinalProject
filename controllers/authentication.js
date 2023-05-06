@@ -78,20 +78,19 @@ const postLogin = async (req, res) => {
   }
 
   //If profile is set up then we will redirect them to their appropriate pages
- 
-  //admin
+  // For admin
   if (validUser.typeOfUser == "admin") {
     res.status(200).redirect("/admin/profile");
     return;
   }
 
-  //users buyer or seller
+  // For users buyer or seller
   if (validUser.typeOfUser == "user") {
     res.status(200).redirect("/land");
     return;
   }
 
-  //land surveyor or title company or government, basically, any entity
+  // For land surveyor or title company or government, basically, any entity
   if (
     validUser.typeOfUser == "landSurveyor" ||
     validUser.typeOfUser == "titleCompany" ||
@@ -110,16 +109,42 @@ const getSignUp = async (req, res) => {
 const postSignUp = async (req, res) => {
   let { emailInput, passwordInput, rePasswordInput, roleInput } = req.body;
   let queryData = {};
+  let errors =[];
   //valid email
-  queryData.emailId = validation.validEmail(emailInput);
+  try {  
+    queryData.emailId = validation.validEmail(emailInput);
+    
+  } catch (e) {
+    errors.push(e);
+  }
 
   //valid password
-  queryData.password = validation.validPassword(passwordInput);
-  queryData.repassword = validation.validPassword(rePasswordInput);
-  if (passwordInput !== rePasswordInput) throw `Passwords do not match!`;
+  try {
+    queryData.password = validation.validPassword(passwordInput);
+  } catch (e) {
+    errors.push(e);
+  }
+
+  try {
+    queryData.repassword = validation.validPassword(rePasswordInput);
+  } catch (e) {
+    errors.push(e);
+
+  }
+
+  // check if both the passwords are same
+  if (passwordInput !== rePasswordInput) errors.push(`Passwords do not match!`);
 
   //valid type of user
-  queryData.typeOfUser = validation.validTypeOfUser(roleInput);
+  try {
+    queryData.typeOfUser = validation.validTypeOfUser(roleInput);
+  } catch (e) {
+    errors.push(e)
+  }
+  
+  //default values
+  queryData.isApproved = false;
+  queryData.profileSetUpDone= false;
 
   //add new credentials
   let signup;
@@ -127,15 +152,16 @@ const postSignUp = async (req, res) => {
     signup = await auth.addCredential(queryData);
   } catch (error) {
     //error due to server issue
-    console.log(error);
     if (error == "Could not create account") {
       res.status(500).render("error", { title: "Error Page", error: error });
       return;
     }
+
     //error due to bad data or email already getting used
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
-      error: error,
+      hasError:true, //TODO add {{#if hasError}}
+      error: errors, 
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
@@ -143,6 +169,7 @@ const postSignUp = async (req, res) => {
   }
 
   //add user to user collection
+  //TODO create a new function for initial set up in users.js;
 
   //successful creation
   if (signup) {
