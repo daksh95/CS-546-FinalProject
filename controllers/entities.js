@@ -197,6 +197,7 @@ const transDetails = async (req, res) => {
 
 const setUpProfile = async(req, res) =>{
   const {nameInput, phoneInput,emailIdInput, typeofGovernmentIdInput, governmentIdInput, dobInput, websiteInput, licenseInput } = req.body;
+  
 }
 
 export { getHome, getProfile, allTransacs, pendingTransacs, transDetails, setUpProfile };
