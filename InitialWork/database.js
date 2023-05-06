@@ -1,6 +1,7 @@
 const users = {
   // buyers and sellers
   _id: new ObjectId(),
+  userId: String,
   name: String,
   phone: String,
   emailId: String,
@@ -101,4 +102,6 @@ const credentials = {
   emailId: String,
   password: String,
   previousPassword: [String],
+  profileSetUpDone: Boolean,
+  isApproved: Boolean,
 };

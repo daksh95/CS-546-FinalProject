@@ -11,18 +11,32 @@ const getLogin = async (req, res) => {
 
 const postLogin = async (req, res) => {
   let { emailInput, passwordInput } = req.body;
+  let errors=[];
   //validation for email
-  emailInput = validation.validEmail(emailInput);
+  try {
+    emailInput = validation.validEmail(emailInput);
+  } catch (e) {
+    errors.push(e);
+  }
 
   //validation for password
-  passwordInput = validation.validPassword(passwordInput);
+  try {
+    passwordInput = validation.validPassword(passwordInput);
+
+  } catch (e) {
+    errors.push(e);
+  }
+
+  if(errors.length>0){
+      res.status(400).render("authentication/login", {title:"Login Page", email:emailInput, password:passwordInput, error:errors});
+      return;
+  }
 
   let validUser;
 
   //check if user exist
   try {
     validUser = await auth.getCredentialByEmailId(emailInput);
-    console.log(validUser);
   } catch (error) {
     res.status(401).render("authentication/login", {
       title: "Login Page",
@@ -35,7 +49,7 @@ const postLogin = async (req, res) => {
 
   //Checking if password is correct
   const validPass = await hash.compareHash(passwordInput, validUser.password);
-  // console.log(hashPass, validUser.password);
+
   if (!validPass) {
     res.status(401).render("authentication/login", {
       title: "Login Page",
@@ -68,31 +82,33 @@ const postLogin = async (req, res) => {
     id: id,
     credentialId: validUser._id,
     typeOfUser: validUser.typeOfUser,
+    isApproved: validUser.isApproved,
   };
 
-  // check if user is approved
-  // if (!validUser.approved) {
-  //   //set up profile
-  //   res.status(404).render("error", { Title: "Error", hasError });
-  //   // res.status(200).redirect(`/user/${userApproved.id}/profile`);
-  //   return;
-  // }
+  //if profile is not set up
+  if(!validUser.profileSetUpDone){
+    res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
+    return;
+  }
 
-  const userApproved = await userData.getUserByEmail(emailInput);
-  //Valid credential therfore, redirect them to appropriate pages;
-  //admin
+  if(validUser.isApproved == false){
+    res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
+  }
+
+  //If profile is set up then we will redirect them to their appropriate pages
+  // For admin
   if (validUser.typeOfUser == "admin") {
     res.status(200).redirect("/admin/profile");
     return;
   }
 
-  //users buyer or seller
+  // For users buyer or seller
   if (validUser.typeOfUser == "user") {
     res.status(200).redirect("/land");
     return;
   }
 
-  //land surveyor or title company or government, basically, any entity
+  // For land surveyor or title company or government, basically, any entity
   if (
     validUser.typeOfUser == "landSurveyor" ||
     validUser.typeOfUser == "titleCompany" ||
@@ -111,16 +127,42 @@ const getSignUp = async (req, res) => {
 const postSignUp = async (req, res) => {
   let { emailInput, passwordInput, rePasswordInput, roleInput } = req.body;
   let queryData = {};
+  let errors =[];
   //valid email
-  queryData.emailId = validation.validEmail(emailInput);
+  try {  
+    queryData.emailId = validation.validEmail(emailInput);
+    
+  } catch (e) {
+    errors.push(e);
+  }
 
   //valid password
-  queryData.password = validation.validPassword(passwordInput);
-  queryData.repassword = validation.validPassword(rePasswordInput);
-  if (passwordInput !== rePasswordInput) throw `Passwords do not match!`;
+  try {
+    queryData.password = validation.validPassword(passwordInput);
+  } catch (e) {
+    errors.push(e);
+  }
+
+  try {
+    queryData.repassword = validation.validPassword(rePasswordInput);
+  } catch (e) {
+    errors.push(e);
+
+  }
+
+  // check if both the passwords are same
+  if (passwordInput !== rePasswordInput) errors.push(`Passwords do not match!`);
 
   //valid type of user
-  queryData.typeOfUser = validation.validTypeOfUser(roleInput);
+  try {
+    queryData.typeOfUser = validation.validTypeOfUser(roleInput);
+  } catch (e) {
+    errors.push(e)
+  }
+  
+  //default values
+  queryData.isApproved = false;
+  queryData.profileSetUpDone= false;
 
   //add new credentials
   let signup;
@@ -128,15 +170,16 @@ const postSignUp = async (req, res) => {
     signup = await auth.addCredential(queryData);
   } catch (error) {
     //error due to server issue
-    console.log(error);
     if (error == "Could not create account") {
       res.status(500).render("error", { title: "Error Page", error: error });
       return;
     }
+
     //error due to bad data or email already getting used
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
-      error: error,
+      hasError:true, //TODO add {{#if hasError}}
+      error: errors, 
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
@@ -144,6 +187,7 @@ const postSignUp = async (req, res) => {
   }
 
   //add user to user collection
+  //TODO create a new function for initial set up in users.js;
 
   //successful creation
   if (signup) {
