@@ -7,7 +7,8 @@ import {
   allTransacs,
   pendingTransacs,
   transDetails,
-  setUpProfile
+  response,
+  setUpProfile,
 } from "../controllers/entities.js";
 
 router.route("/").get(getHome);
@@ -16,6 +17,9 @@ router.route("/myProfile").get(getProfile).post(setUpProfile);
 
 router.route("/allTransactions/:entityId").get(allTransacs);
 router.route("/pendingTransactions/:entityId").get(pendingTransacs);
-router.route("/transactionDetails/:transactionId").get(transDetails).post();
+router
+  .route("/transactionDetails/:transactionId")
+  .get(transDetails)
+  .post(response);
 
 export default router;

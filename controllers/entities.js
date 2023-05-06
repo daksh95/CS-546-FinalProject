@@ -237,6 +237,8 @@ const transDetails = async (req, res) => {
   }
 };
 
+const response = async (req, res) => {};
+
 const setUpProfile = async (req, res) => {
   const email = req.session.user.email;
   let error = [];
@@ -282,5 +284,6 @@ export {
   allTransacs,
   pendingTransacs,
   transDetails,
+  response,
   setUpProfile,
 };

@@ -4,14 +4,8 @@ import { entityCollection, transacsCollection } from "./collectionNames.js";
 import validation from "../utils/validation.js";
 
 const addNewEntity = async (name, contactInfo, emailId, website, license) => {
-  if (!name || !contactInfo || !emailId || !website || !license) {
-    console.log(name);
-    console.log(contactInfo);
-    console.log(emailId);
-    console.log(website);
-    console.log(license);
+  if (!name || !contactInfo || !emailId || !website || !license)
     throw `Recheck your inputs, one or more inputs are missing!`;
-  }
 
   if (typeof name !== "string") throw `Entity name must be a string!`;
   if (name.trim().length === 0)
