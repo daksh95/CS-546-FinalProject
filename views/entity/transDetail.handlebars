@@ -20,15 +20,58 @@
     <h1>Below are all the required details:</h1>
     <br>
     <h3>Below are the land details:</h3>
-    <p>ID: {{land._id}}</p>
-    <p>Dimensions: {{entity.name}}</p>
-    <p>Role: {{entity.role}}</p>
-    <p>Contact information: {{entity.contactInfo}}</p>
-    <p>EmailId: {{entity.emailId}}</p>
-    <p>Website: {{entity.Website}}</p>
-    <p>License: {{entity.license}}</p>
+    <p>{{land.address.line1}} {{land.address.line2}},</p>
+    <p>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</p>
+    <p>Land id: {{land._id}}</p>
+    <p>Land approved: {{land.approved}}</p>
+    <p>Dimensions: {{land.dimensions.length}}ft x {{land.dimensions.breadth}}ft</p>
+    <p>Area: {{land.area}} sq ft</p>
+    <p>{{land.type}} Area</p>
+    <p>Restrictions: </p>
+    <ul>
+        {{#each land.restrictions}}
+        <li>{{this}}</li>
+        {{/each}}
+    </ul>
+    {{#if land.sale.onSale}}
+    <p>Sale: Yes</p>
+    <p>Price: ${{land.sale.price}}</p>
+    <p>Date of Listing: {{land.sale.dateOfListing}}</p>
+    {{else}}
+    <p>Sale: No</p>
+    {{/if}}
     <br><br>
     <h3>Below are the seller details:</h3>
+    <p>Seller id: {{seller._id}}</p>
+    <p>Seller name: {{seller.name}}</p>
+    <p>Seller phone: {{seller.phone}}</p>
+    <p>Seller email id: {{seller.emailId}}</p>
+    <p>Seller date of birth: {{seller.dob}}</p>
+    <p>Seller gender: {{seller.gender}}</p>
+    <p>Seller approved: {{seller.approved}}</p>
+    <p>Seller rating: {{sellerRating}}</p>
     <br><br>
     <h3>Below are the buyer details:</h3>
+    <p>Buyer id: {{buyer._id}}</p>
+    <p>Buyer name: {{buyer.name}}</p>
+    <p>Buyer phone: {{buyer.phone}}</p>
+    <p>Buyer email id: {{buyer.emailId}}</p>
+    <p>Buyer date of birth: {{buyer.dob}}</p>
+    <p>Buyer gender: {{buyer.gender}}</p>
+    <p>Buyer approved: {{buyer.approved}}</p>
+    <p>Buyer rating: {{buyerRating}}</p>
+    <br><br><br>
+    <form method="post" id="responseForm">
+        <label for="status">
+            <input type="radio" name="status" value="approve">
+            Approve
+        </label>
+        <label>
+            <input type="radio" name="status" value="reject">
+            Reject
+        </label>
+        <label for="comment_input">Enter Comment:</label>
+        <textarea id="comment_input" name="comment_input"></textarea>
+        <button type="submit">Submit</button>
+    </form>
 </main>

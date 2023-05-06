@@ -160,10 +160,18 @@ const transDetails = async (req, res) => {
     let seller = await userData.getUserById(sellerId);
     let buyer = await userData.getUserById(buyerId);
     let land = await landData.getLand(landId);
+    let sellerRating = (
+      seller.rating.totalRating / seller.rating.count
+    ).toFixed(1);
+    let buyerRating = (buyer.rating.totalRating / buyer.rating.count).toFixed(
+      1
+    );
     res.render("entity/transDetail", {
       transaction: transactiontransaction,
       seller: seller,
+      sellerRating: sellerRating,
       buyer: buyer,
+      buyerRating: buyerRating,
       land: land,
     });
   } catch (error) {
