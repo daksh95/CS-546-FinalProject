@@ -10,8 +10,9 @@
             <label for ="emailIdInput"id ="email-text"> Email address:</label>
             <input type="emsil" id = "emailIdInput" name 
             "emailIdInput" value="{{details.emailId}}" readonly> <br>
+
             {{#if details.user}}
-            <label for="typeofGovernmentIdInput">Government Id:</label>
+            <label for="typeofGovernmentIdInput">Government ID:</label>
                 <select name="typeofGovernmentIdInput" id="typeofGovernmentIdInput">
                 <option value="ssn">SSN</option>
                 <option value="driverLicense">Driver's License</option>
@@ -27,10 +28,10 @@
             {{/if}}
 
             {{#if details.entity}}
-            <label for ="websiteInput"id ="website-text"> Website:</label>
+            <label for ="websiteInput"id ="website-text">Website: </label>
             <input type="url" id = "websiteInput" name 
             "websiteInput"> <br> 
-            <label for ="licenseInput"id ="license-text"> Website:</label>
+            <label for ="licenseInput"id ="license-text">License: </label>
             <input type="url" id = "licenseInput" name 
             "licenseInput"> <br> 
             {{/if}}

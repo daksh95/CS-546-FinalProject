@@ -8,12 +8,11 @@ import session from "express-session";
 //Login
 const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
-
 };
 
 const postLogin = async (req, res) => {
   let { emailInput, passwordInput } = req.body;
-  let errors=[];
+  let errors = [];
   //validation for email
   try {
     emailInput = validation.validEmail(emailInput);
@@ -24,19 +23,19 @@ const postLogin = async (req, res) => {
   //validation for password
   try {
     passwordInput = validation.validPassword(passwordInput);
-
   } catch (e) {
     errors.push(e);
   }
 
-  if(errors.length>0){
-      res.status(400).render("authentication/login", {
-        title:"Login Page", 
-        email:emailInput, 
-        password:passwordInput, 
-        hasError:true,
-        error:[errors]});
-      return;
+  if (errors.length > 0) {
+    res.status(400).render("authentication/login", {
+      title: "Login Page",
+      email: emailInput,
+      password: passwordInput,
+      hasError: true,
+      error: [errors],
+    });
+    return;
   }
 
   let validUser;
@@ -95,17 +94,17 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  if(!validUser.profileSetUpDone){
-    if(validUser.typeOfUser == "user"){
+  if (!validUser.profileSetUpDone) {
+    if (validUser.typeOfUser == "user") {
       res.status(200).redirect(`/user/${id}/profile`);
       return;
-    }else if(validUser.typeOfUser != "admin"){
+    } else if (validUser.typeOfUser != "admin") {
       res.status(200).redirect(`/entity/myProfile`);
       return;
     }
   }
-  if(validUser.isApproved == false){
-    res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
+  if (validUser.isApproved == false) {
+    res.status(200).redirect("", { title: "Approval waiting" }); //TODO create HTML page for this
   }
 
   //If profile is set up then we will redirect them to their appropriate pages
@@ -140,11 +139,10 @@ const getSignUp = async (req, res) => {
 const postSignUp = async (req, res) => {
   let { emailInput, passwordInput, rePasswordInput, roleInput } = req.body;
   let queryData = {};
-  let errors =[];
+  let errors = [];
   //valid email
-  try {  
+  try {
     queryData.emailId = validation.validEmail(emailInput);
-    
   } catch (e) {
     errors.push(e);
   }
@@ -160,7 +158,6 @@ const postSignUp = async (req, res) => {
     queryData.repassword = validation.validPassword(rePasswordInput);
   } catch (e) {
     errors.push(e);
-
   }
 
   // check if both the passwords are same
@@ -170,19 +167,20 @@ const postSignUp = async (req, res) => {
   try {
     queryData.typeOfUser = validation.validTypeOfUser(roleInput);
   } catch (e) {
-    errors.push(e)
+    errors.push(e);
   }
 
-  if(errors.length>0){
+  if (errors.length > 0) {
     res.status(400).render("authentication/signUp", {
-      title:"Registration Page", 
-      email:emailInput, 
-      password:passwordInput, 
-      hasError:true, 
-      error:errors});
+      title: "Registration Page",
+      email: emailInput,
+      password: passwordInput,
+      hasError: true,
+      error: errors,
+    });
     return;
-}
-  
+  }
+
   //add new credentials
   let signup;
   try {
@@ -190,15 +188,19 @@ const postSignUp = async (req, res) => {
   } catch (error) {
     //error due to server issue
     if (error == "Could not create account") {
-      res.status(500).render("error", { title: "Error Page", hasError:true, error: [error] });
+      res.status(500).render("error", {
+        title: "Error Page",
+        hasError: true,
+        error: [error],
+      });
       return;
     }
 
     //error due to bad data or email already getting used
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
-      hasError:true, 
-      error: errors, 
+      hasError: true,
+      error: errors,
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
@@ -207,7 +209,7 @@ const postSignUp = async (req, res) => {
   }
 
   //add user to user collection
-  if( queryData.typeOfUser == "user"){
+  if (queryData.typeOfUser === "user") {
     try {
       await userData.initializeProfile(queryData.emailId);
     } catch (error) {
@@ -215,36 +217,37 @@ const postSignUp = async (req, res) => {
       await auth.deleteCredentialByEmailId(queryData.emailId);
       res.status(500).render("authentication/signUp", {
         title: "Registration Page",
-        hasError:true, 
-        error: [error], 
+        hasError: true,
+        error: [error],
+        emailInput: emailInput,
+        passwordInput: passwordInput,
+      });
+      return;
+    }
+  } else if (queryData.typeOfUser !== "admin") {
+    try {
+      await entityData.initializeEntityProfile(
+        queryData.emailId,
+        queryData.typeOfUser
+      );
+    } catch (error) {
+      //TODO delete user;
+      await auth.deleteCredentialByEmailId(queryData.emailId);
+      res.status(500).render("authentication/signUp", {
+        title: "Registration Page",
+        hasError: true,
+        error: [error],
         emailInput: emailInput,
         passwordInput: passwordInput,
       });
       return;
     }
   }
-  else if(queryData.typeOfUser != "admin"){
-    try {
-      await entityData.initializeEntityProfile(queryData.emailId, queryData.typeOfUser);
-    } catch (error) {
-       //TODO delete user;
-        await auth.deleteCredentialByEmailId(queryData.emailId);
-        res.status(500).render("authentication/signUp", {
-        title: "Registration Page",
-        hasError:true, 
-        error: [error], 
-        emailInput: emailInput,
-        passwordInput: passwordInput,
-      });
-      return;
-   }
- }
   //successful creation
   if (signup) {
     // redirect user to login page
-  return res.status(200).redirect("/login");
+    return res.status(200).redirect("/login");
   }
-
 };
 
 const getLogout = async (req, res) => {

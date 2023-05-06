@@ -3,15 +3,8 @@ import { getClient } from "../config/connection.js";
 import { entityCollection, transacsCollection } from "./collectionNames.js";
 import validation from "../utils/validation.js";
 
-const addNewEntity = async (
-  name,
-  role,
-  contactInfo,
-  emailId,
-  Website,
-  license
-) => {
-  if (!name || !contactInfo || !emailId || !Website || !license || !role)
+const addNewEntity = async (name, contactInfo, emailId, website, license) => {
+  if (!name || !contactInfo || !emailId || !website || !license)
     throw `Recheck your inputs, one or more inputs are missing!`;
 
   if (typeof name !== "string") throw `Entity name must be a string!`;
@@ -30,51 +23,41 @@ const addNewEntity = async (
   if (!bleh.test(emailId)) throw `Invalid email address!`;
   emailId = emailId.trim().toLowerCase();
 
-  if (typeof Website !== "string") throw `Band website must be a string!`;
+  if (typeof website !== "string") throw `Band website must be a string!`;
   if (website.trim().length === 0)
     throw `Band website cannot be an empty string or just spaces!`;
   if (
-    !Website.includes("http://www.") ||
-    !Website.includes(".com") ||
-    Website.trim().length < 17
+    !website.includes("http://www.") ||
+    !website.includes(".com") ||
+    website.trim().length < 17
   )
     throw `Invalid entity website!`;
-  Website = Website.trim();
+  website = website.trim();
 
   if (typeof license !== "string") throw `Entity license must be a string!`;
   if (license.trim().length === 0)
     throw `Entity license cannot be an empty string or just spaces!`;
   license = license.trim();
 
-  role = role.toLowerCase();
-  if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
-    role !== "government"
-  )
-    throw `Invalid role!`;
-
   const client = getClient();
   const entityData = client.collection(entityCollection);
-  let meh = await entityData.findOne({ emailId: emailId });
-  if (meh !== null) throw `Email address already in use!`;
-
-  let newEntity = {
-    name: name,
-    role: role,
-    contactInfo: contactInfo,
-    emailId: emailId,
-    Website: Website,
-    license: license,
-    transactions: [],
-    approved: false,
-  };
-  const insertInfo = await entityData.insertOne(newEntity);
-  if (!insertInfo.acknowledged || !insertInfo.insertedId)
-    throw "Could not add the entity!";
-  const newId = insertInfo.insertedId.toString();
-  const newOne = await this.getEntityById(newId);
-  return newOne;
+  let updatedEntity = await entityData.findOneAndUpdate(
+    { emailId: emailId },
+    {
+      $set: {
+        name: name,
+        contactInfo: contactInfo,
+        emailId: emailId,
+        website: website,
+        license: license,
+      },
+    },
+    { returnDocument: "after" }
+  );
+  if (updatedEntity.lastErrorObject.n < 1) {
+    throw `Details for entity with email ${emailId} could not be inputted!`;
+  }
+  return;
 };
 
 const getAllEntities = async () => {
@@ -111,7 +94,6 @@ const getEntityByEmail = async (emailInput) => {
 const updateEntity = async (emailId) => {};
 
 const getTransactionsByEntityId = async (id) => {
-  // Change validations, func name, new object
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid entity id inputted!`;
 
@@ -132,8 +114,8 @@ const entityApproved = async (id, role) => {
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
@@ -145,7 +127,7 @@ const entityApproved = async (id, role) => {
   if (transaction === null) throw `No transaction with given ID found!`;
 
   let result = undefined;
-  if (role === "land surveyor") {
+  if (role === "landsurveyor") {
     result = await client
       .collection(transacsCollection)
       .findOneAndUpdate(
@@ -153,7 +135,7 @@ const entityApproved = async (id, role) => {
         { $set: { "surveyor.status": "approved" } },
         { returnDocument: "after" }
       );
-  } else if (role === "title company") {
+  } else if (role === "titlecompany") {
     result = await client
       .collection(transacsCollection)
       .findOneAndUpdate(
@@ -186,8 +168,8 @@ const entityTerminateTransaction = async (id, comment, role) => {
   comment = comment.trim();
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
@@ -243,7 +225,6 @@ const entityTerminateTransaction = async (id, comment, role) => {
 };
 
 const pendingTransactionsByEntityId = async (id) => {
-  // Change validations
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
 
@@ -251,14 +232,14 @@ const pendingTransactionsByEntityId = async (id) => {
   const entity = await this.getEntityById(id);
   let result = [];
   for (let i = 0; i < transactions.length; i++) {
-    if (entity.role === "land surveyor") {
+    if (entity.role === "landsurveyor") {
       if (
         transactions[i].status.toLowerCase() === "pending" &&
         transactions[i].surveyor.status === "pending"
       ) {
         result.push(transactions[i]);
       }
-    } else if (entity.role === "title company") {
+    } else if (entity.role === "titlecompany") {
       if (
         transactions[i].status.toLowerCase() === "pending" &&
         transactions[i].titleCompany.status === "pending"
@@ -284,8 +265,8 @@ const assignEntity = async (id, role) => {
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
@@ -295,7 +276,7 @@ const assignEntity = async (id, role) => {
     .collection(transacsCollection)
     .findOne({ _id: id });
   if (transaction === null) throw `No transaction with given ID found!`;
-  
+
   const entityData = client.collection(entityCollection);
 
   if (transaction.seller.status === "approved") {
@@ -310,9 +291,9 @@ const assignEntity = async (id, role) => {
       ) {
         random = 0;
       } else if (meh[random].transactions.length < 25 && random < meh.length) {
-        if (role === "land surveyor") {
+        if (role === "landsurveyor") {
           return meh._id.toString();
-        } else if (role === "title company") {
+        } else if (role === "titlecompany") {
           return meh._id.toString();
         } else if (role === "government") {
           return meh._id.toString();
@@ -335,8 +316,7 @@ const totalTransactionsCount = async (id) => {
   return transactions.length;
 };
 
-
-const initializeEntityProfile = async (email, role)=>{
+const initializeEntityProfile = async (email, role) => {
   email = validation.validEmail(email);
   role = validation.validTypeOfUser(role);
 
@@ -345,17 +325,22 @@ const initializeEntityProfile = async (email, role)=>{
     role: role,
     contactInfo: "",
     emailId: email,
-    Website: "",
+    website: "",
     license: "",
     transactions: [],
     approved: false,
   };
 
   const client = getClient();
-  let result = await client.collection(entityCollection).insertOne(newEntity);
-  if (!result.acknowledged || !result.insertedId) throw "Could not add the entity!";
+  const entityData = await client.collection(entityCollection);
+  let meh = await entityData.findOne({ emailId: email });
+  if (meh !== null) throw `Email address already in use!`;
+
+  let result = await entityData.insertOne(newEntity);
+  if (!result.acknowledged || !result.insertedId)
+    throw "Could not add the entity!";
   return true;
-}
+};
 
 const entityData = {
   addNewEntity,
@@ -370,7 +355,7 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
-  initializeEntityProfile
+  initializeEntityProfile,
 };
 
 export default entityData;
