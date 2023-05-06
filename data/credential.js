@@ -33,7 +33,7 @@ const addCredential = async(object) =>{
     
     //default values
     queryData.isApproved = false;
-    queryData.profileSetUpDon = false;
+    queryData.profileSetUpDone = false;
     queryData.previousPassword =[];
 
     //inserting credential

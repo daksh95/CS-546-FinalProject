@@ -1,6 +1,7 @@
 import userData from "../data/user.js";
 import transactionData from "../data/transactions.js";
 import landData from "../data/land.js";
+import auth from "../data/credential.js";
 import {
   checkInputType,
   exists,
@@ -60,6 +61,23 @@ const getProfile = async (req, res) => {
       hasError: true,
       error: error,
     });
+    
+    //check if session id matched url id
+    if(id != req.session.user.id){
+    //TODO Not authorized page
+    
+    }  
+  const profileSetUp = await auth.getCredentialByEmailId(req.session.user.email);
+  if(!profileSetUp.profileSetUpDone){
+    let details ={};
+    details.emailId = req.session.user.email;
+    details.url = `/user/${req.session.user.id}/profile`;
+    details.user = true;
+    res.status(200).render("authentication/profileSetUp", {
+      title: "Profile Set up", 
+      details});
+    return;
+  }
 
   try {
     const user = await userData.getUserById(id);
@@ -213,7 +231,9 @@ const getTransactionDetails = async (req, res) => {
   }
 };
 
-const setUpProfile = async (req, res) => {};
+const setUpProfile = async (req, res) => {
+
+};
 export {
   getPropertiesOfUser,
   getProfile,

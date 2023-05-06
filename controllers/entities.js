@@ -52,6 +52,18 @@ const getProfile = async (req, res) => {
       error: error,
     });
 
+  const profileSetUp = await auth.getCredentialByEmailId(req.session.user.email);
+    if(!profileSetUp.profileSetUpDone){
+      let details ={};
+      details.emailId = req.session.user.email; 
+      details.url = `/entity/myProfile`;
+      details.entity = true;
+      details.role = req.session.user.typeOfUser;
+      res.status(200).render("authentication/profileSetUp", {
+        title: "Profile Set up", 
+        details});
+      return;
+    }
   try {
     let entity = await entityData.getEntityById(id);
     res.render("entity/profile", {
@@ -183,4 +195,8 @@ const transDetails = async (req, res) => {
   }
 };
 
-export { getHome, getProfile, allTransacs, pendingTransacs, transDetails };
+const setUpProfile = async(req, res) =>{
+  const {nameInput, phoneInput,emailIdInput, typeofGovernmentIdInput, governmentIdInput, dobInput, websiteInput, licenseInput } = req.body;
+}
+
+export { getHome, getProfile, allTransacs, pendingTransacs, transDetails, setUpProfile };

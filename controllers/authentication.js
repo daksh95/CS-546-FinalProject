@@ -3,10 +3,12 @@ import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import userData from "../data/user.js";
 import entityData from "../data/entities.js";
+import session from "express-session";
 
 //Login
 const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
+
 };
 
 const postLogin = async (req, res) => {
@@ -94,10 +96,14 @@ const postLogin = async (req, res) => {
 
   //if profile is not set up
   if(!validUser.profileSetUpDone){
-    res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
-    return;
+    if(validUser.typeOfUser == "user"){
+      res.status(200).redirect(`/user/${id}/profile`);
+      return;
+    }else if(validUser.typeOfUser != "admin"){
+      res.status(200).redirect(`/entity/myProfile`);
+      return;
+    }
   }
-
   if(validUser.isApproved == false){
     res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
   }
@@ -201,7 +207,6 @@ const postSignUp = async (req, res) => {
   }
 
   //add user to user collection
-  //TODO create a new function for initial set up in users.js && entities.js;
   if( queryData.typeOfUser == "user"){
     try {
       await userData.initializeProfile(queryData.emailId);
