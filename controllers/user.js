@@ -172,6 +172,8 @@ const getTransactionDetails = async (req, res) => {
   let transaction = undefined;
   try {
     transaction = await transactionData.getTransactionById(transactionId);
+    transaction.buyer._id = transaction.buyer._id.toString();
+    transaction.seller._id = transaction.seller._id.toString();
     if (transaction.buyer._id === req.session.user.id) role = "buyer";
     else if (transaction.seller._id === req.session.user.id) role = "seller";
   } catch (error) {
@@ -184,6 +186,7 @@ const getTransactionDetails = async (req, res) => {
   let buyerInfo = undefined;
   try {
     buyerInfo = await userData.getUserById(transaction.buyer._id);
+    buyerInfo._id = buyerInfo._id.toString();
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",

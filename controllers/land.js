@@ -259,6 +259,7 @@ const placedBid = async (req, res) => {
   let landId = req.params.landId;
   let sellerId = req.params.sellerId;
   let landPrice = req.body.price;
+  let buyerId = req.session.user.id;
   let error = [];
   if (!exists(bid)) error.push("bid parameter does not exists");
   if (!checkInputType(bid, "number") || bid === NaN || bid === Infinity)
@@ -273,6 +274,13 @@ const placedBid = async (req, res) => {
     error.push("sellerId cannot be of empty spaces");
   sellerId = sellerId.trim();
   if (!ObjectId.isValid(sellerId)) error.push("Invalid Object sellerId");
+  if (!exists(buyerId)) error.push("buyerId parameter does not exists");
+  if (!checkInputType(buyerId, "string"))
+    error.push("buyerId must be of type string only");
+  if (buyerId.trim().length === 0)
+    error.push("buyerId cannot be of empty spaces");
+  buyerId = buyerId.trim();
+  if (!ObjectId.isValid(buyerId)) error.push("Invalid Object buyerId");
   if (!exists(landId)) error.push("landId parameter does not exists");
   if (!checkInputType(landId, "string"))
     error.push("landId must be of type string only");
@@ -287,7 +295,7 @@ const placedBid = async (req, res) => {
       error: error,
     });
   try {
-    await transactionData.createTransaction(bid, landId, sellerId);
+    await transactionData.createTransaction(bid, landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
     return res.status(400).render("Error", {
