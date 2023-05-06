@@ -30,6 +30,10 @@
     </div>
 
     {{#if hasError}}
-    
+      <ul>
+        {{#each error}}
+          <li>{{this}}</li>
+        {{/each}}
+      </ul>
     {{/if}}
 </main>

@@ -16,15 +16,24 @@
       </div>
   </nav>
 </header>
+<br>
 <main>
+  <div class="container-xl border border-dark rounded"; style="height: 85vh">
   {{#if transactionsExist}}
-  <ul class="approval-list"></ul>
+  <ul class="list-group">
     {{#each transactionList}}
       <a href="/admin/approvals/transaction/{{this._id}}">
-        <li>{{this.name}} {{this.emailId}}</li>
+        <li class="list-group-item">{{this.name}} {{this.emailId}}</li>
       </a>
     {{/each}}
+  </ul>
   {{else}}
-    <div class="empty-list">No transactions to be approved</div>
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <p class="text-center">No transnactions to be approved</p>
+      </div>
+    </div>
   {{/if}}
+  </div>
 </main>

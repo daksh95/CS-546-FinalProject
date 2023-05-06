@@ -26,7 +26,10 @@ const getApprovalAccount = async (req, res) => {
     const account = await adminData.getAccountById(accountId);
     if (!account) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
-    return res.json(account);
+    const isUser = account.user.toLowerCase() === 'user';
+    const isEntity = !isUser;
+
+    return res.render('approveAccount', { title: "Approve Account", account, isUser, isEntity });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }

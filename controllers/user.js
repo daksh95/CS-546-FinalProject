@@ -1,6 +1,7 @@
 import userData from "../data/user.js";
 import transactionData from "../data/transactions.js";
 import landData from "../data/land.js";
+import auth from "../data/credential.js";
 import {
   checkInputType,
   exists,
@@ -60,6 +61,23 @@ const getProfile = async (req, res) => {
       hasError: true,
       error: error,
     });
+    
+    //check if session id matched url id
+    if(id != req.session.user.id){
+    //TODO Not authorized page
+    
+    }  
+  const profileSetUp = await auth.getCredentialByEmailId(req.session.user.email);
+  if(!profileSetUp.profileSetUpDone){
+    let details ={};
+    details.emailId = req.session.user.email;
+    details.url = `/user/${req.session.user.id}/profile`;
+    details.user = true;
+    res.status(200).render("authentication/profileSetUp", {
+      title: "Profile Set up", 
+      details});
+    return;
+  }
 
   try {
     const user = await userData.getUserById(id);
@@ -172,6 +190,8 @@ const getTransactionDetails = async (req, res) => {
   let transaction = undefined;
   try {
     transaction = await transactionData.getTransactionById(transactionId);
+    transaction.buyer._id = transaction.buyer._id.toString();
+    transaction.seller._id = transaction.seller._id.toString();
     if (transaction.buyer._id === req.session.user.id) role = "buyer";
     else if (transaction.seller._id === req.session.user.id) role = "seller";
   } catch (error) {
@@ -184,6 +204,7 @@ const getTransactionDetails = async (req, res) => {
   let buyerInfo = undefined;
   try {
     buyerInfo = await userData.getUserById(transaction.buyer._id);
+    buyerInfo._id = buyerInfo._id.toString();
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",
@@ -210,7 +231,9 @@ const getTransactionDetails = async (req, res) => {
   }
 };
 
-const setUpProfile = async (req, res) => {};
+const setUpProfile = async (req, res) => {
+
+};
 export {
   getPropertiesOfUser,
   getProfile,

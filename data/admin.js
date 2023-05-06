@@ -58,7 +58,7 @@ const getAccountById = async (accountId) => {
 
   const account = accountUser ? accountUser : accountEntity;
   
-  if (accountUser) account.type = 'User';
+  if (accountUser) account.role = 'User';
 
   account._id = account._id.toString();
 
@@ -152,6 +152,15 @@ const approveLand = async (landId) => {
 
 const adminApproved = async (transactionId, buyerId, sellerId) => {};
 
+const getAdminId = async () => {
+  const client = getClient();
+  const result = await client.collection('credential').findOne({ typeOfUser: 'admin' });
+  if (!result) throw 'No admin account exists, please make one';
+
+  result._id = result._id.toString();
+  return result._id;
+}
+
 const adminData = {
   approveUser,
   approveLand,
@@ -159,7 +168,8 @@ const adminData = {
   getUnapprovedAccounts,
   getAccountById,
   getUnapprovedLands,
-  getUnapprovedTransactions
+  getUnapprovedTransactions,
+  getAdminId
 };
 
 export default adminData;

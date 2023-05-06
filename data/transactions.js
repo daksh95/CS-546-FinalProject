@@ -2,6 +2,10 @@ import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { inputValidation } from "../utils/helpers.js";
+import landData from "./land.js";
+import userData from './user.js';
+import adminData from "./admin.js";
+import entityData from "./entities.js";
 
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByBuyerId = async (id) => {
@@ -82,12 +86,40 @@ const sellerApproved = async (transactionId, sellerId, value) => {
 
   const client = getClient();
   if (value === "approve") {
+    const landSurveyorId = await entityData.assignEntity(transactionId, "land surveyor");
+    const titleCompanyId = await entityData.assignEntity(transactionId, "title company");
+    const governmentId = await entityData.assignEntity(transactionId, "government");
+    
+    if (!landSurveyorId) throw 'Could not find any Land Surveyor to assign to this transaction';
+    if (!titleCompanyId) throw 'Could not find any Title Company to assign to this transaction';
+    if (!governmentId) throw 'Could not find any Government user to assign to this transaction';
+
+    let approvalupdates = {
+      "seller.status": "approved",
+      surveyor: {
+        _id: new ObjectId(landSurveyorId),
+        status: "pending",
+        Comment: null
+      },
+      titleCompanyId: {
+        _id: new ObjectId(titleCompanyId),
+        status: "pending",
+        Comment: null
+      },
+      government: {
+        _id: new ObjectId(governmentId),
+        status: "pending",
+        Comment: null
+      },
+      status: "pending"
+    }
+
     const result = await client.collection("transaction").findOneAndUpdate(
       {
         _id: new ObjectId(transactionId),
         "seller._id": new ObjectId(sellerId),
       },
-      { $set: { "seller.status": "approved" } },
+      { $set: { approvalupdates } },
       { returnDocument: "after" }
     );
     if (result.lastErrorObject.n < 1) {
@@ -99,17 +131,64 @@ const sellerApproved = async (transactionId, sellerId, value) => {
         _id: new ObjectId(transactionId),
         "seller._id": new ObjectId(sellerId),
       },
-      { $set: { "seller.status": "rejected" } },
+      { $set: {
+        "seller.status": "rejected",
+        status: "rejected"
+      } },
       { returnDocument: "after" }
     );
     if (result.lastErrorObject.n < 1) {
-      throw "Could not be approved";
+      throw "Could not be rejected";
     }
   }
   return;
 };
 
-const createTransaction = async (bid, landId, sellerId) => {};
+const createTransaction = async (bid, landId, sellerId, buyerId) => {
+  // Validating input
+  bid = validation.validNumber(bid, "bid");
+  landId = validation.validObjectId(landId);
+  sellerId = validation.validObjectId(sellerId);
+  buyerId = validation.validObjectId(buyerId);
+  
+  landData.getLand(landId);
+  userData.getUserById(sellerId);
+  userData.getUserById(buyerId);
+  
+  const adminId = await adminData.getAdminId();
+  if (!adminId) throw 'could not fetch admin accounts';
+
+  let transaction = {
+    land: new ObjectId(landId),
+    buyer: {
+      _id: new ObjectId(buyerId),
+      bid: bid,
+    },
+    priceSoldFor: null,
+    seller: {
+      _id: new ObjectId(sellerId),
+      status: "pending"
+    },
+    surveyor: {},
+    titleCompany: {},
+    government: {},
+    admin: {
+      _id: new ObjectId(adminId),
+      status: false,
+      Comment: null
+    },
+    status: null
+  };
+
+  const client = getClient();
+  const insertedInfo = await client.collection('transaction').insertOne(transaction);
+
+  if (!insertedInfo.acknowledged || !insertedInfo.insertedId)
+    throw 'Could not initiate a transaction';
+
+  const newTransaction = await getTransactionById(insertedInfo._id.toString());
+  return newTransaction;
+};
 
 const terminateTransaction = async (transactionId, adminComment) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
@@ -130,8 +209,6 @@ const terminateTransaction = async (transactionId, adminComment) => {
   }
   return result;
 };
-
-const updateBid = async (transactionId, bidAmount) => {};
 
 const getTransactionById = async (transactionId) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");

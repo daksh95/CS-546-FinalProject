@@ -290,11 +290,12 @@ const assignEntity = async (id, role) => {
   )
     throw `Invalid role!`;
 
+  const client = await getClient();
   const transaction = await client
     .collection(transacsCollection)
     .findOne({ _id: id });
   if (transaction === null) throw `No transaction with given ID found!`;
-  const client = await getClient();
+  
   const entityData = client.collection(entityCollection);
 
   if (transaction.seller.status === "approved") {
@@ -310,11 +311,11 @@ const assignEntity = async (id, role) => {
         random = 0;
       } else if (meh[random].transactions.length < 25 && random < meh.length) {
         if (role === "land surveyor") {
-          transaction.surveyor._id = meh._id;
+          return meh._id.toString();
         } else if (role === "title company") {
-          transaction.titleCompany._id = meh._id;
+          return meh._id.toString();
         } else if (role === "government") {
-          transaction.government._id = meh._id;
+          return meh._id.toString();
         }
         break;
       }
@@ -334,6 +335,28 @@ const totalTransactionsCount = async (id) => {
   return transactions.length;
 };
 
+
+const initializeEntityProfile = async (email, role)=>{
+  email = validation.validEmail(email);
+  role = validation.validTypeOfUser(role);
+
+  let newEntity = {
+    name: "",
+    role: role,
+    contactInfo: "",
+    emailId: email,
+    Website: "",
+    license: "",
+    transactions: [],
+    approved: false,
+  };
+
+  const client = getClient();
+  let result = await client.collection(entityCollection).insertOne(newEntity);
+  if (!result.acknowledged || !result.insertedId) throw "Could not add the entity!";
+  return true;
+}
+
 const entityData = {
   addNewEntity,
   getAllEntities,
@@ -347,6 +370,7 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
+  initializeEntityProfile
 };
 
 export default entityData;

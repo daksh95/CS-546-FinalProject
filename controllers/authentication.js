@@ -3,10 +3,12 @@ import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import userData from "../data/user.js";
 import entityData from "../data/entities.js";
+import session from "express-session";
 
 //Login
 const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
+
 };
 
 const postLogin = async (req, res) => {
@@ -28,7 +30,12 @@ const postLogin = async (req, res) => {
   }
 
   if(errors.length>0){
-      res.status(400).render("authentication/login", {title:"Login Page", email:emailInput, password:passwordInput, error:errors});
+      res.status(400).render("authentication/login", {
+        title:"Login Page", 
+        email:emailInput, 
+        password:passwordInput, 
+        hasError:true,
+        error:[errors]});
       return;
   }
 
@@ -42,7 +49,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
-      error: "Invalid Email or Password",
+      hasError: true,
+      error: ["Invalid Email or Password"],
     });
     return;
   }
@@ -55,7 +63,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
-      error: "Invalid Email or Password",
+      hasError: true,
+      error: ["Invalid Email or Password"],
     });
     return;
   }
@@ -86,14 +95,18 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  // if(!validUser.profileSetUpDone){
-  //   res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
-  //   return;
-  // }
-
-  // if(validUser.isApproved == false){
-  //   res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
-  // }
+  if(!validUser.profileSetUpDone){
+    if(validUser.typeOfUser == "user"){
+      res.status(200).redirect(`/user/${id}/profile`);
+      return;
+    }else if(validUser.typeOfUser != "admin"){
+      res.status(200).redirect(`/entity/myProfile`);
+      return;
+    }
+  }
+  if(validUser.isApproved == false){
+    res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
+  }
 
   //If profile is set up then we will redirect them to their appropriate pages
   // For admin
@@ -159,11 +172,17 @@ const postSignUp = async (req, res) => {
   } catch (e) {
     errors.push(e)
   }
-  
-  //default values
-  queryData.isApproved = false;
-  queryData.profileSetUpDone= false;
 
+  if(errors.length>0){
+    res.status(400).render("authentication/signUp", {
+      title:"Registration Page", 
+      email:emailInput, 
+      password:passwordInput, 
+      hasError:true, 
+      error:errors});
+    return;
+}
+  
   //add new credentials
   let signup;
   try {
@@ -171,30 +190,61 @@ const postSignUp = async (req, res) => {
   } catch (error) {
     //error due to server issue
     if (error == "Could not create account") {
-      res.status(500).render("error", { title: "Error Page", error: error });
+      res.status(500).render("error", { title: "Error Page", hasError:true, error: [error] });
       return;
     }
 
     //error due to bad data or email already getting used
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
-      hasError:true, //TODO add {{#if hasError}}
+      hasError:true, 
       error: errors, 
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
+
     return;
   }
 
   //add user to user collection
-  //TODO create a new function for initial set up in users.js;
-
+  if( queryData.typeOfUser == "user"){
+    try {
+      await userData.initializeProfile(queryData.emailId);
+    } catch (error) {
+      //TODO delete user credentials;
+      await auth.deleteCredentialByEmailId(queryData.emailId);
+      res.status(500).render("authentication/signUp", {
+        title: "Registration Page",
+        hasError:true, 
+        error: [error], 
+        emailInput: emailInput,
+        passwordInput: passwordInput,
+      });
+      return;
+    }
+  }
+  else if(queryData.typeOfUser != "admin"){
+    try {
+      await entityData.initializeEntityProfile(queryData.emailId, queryData.typeOfUser);
+    } catch (error) {
+       //TODO delete user;
+        await auth.deleteCredentialByEmailId(queryData.emailId);
+        res.status(500).render("authentication/signUp", {
+        title: "Registration Page",
+        hasError:true, 
+        error: [error], 
+        emailInput: emailInput,
+        passwordInput: passwordInput,
+      });
+      return;
+   }
+ }
   //successful creation
   if (signup) {
     // redirect user to login page
-    res.status(200).redirect("/login");
-    return;
+  return res.status(200).redirect("/login");
   }
+
 };
 
 const getLogout = async (req, res) => {

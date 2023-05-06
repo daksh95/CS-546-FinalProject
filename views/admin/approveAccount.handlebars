@@ -1,0 +1,64 @@
+<header>
+  <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+      <div class="container-fluid">
+          <div class="navbar-header text-light">
+              <a class="navbar-brand" href="#">WebSite Name</a>
+          </div>
+          <ul class="nav navbar-nav">
+              <li class="nav-item"><a href="/home" class="nav-link text-light">Home</a></li>
+              <li class="nav-item"><a href="/admin/approvals/account" class="nav-link text-light">Account Approvals</a></li>
+              <li class="nav-item"><a href="/admin/approvals/land" class="nav-link text-light">Land Approvals</a></li>
+              <li class="nav-item"><a href="/admin/approvals/transaction" class="nav-link text-light">Transaction Approvals</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+              <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
+          </ul>
+      </div>
+  </nav>
+</header>
+<br>
+
+<main class="container-fluid">
+  <div class="row">
+    <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
+      {{#if isUser }}
+        <dl>
+          <dt>ID:</dt>
+          <dd>{{ account._id }}</dd>
+          <dt>Name:</dt>
+          <dd>{{ account.name }}</dd>
+          <dt>Account Type:</dt>
+          <dd>User</dd>
+          <dt>Phone Number:</dt>
+          <dd>{{ account.phone }}</dd>
+          <dt>Email Address:</dt>
+          <dd>{{ account.emailId }}</dd>
+          <dt>Government ID:</dt>
+          <dd>{{ account.typeOfId }} - {{ account.Id }}</dd>
+          <dt>Date of Birth:</dt>
+          <dd>{{ account.dob }}</dd>
+          <dt>Gender:</dt>
+          <dd>{{ account.gender }}</dd>
+        </dl>
+      {{#else }}
+        <dl>
+          <dt>ID:</dt>
+          <dd>{{ account._id }}</dd>
+          <dt>Name:</dt>
+          <dd>{{ account.name }}</dd>
+          <dt>Account Type:</dt>
+          <dd>{{ account.role }}</dd>
+          <dt>Phone Number:</dt>
+          <dd>{{ account.contactInfo }}</dd>
+          <dt>Email Address:</dt>
+          <dd>{{ account.emailId }}</dd>
+          <dt>Website:</dt>
+          <dd>{{ account.Website }}</dd>
+          <dt>License:</dt>
+          <dd>{{ account.license }}</dd>
+        </dl>
+      {{/if}}
+    </div>
+    
+  </div>
+</main>

@@ -1,0 +1,47 @@
+<div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
+    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">    
+        <form action = "{{details.url}}" method="post" id = "profileSetUp form">
+            <label for ="nameInput"id ="name-text"> Name:</label>
+            <input type="text" id = "nameInput" name 
+            "nameInput"><br>
+            <label for ="phoneInput"id ="phone-number"> Phone:</label>
+            <input type="number" id = "phoneInput" name 
+            "phoneInput"> <br>
+            <label for ="emailIdInput"id ="email-text"> Email address:</label>
+            <input type="emsil" id = "emailIdInput" name 
+            "emailIdInput" value="{{details.emailId}}" readonly> <br>
+            {{#if details.user}}
+            <label for="typeofGovernmentIdInput">Government Id:</label>
+                <select name="typeofGovernmentIdInput" id="typeofGovernmentIdInput">
+                <option value="ssn">SSN</option>
+                <option value="driverLicense">Driver's License</option>
+                <option value="val3">val 3</option>
+                </select> 
+            <label for ="governmentIdInput"id ="government-text"> valid GovernmentID number:</label>
+            <input type="text" id = "governmentIdInput" name 
+            "governmentIdInput"> <br> 
+            
+            <label for ="dobInput"id ="dob-date"> Date of birth:</label>
+            <input type="Date" id = "dobInput" name 
+            "dobInput"> <br> 
+            {{/if}}
+
+            {{#if details.entity}}
+            <label for ="websiteInput"id ="website-text"> Website:</label>
+            <input type="url" id = "websiteInput" name 
+            "websiteInput"> <br> 
+            <label for ="licenseInput"id ="license-text"> Website:</label>
+            <input type="url" id = "licenseInput" name 
+            "licenseInput"> <br> 
+            {{/if}}
+            <button type="submit">Submit </button>
+        </form>   
+</main>
+  {{#if hasError}}
+      <ul>
+        {{#each error}}
+          <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    {{/if}}
+</div>

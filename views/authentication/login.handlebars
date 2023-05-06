@@ -25,4 +25,11 @@
             <a href="/signUp" id="signUpLink">Click here to sign up!</a>
         </div>
     </main>
+    {{#if hasError}}
+      <ul>
+        {{#each error}}
+          <li>{{this}}</li>
+        {{/each}}
+      </ul>
+    {{/if}}
 </div>

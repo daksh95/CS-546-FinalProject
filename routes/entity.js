@@ -7,11 +7,12 @@ import {
   allTransacs,
   pendingTransacs,
   transDetails,
+  setUpProfile
 } from "../controllers/entities.js";
 
 router.route("/").get(getHome);
 
-router.route("/myProfile").get(getProfile);
+router.route("/myProfile").get(getProfile).post(setUpProfile);
 
 router.route("/allTransactions/:entityId").get(allTransacs);
 router.route("/pendingTransactions/:entityId").get(pendingTransacs);

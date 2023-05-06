@@ -24,8 +24,9 @@ const getOwnerByLandId = async (id) => {
 const getUserByEmail = async (email) => {
   email = validation.validEmail(email);
   const client = getClient();
-  const result = await client.collection("users").findOne({ emailId: email });
-  return result;
+  let result = await client.collection("users").findOne({ emailId: email });
+  if(result == null) throw "User not found";
+  return result._id.toString();
 };
 
 const updateUserData = async (email, name, phone, dob, gender) => {};
@@ -85,10 +86,9 @@ const createUser = async (
     },
     land: [],
   };
-
   // Insert user into database
   const client = getClient();
-  const result = await client.collection("users").insertOne(newUser);
+  const result = await client.collection("users").insertOne(newUser);//TODO: change to update function;
 
   if (!result.ackowledged || !result.insertedId) throw `failed to insert user`;
 
@@ -123,6 +123,44 @@ const getLandsOfUserID = async (id) => {
   return lands;
 };
 
+const initializeProfile = async(email)=>{
+  email = validation.validEmail(email);
+  let newUser = {
+      name: "",
+      phone: "",
+      emailId: email,
+      governmentId: {
+        typeofId: "",
+        id: "",
+      },
+      dob: "",
+      gender: "",
+      approved: false,
+      rating: {
+        totalRating: 0,
+        noOfRating: 0,
+      },
+      land: [],
+    };
+
+  const client = getClient();
+
+  //if email already being used
+  try {
+    const isPresent = await getUserByEmail(email);
+    throw "Email already exist, please login."
+  } catch (error) {
+  }
+
+  //initializing user
+  const result = await client.collection("users").insertOne(newUser);
+
+  console.log(result);
+  if (!result.ackowledged || !result.insertedId) {throw `failed to insert user`};
+  
+  return true;
+}
+
 const userData = {
   getOwnerByLandId: getOwnerByLandId,
   getUserByEmail: getUserByEmail,
@@ -130,6 +168,7 @@ const userData = {
   getUserById: getUserById,
   createUser: createUser,
   getLandsOfUserID: getLandsOfUserID,
+  initializeProfile:initializeProfile
 };
 
 export default userData;
