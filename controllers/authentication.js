@@ -17,12 +17,11 @@ const postLogin = async (req, res) => {
   passwordInput = validation.validPassword(passwordInput);
 
   let validUser;
-  console.log(emailInput);
 
   //check if user exist
   try {
     validUser = await auth.getCredentialByEmailId(emailInput);
-    console.log(validUser.password);
+    console.log(validUser);
   } catch (error) {
     res.status(401).render("authentication/login", {
       title: "Login Page",
@@ -49,10 +48,10 @@ const postLogin = async (req, res) => {
   //create session
   req.session.user = {
     email: emailInput,
-    id: validUser.id,
+    id: validUser._id,
     typeOfUser: validUser.typeOfUser,
   };
-  console.log("here i am in");
+
   // check if user is approved
   // if (!validUser.approved) {
   //   //set up profile
