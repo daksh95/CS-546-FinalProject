@@ -8,16 +8,16 @@ const getLogin = async (req, res) => {
   res.status(200).render("authentication/login", { title: "Login Page" });
 };
 
-const postLogin = async (req, res) =>{
-    let {emailInput, passwordInput} = req.body;
-    //validation for email
-    emailInput = validation.validEmail(emailInput);
-    
-    //validation for password
-    passwordInput = validation.validPassword(passwordInput);
-    
-    let validUser;
-    console.log(emailInput);
+const postLogin = async (req, res) => {
+  let { emailInput, passwordInput } = req.body;
+  //validation for email
+  emailInput = validation.validEmail(emailInput);
+
+  //validation for password
+  passwordInput = validation.validPassword(passwordInput);
+
+  let validUser;
+  console.log(emailInput);
 
   //check if user exist
   try {
@@ -136,11 +136,17 @@ const postSignUp = async (req, res) => {
   }
 };
 
+const getLogout = async (req, res) => {
+  req.session.destroy();
+  return res.status(200).render("authentication/logout", { title: "logout" });
+};
+
 const authController = {
   getLogin: getLogin,
   postLogin: postLogin,
   getSignUp: getSignUp,
   postSignUp: postSignUp,
+  getLogout: getLogout,
 };
 
 export default authController;

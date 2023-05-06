@@ -2,6 +2,7 @@ import auth from "../controllers/authentication.js";
 import { Router } from "express";
 const loginRoutes = Router();
 const signUpRoutes = Router();
+const logoutRoutes = Router();
 
 //login page routes
 loginRoutes.route("/").get(auth.getLogin).post(auth.postLogin);
@@ -9,4 +10,6 @@ loginRoutes.route("/").get(auth.getLogin).post(auth.postLogin);
 //signUp page routes
 signUpRoutes.route("/").get(auth.getSignUp).post(auth.postSignUp);
 
-export {loginRoutes, signUpRoutes};
+logoutRoutes.route("/").get(auth.getLogout);
+
+export {loginRoutes, signUpRoutes, logoutRoutes};
