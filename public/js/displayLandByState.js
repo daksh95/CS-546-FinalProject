@@ -58,8 +58,8 @@
       var lands = document.getElementById("lands");
       var landsJSON = lands.dataset.landstates;
       var landByState = JSON.parse(landsJSON);
-      let mainResultsDiv = document.getElementById("mainResults");
-      let resultsDiv = document.getElementById("results");
+      let mainResultsDiv = document.getElementById("displayResults");
+      let resultsDiv = document.getElementById("result");
       let selectedValue = this.value;
       if (selectedValue === "priceAsc") {
         landByState.sort(function (a, b) {
@@ -72,7 +72,7 @@
       }
       resultsDiv.remove();
       resultsDiv = document.createElement("div");
-      resultsDiv.setAttribute("id", "results");
+      resultsDiv.setAttribute("id", "result");
       mainResultsDiv.appendChild(resultsDiv);
       resultsDiv.classList.add("col-sm-8");
       for (let i = 0; i < landByState.length; i++) {

@@ -92,39 +92,36 @@ const getLandByState = async (req, res) => {
 
 const postLandByState = async (req, res) => {
   let state = req.body.state;
-  let error = [];
-  if (!exists(state)) error.push("State is not entered");
+  if (!exists(state))
+    return res.status(400).send({ message: "State not provided" });
   if (!checkInputType(state, "string"))
-    error.push("State must be of type string only");
+    return res
+      .status(400)
+      .send({ message: "State must be of type string only" });
   if (state.trim().length === 0)
-    error.push("State cannot contain empty spaces only");
+    return res
+      .status(400)
+      .send({ message: "State cannot contain empty spaces only" });
   state = state.trim();
   if (!validStateCodes.includes(state.toUpperCase()))
-    error.push(
-      "State parameter must be a valid statecode in abbreviations only"
-    );
-  if (error.length !== 0)
-    return res.status(400).render("displayLandByState", {
-      title: "Lands",
-      landByState: [],
-      state: undefined,
-      hasSearchError: true,
-      error: error,
-      userId: req.session.user.id,
+    return res.status(400).send({
+      message:
+        "State parameter must be a valid statecode in abbreviations only",
     });
 
   try {
     let landByState = await landData.getLandByState(state);
     let empty_lands = false;
     if (!arrayLength(landByState, 1)) empty_lands = true;
-    // res.status(200).render("displayLandByState", {
-    //   title: "Lands",
-    //   landByState: landByState,
-    //   state: state,
-    //   empty_lands: empty_lands,
-    //   userId: req.session.user.id,
-    // });
-    return res.json(landByState);
+    return res.status(200).render("displayLandByState", {
+      title: "Lands",
+      landByState: landByState,
+      state: state,
+      empty_lands: empty_lands,
+      // userId: req.session.user.id,/
+      layout: false,
+    });
+    // return res.json(landByState);
   } catch (error) {
     return res.status(400).render("displayLandByState", {
       title: "Lands",

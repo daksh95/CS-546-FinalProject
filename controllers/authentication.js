@@ -86,14 +86,14 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  if(!validUser.profileSetUpDone){
-    res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
-    return;
-  }
+  // if(!validUser.profileSetUpDone){
+  //   res.status(200).redirect("profileSetUp", {title: "Profile Set up", typeOfUser:validUser.typeOfUser});
+  //   return;
+  // }
 
-  if(validUser.isApproved == false){
-    res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
-  }
+  // if(validUser.isApproved == false){
+  //   res.status(200).redirect("", {title: "Approval waiting"}); //TODO create HTML page for this
+  // }
 
   //If profile is set up then we will redirect them to their appropriate pages
   // For admin
