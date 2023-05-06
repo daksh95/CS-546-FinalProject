@@ -335,6 +335,28 @@ const totalTransactionsCount = async (id) => {
   return transactions.length;
 };
 
+
+const initializeEntityProfile = async (email, role)=>{
+  email = validation.validEmail(email);
+  role = validation.validTypeOfUser(role);
+
+  let newEntity = {
+    name: "",
+    role: role,
+    contactInfo: "",
+    emailId: email,
+    Website: "",
+    license: "",
+    transactions: [],
+    approved: false,
+  };
+
+  const client = getClient();
+  let result = await client.collection(entityCollection).insertOne(newEntity);
+  if (!result.acknowledged || !result.insertedId) throw "Could not add the entity!";
+  return true;
+}
+
 const entityData = {
   addNewEntity,
   getAllEntities,
@@ -348,6 +370,7 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
+  initializeEntityProfile
 };
 
 export default entityData;

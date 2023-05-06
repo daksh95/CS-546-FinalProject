@@ -128,11 +128,14 @@ const updateProfileStatus = async(profileSetUpDone)=>{
     return;
 }
 
+
+
 const credentialData = {
     addCredential:addCredential,
     getCredentialByEmailId:getCredentialByEmailId,
     updateEmailId:updateEmailId,
-    updatePassword:updatePassword
+    updatePassword:updatePassword,
+    updateProfileStatus:updateProfileStatus
 }
 
 export default credentialData;

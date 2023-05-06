@@ -202,14 +202,43 @@ const postSignUp = async (req, res) => {
 
   //add user to user collection
   //TODO create a new function for initial set up in users.js && entities.js;
-  
-  
+  if( queryData.typeOfUser == "user"){
+    try {
+      await userData.initializeProfile(queryData.emailId);
+    } catch (error) {
+      //TODO delete user credentials;
+      
+      res.status(500).render("authentication/signUp", {
+        title: "Registration Page",
+        hasError:true, 
+        error: [error], 
+        emailInput: emailInput,
+        passwordInput: passwordInput,
+      });
+      return;
+    }
+  }
+  else if(queryData.typeOfUser != "admin"){
+    try {
+      await entityData.initializeEntityProfile(queryData.emailId, queryData.typeOfUser);
+    } catch (error) {
+       //TODO delete user;
+      res.status(500).render("authentication/signUp", {
+        title: "Registration Page",
+        hasError:true, 
+        error: [error], 
+        emailInput: emailInput,
+        passwordInput: passwordInput,
+      });
+      return;
+   }
+ }
   //successful creation
   if (signup) {
     // redirect user to login page
-    res.status(200).redirect("/login");
-    return;
+  return res.status(200).redirect("/login");
   }
+
 };
 
 const getLogout = async (req, res) => {
