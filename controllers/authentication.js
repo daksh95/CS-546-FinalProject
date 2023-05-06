@@ -207,7 +207,7 @@ const postSignUp = async (req, res) => {
       await userData.initializeProfile(queryData.emailId);
     } catch (error) {
       //TODO delete user credentials;
-      
+      await auth.deleteCredentialByEmailId(queryData.emailId);
       res.status(500).render("authentication/signUp", {
         title: "Registration Page",
         hasError:true, 
@@ -223,7 +223,8 @@ const postSignUp = async (req, res) => {
       await entityData.initializeEntityProfile(queryData.emailId, queryData.typeOfUser);
     } catch (error) {
        //TODO delete user;
-      res.status(500).render("authentication/signUp", {
+        await auth.deleteCredentialByEmailId(queryData.emailId);
+        res.status(500).render("authentication/signUp", {
         title: "Registration Page",
         hasError:true, 
         error: [error], 

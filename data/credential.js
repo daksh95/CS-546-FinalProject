@@ -128,6 +128,12 @@ const updateProfileStatus = async(profileSetUpDone)=>{
     return;
 }
 
+const deleteCredentialByEmailId = async(emailId)=>{
+    emailId = validation.validEmail(emailId);
+    const client = getClient();
+    let result = await client.collection(credentialCollection).findOneAndDelete({"emailId": emailId});//todo error handling if its not deleted;
+    return;
+}
 
 
 const credentialData = {
@@ -135,7 +141,8 @@ const credentialData = {
     getCredentialByEmailId:getCredentialByEmailId,
     updateEmailId:updateEmailId,
     updatePassword:updatePassword,
-    updateProfileStatus:updateProfileStatus
+    updateProfileStatus:updateProfileStatus,
+    deleteCredentialByEmailId: deleteCredentialByEmailId
 }
 
 export default credentialData;
