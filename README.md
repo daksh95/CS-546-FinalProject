@@ -13,6 +13,9 @@
         - myProperties
         - myTransactions
         - profile
+        - login
+        - logout
+        - signup
 - [ ] Verify all status codes
 - [x] Generate json for zipcode or API
 - [ ] Change password functionality
