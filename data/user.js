@@ -59,20 +59,19 @@ const createUser = async (
 ) => {
   // Validate input
   name = validation.validString(name);
-  phone = validation.validNumber(phone);
+  phone = validation.validString(phone);
   emailId = validation.validEmail(emailId);
   govtIdType = validation.validString(govtIdType);
   govtIdNumber = validation.validString(govtIdNumber);
-  dob = validation.validDOB(dob);
+  // dob = validation.validDOB(dob);
   gender = validation.validGender(gender);
 
-  const govtIdHashed = govtIdNumber; //TODO: Gotta hash this (BCRYPT)
+  const govtIdHashed = await hash.generateHash(govtIdNumber); //TODO: Gotta hash this (BCRYPT)
 
   // Initialize
   let newUser = {
     name: name,
     phone: phone,
-    emailId: emailId,
     governmentId: {
       typeofId: govtIdType,
       id: govtIdHashed,
@@ -88,13 +87,17 @@ const createUser = async (
   };
   // Insert user into database
   const client = getClient();
-  const result = await client.collection("users").insertOne(newUser);//TODO: change to update function;
-
-  if (!result.ackowledged || !result.insertedId) throw `failed to insert user`;
-
-  const newId = result.insertedId.toString();
-  const user = await getUserById(newId);
-  return user;
+  const result = await client.collection("users").updateOne(
+    { "emailId": emailId },
+    { $set: newUser},
+    { upsert: true }
+  );
+  console.log(result);
+  // if (!result.ackowledged || !result.matchedCount) throw `failed to set profile`;
+  // if(result.lastErrorObject.n<0) throw `failed to set profile`;
+  // const newId = result.value._id.toString();
+  // const user = await getUserById(newId);
+  return true;
 };
 
 const getLandsOfUserID = async (id) => {

@@ -122,10 +122,11 @@ const updateProfileStatus = async(id,profileSetUpDone)=>{
     id = validation.validObjectId(id, "credentialId");
     profileSetUpDone = validation.validBool(profileSetUpDone, "Profile set up status");
     const client = getClient();
-    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(id)}, {"profileSetUpDone": profileSetUpDone}, { returnDocument: "after" });
+    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(id)}, {$set: {"profileSetUpDone": profileSetUpDone}}, { returnDocument: "after" });
     if (result.lastErrorObject.n < 1) {
         throw `Could not update profile set up status`;
     }
+    console.log(result);
     return;
 }
 

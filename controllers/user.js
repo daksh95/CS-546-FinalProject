@@ -2,6 +2,7 @@ import userData from "../data/user.js";
 import transactionData from "../data/transactions.js";
 import landData from "../data/land.js";
 import auth from "../data/credential.js";
+import validation from "../utils/validation.js";
 import {
   checkInputType,
   exists,
@@ -232,19 +233,22 @@ const getTransactionDetails = async (req, res) => {
 };
 
 const setUpProfile = async (req, res) => {
-    let{nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput} = req.body();
+  console.log("inside set up profile");
+  let {nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput} = req.body;
   try {
-     nameInput = validation.validString(nameInput);
-      phoneInput = validation.validNumber(phoneInput);
+      nameInput = validation.validString(nameInput);
+      phoneInput = validation.validString(phoneInput);
       emailIdInput = validation.validEmail(emailIdInput);
       typeofGovernmentIdInput = validation.validString(typeofGovernmentIdInput);
       governmentIdInput = validation.validString(governmentIdInput);
-      dobInput = validation.validDOB(dobInput);
+      // dobInput = validation.validDOB(dobInput);
       genderInput = validation.validGender(genderInput);
   } catch (error) {
     res.status(400).render("authentication/profileSetUp", {title: "Profile set up", hasError:true, error:[error]});
     return;
   } 
+  console.log("here inside the set up profile");
+  console.log("Session id here is", req.session.user.id);
     //TODO call create user
     try {
       const result = await userData.createUser(nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput);
@@ -253,7 +257,7 @@ const setUpProfile = async (req, res) => {
         title: "Error",
         hasError: true,
         error: [error],
-      });
+      }); 
     }
     //TODO change profile status
     try {
@@ -270,7 +274,6 @@ const setUpProfile = async (req, res) => {
     //TODO redirect users;
     res.status(200).redirect("/land");
     return;
-
 
   };
 export {
