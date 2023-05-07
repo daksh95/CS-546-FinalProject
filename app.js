@@ -9,9 +9,10 @@ import { dirname } from "path";
 import exphbs from "express-handlebars";
 import session from "express-session";
 import { homeMiddleware } from "./middleware/middleware.js";
+import userData from "./data/user.js";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(__filename); 
 const staticDir = express.static(__dirname + "/public");
 
 app.use("/public", staticDir);
@@ -57,3 +58,4 @@ const start = async () => {
   }
 };
 start();
+

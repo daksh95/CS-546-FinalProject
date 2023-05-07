@@ -191,10 +191,13 @@ const postSignUp = async (req, res) => {
 
   //add new credentials
   let signup;
+  let flag = false;
   try {
     signup = await auth.addCredential(queryData);
+    console.log("here in signup",signup)
   } catch (error) {
     //error due to server issue
+    flag = true;
     if (error == "Could not create account") {
       res.status(500).render("error", {
         title: "Error Page",
@@ -215,47 +218,49 @@ const postSignUp = async (req, res) => {
 
     return;
   }
-
-  //add user to user collection
-  if (queryData.typeOfUser === "user") {
-    try {
-      await userData.initializeProfile(queryData.emailId);
-    } catch (error) {
-      //TODO delete user credentials;
-      await auth.deleteCredentialByEmailId(queryData.emailId);
-      res.status(500).render("authentication/signUp", {
-        title: "Registration Page",
-        hasError: true,
-        error: [error],
-        emailInput: emailInput,
-        passwordInput: passwordInput,
-      });
-      return;
+  if(!flag){
+     //add user to user collection
+    if (queryData.typeOfUser === "user") {
+      try {
+        await userData.initializeProfile(queryData.emailId);
+      } catch (error) {
+        //TODO delete user credentials;
+        await auth.deleteCredentialByEmailId(queryData.emailId);
+        res.status(500).render("authentication/signUp", {
+          title: "Registration Page",
+          hasError: true,
+          error: [error],
+          emailInput: emailInput,
+          passwordInput: passwordInput,
+        });
+        return;
+      }
+    } else if (queryData.typeOfUser !== "admin") {
+      try {
+        await entityData.initializeEntityProfile(
+          queryData.emailId,
+          queryData.typeOfUser
+        );
+      } catch (error) {
+        //TODO delete user;
+        await auth.deleteCredentialByEmailId(queryData.emailId);
+        res.status(500).render("authentication/signUp", {
+          title: "Registration Page",
+          hasError: true,
+          error: [error],
+          emailInput: emailInput,
+          passwordInput: passwordInput,
+        });
+        return;
+      }
     }
-  } else if (queryData.typeOfUser !== "admin") {
-    try {
-      await entityData.initializeEntityProfile(
-        queryData.emailId,
-        queryData.typeOfUser
-      );
-    } catch (error) {
-      //TODO delete user;
-      await auth.deleteCredentialByEmailId(queryData.emailId);
-      res.status(500).render("authentication/signUp", {
-        title: "Registration Page",
-        hasError: true,
-        error: [error],
-        emailInput: emailInput,
-        passwordInput: passwordInput,
-      });
-      return;
+    //successful creation
+    if (signup) {
+      // redirect user to login page
+      return res.status(200).redirect("/login");
     }
   }
-  //successful creation
-  if (signup) {
-    // redirect user to login page
-    return res.status(200).redirect("/login");
-  }
+  
 };
 
 const getLogout = async (req, res) => {

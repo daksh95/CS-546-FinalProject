@@ -87,10 +87,10 @@ const createUser = async (
   };
   // Insert user into database
   const client = getClient();
-  const result = await client.collection("users").updateOne(
+  const result = await client.collection("users").findOneAndUpdate(
     { "emailId": emailId },
     { $set: newUser},
-    { upsert: true }
+    {}
   );
   console.log(result);
   // if (!result.ackowledged || !result.matchedCount) throw `failed to set profile`;
@@ -157,19 +157,20 @@ const initializeProfile = async(email)=>{
 
   //initializing user
   const result = await client.collection("users").insertOne(newUser);
-
   console.log(result);
-  if (!result.ackowledged || !result.insertedId) {throw `failed to insert user`};
+
+  if (!result.acknowledged || !result.insertedId) {throw `failed to insert user`};
   
   return true;
 }
 
-const addLandToUser = (userId, landId)=>{
+const addLandToUser = async(userId, landId)=>{
   userId = validation.validObjectId(userId, "User Id");
   landId = validation.validObjectId(landId, "Land Id")
+  console.log(userId, landId);
 
   const client = getClient();
-  let result = client.collection("users").findOneAndUpdate({id: new Object(userId)},{$push: {land: landId}});
+  let result = await client.collection("users").findOneAndUpdate({_id: new ObjectId(userId)},{$push: {"land": landId}});
   return result;
 }
 

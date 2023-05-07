@@ -38,7 +38,7 @@ const addCredential = async(object) =>{
 
     //inserting credential
     const result = await client.collection(credentialCollection).insertOne(queryData);
-    
+    console.log("inside auth add",result);
     //error handling, incase credential is not inserted
     if (!result.acknowledged || !result.insertedId) throw 'Could not create account';
     return true;

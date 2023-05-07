@@ -545,10 +545,11 @@ const addNewLand = async (req, res) => {
     }
   }
   //if successfully added then redirect to my lands wala page
-  const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
-  console.log(resul);
+  console.log(req.session.user.id, addLand._id);
+  // const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
+  // console.log(resul);
 
-  res.status(200).redirect(`/${req.session.user.id}/land`);
+  res.status(200).redirect(`/user/${req.session.user.id}/land`);
 };
 const addNewLandForm = async (req, res) => {
   res
