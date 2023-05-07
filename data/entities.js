@@ -3,6 +3,32 @@ import { connectionClose, getClient } from "../config/connection.js";
 import { entityCollection, transacsCollection } from "./collectionNames.js";
 import validation from "../utils/validation.js";
 
+const initializeEntityProfile = async (email, role) => {
+  email = validation.validEmail(email);
+  role = validation.validTypeOfUser(role);
+
+  let newEntity = {
+    name: "",
+    role: role,
+    contactInfo: "",
+    emailId: email,
+    website: "",
+    license: "",
+    transactions: [],
+    approved: "pending",
+  };
+
+  const client = getClient();
+  const entityData = await client.collection(entityCollection);
+  let meh = await entityData.findOne({ emailId: email });
+  if (meh !== null) throw `Email address already in use!`;
+
+  let result = await entityData.insertOne(newEntity);
+  if (!result.acknowledged || !result.insertedId)
+    throw "Could not add the entity!";
+  return true;
+};
+
 const addNewEntity = async (name, contactInfo, emailId, website, license) => {
   if (!name || !contactInfo || !emailId || !website || !license)
     throw `Recheck your inputs, one or more inputs are missing!`;
@@ -50,6 +76,7 @@ const addNewEntity = async (name, contactInfo, emailId, website, license) => {
         emailId: emailId,
         website: website,
         license: license,
+        approved: "pending",
       },
     },
     { returnDocument: "after" }
@@ -57,7 +84,7 @@ const addNewEntity = async (name, contactInfo, emailId, website, license) => {
   if (updatedEntity.lastErrorObject.n < 1) {
     throw `Details for entity with email ${emailId} could not be inputted!`;
   }
-  return;
+  return updatedEntity;
 };
 
 const getAllEntities = async () => {
@@ -91,8 +118,6 @@ const getEntityByEmail = async (emailInput) => {
   return result;
 };
 
-const updateEntity = async (emailId) => {};
-
 const getTransactionsByEntityId = async (id) => {
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid entity id inputted!`;
@@ -103,15 +128,18 @@ const getTransactionsByEntityId = async (id) => {
   if (meh === null) throw `No entity with given id!`;
 
   const trans = meh.transactions;
-  if (trans.length === 0) throw `No transaction has been alloted to you yet!`;
 
   return trans;
 };
 
-const entityApproved = async (id, role) => {
+const entityApproved = async (id, comment, role) => {
   if (!id || !role)
     throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
+  if (typeof comment !== "string") throw `Comment must be a string!`;
+  if (comment.trim().length === 0)
+    throw `Comment box cannot be empty or just spaces!`;
+  comment = comment.trim();
   role = role.toLowerCase();
   if (
     role !== "landsurveyor" &&
@@ -128,29 +156,35 @@ const entityApproved = async (id, role) => {
 
   let result = undefined;
   if (role === "landsurveyor") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { "surveyor.status": "approved" } },
-        { returnDocument: "after" }
-      );
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: { "surveyor.status": "approved", "surveyor.Comment": comment },
+      },
+      { returnDocument: "after" }
+    );
   } else if (role === "titlecompany") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { "titleCompany.status": "approved" } },
-        { returnDocument: "after" }
-      );
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "titleCompany.status": "approved",
+          "titleCompany.Comment": comment,
+        },
+      },
+      { returnDocument: "after" }
+    );
   } else if (role === "government") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { "government.status": "approved" } },
-        { returnDocument: "after" }
-      );
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "government.status": "approved",
+          "government.Comment": comment,
+        },
+      },
+      { returnDocument: "after" }
+    );
   }
   if (result.lastErrorObject.n < 1) {
     throw `Transaction with id ${id} could not be approved!`;
@@ -228,8 +262,8 @@ const pendingTransactionsByEntityId = async (id) => {
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
 
-  const transactions = await this.getTransactionsByEntityId(id);
-  const entity = await this.getEntityById(id);
+  const transactions = await getTransactionsByEntityId(id);
+  const entity = await getEntityById(id);
   let result = [];
   for (let i = 0; i < transactions.length; i++) {
     if (entity.role === "landsurveyor") {
@@ -256,7 +290,6 @@ const pendingTransactionsByEntityId = async (id) => {
     }
   }
 
-  if (result.length === 0) throw `No pending transaction exists!`;
   return result;
 };
 
@@ -307,46 +340,30 @@ const assignEntity = async (id, role) => {
 };
 
 const pendingTransactionsCount = async (id) => {
-  const transactions = await this.pendingTransactionsByEntityId(id);
+  let transactions = [];
+  try {
+    transactions = await pendingTransactionsByEntityId(id);
+  } catch (error) {
+    return 0;
+  }
   return transactions.length;
 };
 
 const totalTransactionsCount = async (id) => {
-  const transactions = await this.getTransactionsByEntityId(id);
+  let transactions = [];
+  try {
+    transactions = await getTransactionsByEntityId(id);
+  } catch (error) {
+    return 0;
+  }
   return transactions.length;
 };
 
-const initializeEntityProfile = async (email, role) => {
-  email = validation.validEmail(email);
-  role = validation.validTypeOfUser(role);
-
-  let newEntity = {
-    name: "",
-    role: role,
-    contactInfo: "",
-    emailId: email,
-    website: "",
-    license: "",
-    transactions: [],
-    approved: false,
-  };
-
-  const client = getClient();
-  const entityData = await client.collection(entityCollection);
-  let meh = await entityData.findOne({ emailId: email });
-  if (meh !== null) throw `Email address already in use!`;
-
-  let result = await entityData.insertOne(newEntity);
-  if (!result.acknowledged || !result.insertedId)
-    throw "Could not add the entity!";
-  return true;
-};
-
 const entityData = {
+  initializeEntityProfile,
   addNewEntity,
   getAllEntities,
   getEntityById,
-  updateEntity,
   getTransactionsByEntityId,
   entityApproved,
   entityTerminateTransaction,
@@ -355,7 +372,6 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
-  initializeEntityProfile,
 };
 
 export default entityData;

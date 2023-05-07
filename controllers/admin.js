@@ -49,8 +49,8 @@ const approveAccount = async (req, res) => {
     throw 'Request header does not match the correct format';
 
     const status = validation.validApprovalStatus(approvalInfo.approval, 'Approval Status');
-    let comment;
-    if (status === 'rejected') comment = validation.validString(approvalInfo.comment, 'Approval Comment');
+    let comment = approvalInfo.comment;
+    if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
     const accountId = validation.validObjectId(req.params.accountId, 'accountId');
     const approvalResult = await adminData.approveAccount(accountId, status, comment);
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
