@@ -79,7 +79,7 @@
         aElement = document.createElement("a");
         aElement.href = "/land/" + landByState[i]._id;
         aElement.classList.add("text-decoration-none");
-        aElement.classList.add("text-info");
+        aElement.classList.add("text-dark");
         divElement = document.createElement("div");
         divElement.classList.add("card");
         divElement.classList.add("border-info");

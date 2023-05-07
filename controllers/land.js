@@ -421,7 +421,6 @@ const updateLand = async (req, res) => {
       }
     }
 
-
     //if successfully added then redirect to my lands wala page
     res.status(200).redirect(`/land/${landId}`);
   }
@@ -442,31 +441,23 @@ const addNewLand = async (req, res) => {
   const queryData = {};
   length = parseInt(length);
   breadth = parseInt(breadth);
-  
+
   console.log(length);
   //valid numbers
   // queryData.dimensions.length = length;
-  length = validation.validNumber(
-    length,
-    "length",
-    1
-  );
-  breadth = validation.validNumber(
-    breadth,
-    "breadth",
-    1
-  );
+  length = validation.validNumber(length, "length", 1);
+  breadth = validation.validNumber(breadth, "breadth", 1);
 
-  queryData.dimensions ={
+  queryData.dimensions = {
     length: length,
     breadth: breadth,
-  }
+  };
   //default behaviour
   queryData.sale = {
     price: 1,
-    dateOfListing:"11/11/1234",
+    dateOfListing: "11/11/1234",
     onSale: false,
-  }
+  };
   queryData.approved = "pending";
   queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
 
@@ -484,22 +475,19 @@ const addNewLand = async (req, res) => {
   line2 = validation.validString(line2, "line2", 46);
   city = validation.validString(city, "city", 17);
   state = validation.validString(state, "state", 2);
-  zipCode = validation.validString(
-    zipCode,
-    "zipCode",
-    501,
-    99950
-  );
-  queryData.address ={
-    line1:line1,
-    line2:line2,
+  zipCode = validation.validString(zipCode, "zipCode", 501, 99950);
+  queryData.address = {
+    line1: line1,
+    line2: line2,
     city: city,
     state: state,
-    zipCode:zipCode,
-  }
+    zipCode: zipCode,
+  };
 
   // Calculated field
-  queryData.area = (queryData.dimensions.length * queryData.dimensions.breadth).toString();
+  queryData.area = (
+    queryData.dimensions.length * queryData.dimensions.breadth
+  ).toString();
   console.log(queryData);
   /*
   queryData has following structure

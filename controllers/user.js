@@ -13,8 +13,6 @@ import {
 import { ObjectId } from "mongodb";
 
 const getPropertiesOfUser = async (req, res) => {
-  console.log(req.params);
-  
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -64,35 +62,39 @@ const getProfile = async (req, res) => {
       hasError: true,
       error: error,
     });
-    
-    //check if session id matched url id
-    if(id != req.session.user.id){
+
+  //check if session id matched url id
+  if (id != req.session.user.id) {
     //TODO Not authorized page
-    
-    }  
-  const profileSetUp = await auth.getCredentialByEmailId(req.session.user.email);
-  if(!profileSetUp.profileSetUpDone){
-    let details ={};
+  }
+  const profileSetUp = await auth.getCredentialByEmailId(
+    req.session.user.email
+  );
+  if (!profileSetUp.profileSetUpDone) {
+    let details = {};
     details.emailId = req.session.user.email;
     details.url = `/user/${req.session.user.id}/profile`;
     details.user = true;
     res.status(200).render("authentication/profileSetUp", {
-      title: "Profile Set up", 
-      details});
+      title: "Profile Set up",
+      details,
+    });
     return;
   }
 
   try {
     const user = await userData.getUserById(id);
-    let avgRating = user.rating.totalRating / user.rating.count;
-    res.status(200).render("Profile", {
+    let avgRating = undefined;
+    if (user.rating.count === 0) avgRating = 0;
+    else avgRating = user.rating.totalRating / user.rating.count;
+    res.status(200).render("profile", {
       title: "Profile",
       user: user,
       avgRating: avgRating,
       userId: req.session.user.id,
     });
   } catch (error) {
-    res.status(404).render("Error", {
+    res.status(404).render("error", {
       title: "Error",
       hasError: true,
       error: [error.message],
@@ -197,6 +199,7 @@ const getTransactionDetails = async (req, res) => {
     transaction.seller._id = transaction.seller._id.toString();
     if (transaction.buyer._id === req.session.user.id) role = "buyer";
     else if (transaction.seller._id === req.session.user.id) role = "seller";
+    else role = "admin";
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",
@@ -215,6 +218,17 @@ const getTransactionDetails = async (req, res) => {
       error: [error.message],
     });
   }
+  let sellerInfo = undefined;
+  try {
+    sellerInfo = await userData.getUserById(transaction.seller._id);
+    sellerInfo._id = sellerInfo._id.toString();
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
   try {
     let land = await landData.getLand(transaction.landId);
     res.status(200).render("transactionDetails", {
@@ -223,6 +237,7 @@ const getTransactionDetails = async (req, res) => {
       role: role,
       land: land,
       buyerInfo: buyerInfo,
+      sellerInfo: sellerInfo,
       userId: req.session.user.id,
     });
   } catch (error) {
@@ -236,47 +251,69 @@ const getTransactionDetails = async (req, res) => {
 
 const setUpProfile = async (req, res) => {
   console.log("inside set up profile");
-  let {nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput} = req.body;
+  let {
+    nameInput,
+    phoneInput,
+    emailIdInput,
+    typeofGovernmentIdInput,
+    governmentIdInput,
+    dobInput,
+    genderInput,
+  } = req.body;
   try {
-      nameInput = validation.validString(nameInput);
-      phoneInput = validation.validString(phoneInput);
-      emailIdInput = validation.validEmail(emailIdInput);
-      typeofGovernmentIdInput = validation.validString(typeofGovernmentIdInput);
-      governmentIdInput = validation.validString(governmentIdInput);
-      // dobInput = validation.validDOB(dobInput);
-      genderInput = validation.validGender(genderInput);
+    nameInput = validation.validString(nameInput);
+    phoneInput = validation.validString(phoneInput);
+    emailIdInput = validation.validEmail(emailIdInput);
+    typeofGovernmentIdInput = validation.validString(typeofGovernmentIdInput);
+    governmentIdInput = validation.validString(governmentIdInput);
+    // dobInput = validation.validDOB(dobInput);
+    genderInput = validation.validGender(genderInput);
   } catch (error) {
-    res.status(400).render("authentication/profileSetUp", {title: "Profile set up", hasError:true, error:[error]});
+    res.status(400).render("authentication/profileSetUp", {
+      title: "Profile set up",
+      hasError: true,
+      error: [error],
+    });
     return;
-  } 
+  }
   console.log("here inside the set up profile");
   console.log("Session id here is", req.session.user.id);
-    //TODO call create user
-    try {
-      const result = await userData.createUser(nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput);
-    } catch (error) {
-      return res.status(500).render("Error", {
-        title: "Error",
-        hasError: true,
-        error: [error],
-      }); 
-    }
-    //TODO change profile status
-    try {
-      const result = await auth.updateProfileStatus(req.session.user.credentialId, true);
-    } catch (error) {
-      return res.status(500).render("Error", {
-        title: "Error",
-        hasError: true,
-        error: [error],
-      });
-    }
+  //TODO call create user
+  try {
+    const result = await userData.createUser(
+      nameInput,
+      phoneInput,
+      emailIdInput,
+      typeofGovernmentIdInput,
+      governmentIdInput,
+      dobInput,
+      genderInput
+    );
+  } catch (error) {
+    return res.status(500).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error],
+    });
+  }
+  //TODO change profile status
+  try {
+    const result = await auth.updateProfileStatus(
+      req.session.user.credentialId,
+      true
+    );
+  } catch (error) {
+    return res.status(500).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error],
+    });
+  }
 
-    //TODO redirect users;
-    res.status(200).redirect("/land");
-    return;
-
-  };
+  //TODO redirect users;
+  res.status(200).redirect("/land");
+  return;
+};
 export {
   getPropertiesOfUser,
   getProfile,
