@@ -3,7 +3,6 @@ import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import userData from "../data/user.js";
 import entityData from "../data/entities.js";
-import session from "express-session";
 
 //Login
 const getLogin = async (req, res) => {
@@ -109,7 +108,7 @@ const postLogin = async (req, res) => {
   if (validUser.isApproved == false) {
     return res
       .status(200)
-      .render("approvalWaiting", { title: "Approval waiting" }); //TODO create HTML page for this
+      .render("approvalWaiting", { title: "Approval waiting" }); 
   }
 
   //If profile is set up then we will redirect them to their appropriate pages

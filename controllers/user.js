@@ -232,8 +232,47 @@ const getTransactionDetails = async (req, res) => {
 };
 
 const setUpProfile = async (req, res) => {
+    let{nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput} = req.body();
+  try {
+     nameInput = validation.validString(nameInput);
+      phoneInput = validation.validNumber(phoneInput);
+      emailIdInput = validation.validEmail(emailIdInput);
+      typeofGovernmentIdInput = validation.validString(typeofGovernmentIdInput);
+      governmentIdInput = validation.validString(governmentIdInput);
+      dobInput = validation.validDOB(dobInput);
+      genderInput = validation.validGender(genderInput);
+  } catch (error) {
+    res.status(400).render("authentication/profileSetUp", {title: "Profile set up", hasError:true, error:[error]});
+    return;
+  } 
+    //TODO call create user
+    try {
+      const result = await userData.createUser(nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput);
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      });
+    }
+    //TODO change profile status
+    try {
+      const result = await auth.updateProfileStatus(req.session.user.credentialId, true);
 
-};
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      });
+    }
+
+    //TODO redirect users;
+    res.status(200).redirect("/land");
+    return;
+
+
+  };
 export {
   getPropertiesOfUser,
   getProfile,

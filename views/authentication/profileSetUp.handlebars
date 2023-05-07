@@ -9,7 +9,7 @@
             <input type="emsil" id = "emailIdInput" name="emailIdInput" value="{{details.emailId}}" readonly> <br>
 
             {{#if details.user}}
-            <label for="typeofGovernmentIdInput">Government ID:</label>
+            <label for="typeofGovernmentIdInput" id = "typeOfId-dropdown">Government ID:</label>
                 <select name="typeofGovernmentIdInput" id="typeofGovernmentIdInput">
                 <option value="ssn">SSN</option>
                 <option value="driverLicense">Driver's License</option>
@@ -20,6 +20,12 @@
             
             <label for ="dobInput"id ="dob-date"> Date of birth:</label>
             <input type="Date" id = "dobInput" name="dobInput"> <br> 
+            <label for="genderInput" id ="gender-dropdown">Legal Gender:</label>
+                <select name="genderInput" id="genderInput">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                </select> 
             {{/if}}
 
             {{#if details.entity}}
