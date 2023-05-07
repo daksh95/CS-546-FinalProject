@@ -8,6 +8,11 @@
 - [ ] Ask professor or TAs about using XSS (whether we have to use only for forms, **or do we use it in GET /{id} routes too**)
 - [ ] Complete Middlewares
 - [ ] Check for totally on all pages
+        - displayLandByState
+        - displayLandDetails
+        - myProperties
+        - myTransactions
+        - profile
 - [ ] Verify all status codes
 - [x] Generate json for zipcode or API
 - [ ] Change password functionality

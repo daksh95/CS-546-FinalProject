@@ -81,7 +81,7 @@ const createUser = async (
     approved: "pending",
     rating: {
       totalRating: 0,
-      noOfRating: 0,
+      count: 0,
     },
     land: [],
   };

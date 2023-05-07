@@ -11,7 +11,7 @@ const users = {
   },
   dob: String,
   gender: String,
-  approved: String("pending, approved, rejected"), // to be discussed.
+  approved:   String("pending, approved, rejected"), // to be discussed.
   rating: {
     totalRating: Number,
     count: Number,

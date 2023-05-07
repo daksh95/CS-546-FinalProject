@@ -63,7 +63,8 @@ $(document).ready(() => {
         //     }
       },
       error: (error) => {
-        console.log("here");
+        // console.log("here");
+        $("#stateError").empty();
         ulElement = document.createElement("ul");
         liElement = document.createElement("li");
         liElement.textContent = error.responseJSON.message;
