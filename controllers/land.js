@@ -455,7 +455,7 @@ const addNewLand = async (req, res) => {
   queryData.sale.price = 1;
   queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
   queryData.sale.onSale = false;
-  queryData.approved = false;
+  queryData.approved = "pending";
   queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
 
   //valid string and string of array

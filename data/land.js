@@ -73,7 +73,7 @@ const addNewLand = async (object) => {
 
   //valid bool
   queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
-  queryData.approved = validation.validBool(approved, "approved");
+  queryData.approved = validation.validApprovalStatus(approved, "approved");
 
   //fetch db reference
   const client = getClient();
@@ -131,7 +131,7 @@ const updateLand = async (object) => {
 
   //valid bool
   queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
-  queryData.approved = validation.validBool(approved, "approved");
+  queryData.approved = validation.validApprovalStatus(approved, "approved");
 
   //fetch db reference
   const client = getClient();

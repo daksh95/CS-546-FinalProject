@@ -40,10 +40,10 @@ Data functions (for admin): -- Daksh
 
 1) getAllLands -- land.js (Completed)
 2) getAllEntities -- entities.js (Completed)
-3) approveUser (this'll add new user to database, activated when "Signup" is done) -- admin.js
+3) approveAccount (this'll add new user to database, activated when "Signup" is done) -- admin.js
 4) approveLand (this'll add new land to database, activated when "addLand" is called) -- admin.js
 5) adminApproved (this'll transfer the ownership from seller to buyer, database is updated: if approved) -- admin.js
 6) terminateTransaction (transaction is terminated when transaction is rejected) -- transaction.js (Completed)
 7) createUser (this'll add a new user to the database, unapproved) -- user.js (Completed) (TODOS)
-8) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js
-9) approveEntity (this'll add new entity to database, activated when "Signup" is done)
+8) createTransaction (this'll lead to form page asking buyer to input their quotation - which cannot be lesser than 90% of land price, also they cannot input new request until this one gets rejected) -- transaction.js (Completed)
+9) approveEntity (this'll add new entity to database, activated when "Signup" is done) (Completed)

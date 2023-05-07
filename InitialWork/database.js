@@ -11,7 +11,7 @@ const users = {
   },
   dob: String,
   gender: String,
-  approved: Boolean, // to be discussed.
+  approved: String("pending, approved, rejected"), // to be discussed.
   rating: {
     totalRating: Number,
     count: Number,
@@ -45,7 +45,7 @@ const land = {
     state: String,
     zipCode: String,
   }, //Change here. there was no address field.
-  approved: Boolean,
+  approved: String("pending, approved, rejected"),
 };
 
 const entity = {
@@ -57,7 +57,7 @@ const entity = {
   Website: String,
   license: String,
   transactions: Array,
-  approved: Boolean,
+  approved: String("pending, approved, rejected"),
 };
 
 const transaction = {

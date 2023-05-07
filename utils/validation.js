@@ -89,7 +89,7 @@ const validDOB = (dob, parameter = "DOB") => {
 
   const dobDate = moment(dob, "MM/DD/YYYY");
   const age = moment().diff(dobDate, "years");
-  if (age < 18) throw `User should be 18 years or older in order to register`;
+  if (age < 18 || user > 110) throw `User should be between 18 and 110 years old in order to register`;
   return dob;
 };
 
@@ -152,6 +152,15 @@ const validTypeOfUser = (user) => {
   return user;
 };
 
+const validApprovalStatus = (status, parameter = 'status') => {
+  status = validString(status, parameter);
+  status = status.toLowerCase();
+
+  const validStatus = ['pending', 'approved', 'rejected'];
+  if (!validStatus.includes(status)) throw 'Invalid approval status';
+  return status;
+}
+
 const validation = {
   validString: validString,
   validArrayOfStrings: validArrayOfStrings,
@@ -164,6 +173,7 @@ const validation = {
   validBool: validBool,
   validPassword: validPassword,
   validTypeOfUser: validTypeOfUser,
+  validApprovalStatus: validApprovalStatus
 };
 
 export default validation;

@@ -1,5 +1,5 @@
 <header>
-  <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
       <div class="container-fluid">
           <div class="navbar-header text-light">
               <a class="navbar-brand" href="#">WebSite Name</a>
@@ -11,7 +11,8 @@
               <li class="nav-item"><a href="/admin/approvals/transaction" class="nav-link text-light">Transaction Approvals</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-              <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
           </ul>
       </div>
   </nav>
@@ -40,7 +41,7 @@
           <dt>Gender:</dt>
           <dd>{{ account.gender }}</dd>
         </dl>
-      {{#else }}
+      {{else }}
         <dl>
           <dt>ID:</dt>
           <dd>{{ account._id }}</dd>
@@ -59,6 +60,44 @@
         </dl>
       {{/if}}
     </div>
-    
+    <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
+      <h4 class="ml-3 mb-3">Approval</h4>
+      <h5 class="ml-3 mb-3">Approval State:
+        {{#if isPending }} 
+          <span class="status-pending">Pending</span>
+          </h5>
+          <form action="/admin/approvals/account/{{ account._id }}" id="approvalForm" class="form-check" method="post">
+          <div class="d-grid gap-2 d-md-block">
+              <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
+              <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected">REJECT</button>
+          </div>
+          <div class="mt-3 mb-3 mr-4">
+            <label for="commentTextArea" class="form-label"><h6>Comments:</h6></label>
+            <textarea name="comment" id="commentTextArea" rows="5" class="form-control"></textarea>
+            {{#if isUser }}
+            <input type="hidden" name="role" value="user">
+            {{else}}
+            <input type="hidden" name="role" value="entity">
+            {{/if}}
+          </div>
+          </form>
+        {{else}}
+          {{#if isApproved }}
+            <span class="status-approved">Approved</span>
+          {{/if}}
+          {{#if isRejected }}
+            <span class="status-rejected">Rejected</span>
+          {{/if}}
+          </h5>
+          {{#if account.approvalComment}}
+            <div class="mt-2 ml-3">
+              <h6>Comment:</h6>
+              <p>{{account.approvalComment}}</p>
+            </div>
+          {{/if}}
+        {{/if}}
+    </div>
   </div>
 </main>
+</body>
+</html>
