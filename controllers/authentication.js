@@ -72,6 +72,7 @@ const postLogin = async (req, res) => {
     if (validUser.typeOfUser === "user") {
       let userObj = await userData.getUserByEmail(emailInput);
       id = userObj._id;
+      console.log(id);
     } else if (validUser.typeOfUser === "admin") id = undefined;
     else {
       let entityObj = await entityData.getEntityByEmail(emailInput);
@@ -84,7 +85,7 @@ const postLogin = async (req, res) => {
       error: [error.message],
     });
   }
-
+  console.log(id);
   //create session
   req.session.user = {
     email: emailInput,
@@ -97,7 +98,7 @@ const postLogin = async (req, res) => {
   //if profile is not set up
   if (!validUser.profileSetUpDone) {
     if (validUser.typeOfUser == "user") {
-      res.status(200).redirect(`/user/${id}/profile`);
+      res.status(200).redirect("/user/" + id + "/profile");
       return;
     } else if (validUser.typeOfUser != "admin") {
       res.status(200).redirect(`/entity/myProfile`);

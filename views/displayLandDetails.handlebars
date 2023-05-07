@@ -18,8 +18,8 @@
 <main class="container-fluid">
     <div class="row">
         <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
-            <p class="m-0">{{land.address.line1}} {{land.address.line2}},</p>
-            <p>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</p>
+            <p class="m-0 font-weight-bold">{{land.address.line1}} {{land.address.line2}},</p>
+            <p class="font-weight-bold">{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</p>
             <p>Dimensions: {{land.dimensions.length}}ft x {{land.dimensions.breadth}}ft</p>
             <p>Area: {{land.area}} sq ft</p>
             <p>{{land.type}} Area</p>
@@ -51,7 +51,7 @@
                 Place Bid
             </button>
             {{else}}
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bidModal">
+            <button id="placeBid" type="button" class="btn btn-primary" data-toggle="modal" data-target="#bidModal">
                 Place Bid
             </button>
             {{/if}}
@@ -59,8 +59,8 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title">Enter your bid amount. Please ensure it is in close range to the
-                                price (+/-1000)</h4>
+                            <h6 class="modal-title mx-auto">Enter your bid amount. Bid amount cannot be less than price
+                                by $1000 difference!</h6>
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                         </div>
                         <div class="modal-body">
@@ -69,19 +69,34 @@
                                 <input type="number" name="bidInput" id="bidInput">
                                 <label hidden for="price">Price</label>
                                 <input type="hidden" name="price" id="price" value="{{land.sale.price}}">
-                                <button type="submit" class="btn btn-success">Place</button>
+                                <button type="submit" class="btn btn-success">Bid</button>
                             </form>
+                            <div id="bidError"></div>
+                            {{#if hasBidError}}
+                            <ul class="error">
+                                {{#each error}}
+                                <li>
+                                    {{this}}
+                                </li>
+                                {{/each}}
+                            </ul>
+                            {{/if}}
                         </div>
                     </div>
                 </div>
             </div>
             <br>
             {{/if}}
-            <p class="font-weight-bold mx-auto my-auto">Contact Info: </p>
-            <p>{{owner.name}}</p>
-            <p>{{owner.phone}}</p>
-            <p>{{owner.emailId}}</p>
+            <div class="card rounded-lg shadow-lg p-2">
+                <p class="font-weight-bold mx-auto my-auto">Contact Info: </p>
+                <br>
+                <p class="m-0">{{owner.name}}</p>
+                <p class="m-0">{{owner.phone}}</p>
+                <p>{{owner.emailId}}</p>
+                <p>Rating: {{divide owner.rating.totalRating owner.rating.count}} ({{owner.rating.count}})</p>
+            </div>
             {{/if}}
         </div>
     </div>
 </main>
+<script src="/public/js/placeBid.js"></script>

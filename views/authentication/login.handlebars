@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top mb-4">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top mb-4">
     <div class="container-fluid">
         <h1 class="navbar-header text-light mx-auto">
             WebSite Name
@@ -19,10 +19,11 @@
             </label>
             <input type="password" name="passwordInput" id="passwordInput">
             <br>
-            <button type="submit">Submit </button>
+            <br>
+            <button class="btn btn-success" type="submit">Submit </button>
         </form>
         <div id="links">
-            <a href="/signUp" id="signUpLink">Click here to sign up!</a>
+            <a class="text-dark" href="/signUp" id="signUpLink">Click here to sign up!</a>
         </div>
     </main>
     {{#if hasError}}

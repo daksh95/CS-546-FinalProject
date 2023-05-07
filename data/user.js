@@ -26,7 +26,7 @@ const getUserByEmail = async (email) => {
   const client = getClient();
   let result = await client.collection("users").findOne({ emailId: email });
   if(result == null) throw "User not found";
-  return result._id.toString();
+  return result;
 };
 
 const updateUserData = async (email, name, phone, dob, gender) => {};

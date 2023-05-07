@@ -118,7 +118,7 @@ const postLandByState = async (req, res) => {
       landByState: landByState,
       state: state,
       empty_lands: empty_lands,
-      // userId: req.session.user.id,/
+      userId: req.session.user.id,
       layout: false,
     });
     // return res.json(landByState);
