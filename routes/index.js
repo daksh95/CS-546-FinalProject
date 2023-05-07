@@ -15,7 +15,11 @@ const constructorMethod = (app) => {
   app.use("/signup", signUpRoutes);
   app.use("/logout", logoutRoutes);
   app.use("*", (req, res) => {
-    res.status(400).json({ error: "Not Found" });
+    res.status(400).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Page Not Found"],
+    });
   });
 };
 
