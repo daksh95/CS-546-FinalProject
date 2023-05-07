@@ -120,7 +120,7 @@ const updatePassword = async(password, emailId)=>{
 
 const updateProfileStatus = async(id,profileSetUpDone)=>{
     id = validation.validObjectId(id, "credentialId");
-    profileSetUpDone = validation.validBool(profileSetUpDone, "Profile set up status");
+    validation.validBool(profileSetUpDone, "Profile set up status");
     const client = getClient();
     let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(id)}, {$set: {"profileSetUpDone": profileSetUpDone}}, { returnDocument: "after" });
     if (result.lastErrorObject.n < 1) {

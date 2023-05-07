@@ -13,6 +13,8 @@ import {
 import { ObjectId } from "mongodb";
 
 const getPropertiesOfUser = async (req, res) => {
+  console.log(req.params);
+  
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -262,7 +264,6 @@ const setUpProfile = async (req, res) => {
     //TODO change profile status
     try {
       const result = await auth.updateProfileStatus(req.session.user.credentialId, true);
-
     } catch (error) {
       return res.status(500).render("Error", {
         title: "Error",

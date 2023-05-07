@@ -66,6 +66,8 @@ const postLogin = async (req, res) => {
     });
     return;
   }
+
+  //gettiing the ID of the user
   let id = undefined;
   try {
     if (validUser.typeOfUser === "user") {
@@ -85,6 +87,7 @@ const postLogin = async (req, res) => {
     });
   }
   console.log(id);
+
   //create session
   req.session.user = {
     email: emailInput,
@@ -95,6 +98,7 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
+  console.log("THE FAMOUS VALID USER",validUser);
   if (!validUser.profileSetUpDone) {
     if (validUser.typeOfUser == "user") {
       res.status(200).redirect("/user/" + id + "/profile");

@@ -164,6 +164,15 @@ const initializeProfile = async(email)=>{
   return true;
 }
 
+const addLandToUser = (userId, landId)=>{
+  userId = validation.validObjectId(userId, "User Id");
+  landId = validation.validObjectId(landId, "Land Id")
+
+  const client = getClient();
+  let result = client.collection("users").findOneAndUpdate({id: new Object(userId)},{$push: {land: landId}});
+  return result;
+}
+
 const userData = {
   getOwnerByLandId: getOwnerByLandId,
   getUserByEmail: getUserByEmail,
@@ -171,7 +180,8 @@ const userData = {
   getUserById: getUserById,
   createUser: createUser,
   getLandsOfUserID: getLandsOfUserID,
-  initializeProfile:initializeProfile
+  initializeProfile:initializeProfile,
+  addLandToUser: addLandToUser,
 };
 
 export default userData;
