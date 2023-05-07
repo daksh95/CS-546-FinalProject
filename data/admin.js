@@ -5,6 +5,7 @@ import transactionData from "./transactions.js";
 import landData from "./land.js";
 import { ObjectId } from "mongodb";
 import { getFullAddress } from "../utils/helpers.js";
+import credentialData from "../data/credential.js";
 
 const getUnapprovedAccounts = async () => {
   const client = getClient();
@@ -28,8 +29,20 @@ const getUnapprovedAccounts = async () => {
       { projection: { _id: 1, name: 1, emailId: 1, role: 1 }}
     ).toArray();
 
+  let unapprovedCreds = await client
+    .collection('credential')
+    .find({
+      isApproved: false,
+      profileSetUpDone: true
+    },
+    { projection: { _id: 0, emailId: 1 } }
+    ).toArray();
+
+  unapprovedCreds = unapprovedCreds.map((cred) => cred.emailId);
+
   if (!unapprovedEntities) throw 'Not able to fetch unapproved entities';
   let unapprovedAccounts = [].concat(unapprovedUsers, unapprovedEntities);
+  unapprovedAccounts = unapprovedAccounts.filter((account) => unapprovedCreds.includes(account.emailId));
 
   unapprovedAccounts = unapprovedAccounts.map((account) => {
     account._id = account._id.toString();
@@ -119,6 +132,7 @@ const approveAccount = async (accountId, status, comment) => {
   if (!user && !entity) throw `Account not found for given Id`;
 
   const collectionName = user ? 'users' : 'entity';
+  const account = user ? user : entity;
 
   status = validation.validString(status, 'Approval status');
   status = status.toLowerCase();
@@ -139,6 +153,20 @@ const approveAccount = async (accountId, status, comment) => {
 
   if (result.lastErrorObject.n < 1) {
     throw `account status could not be updated`;
+  }
+
+  const credential = await credentialData.getCredentialByEmailId(account.emailId);
+
+  const credUpdate = await client
+    .collection('credential')
+    .findOneAndUpdate(
+      { _id: new ObjectId(credential._id) },
+      { $set: { isApproved: true } },
+      { returnDocument: "after" }
+    );
+
+  if (credUpdate.lastErrorObject.n < 1) {
+    throw `account credential status could not be updated`;
   }
 
   return result;
