@@ -27,11 +27,16 @@ const getHome = async (req, res) => {
     totalCount = await entityData.totalTransactionsCount(id);
     pendingCount = await entityData.pendingTransactionsCount(id);
 
-    if (!entity || !totalCount || !pendingCount)
+    if (!entity)
       return res.status(500).render("error", {
         title: "Error",
         hasError: true,
         error: ["Internal Server Error"],
+      });
+
+    if (entity.approved === "pending")
+      return res.status(200).render("approvalWaiting", {
+        title: "Approval pending",
       });
 
     res.status(200).render("entity/entityHome", {
@@ -101,6 +106,132 @@ const getProfile = async (req, res) => {
   }
 };
 
+const setUpProfile = async (req, res) => {
+  const email = req.session.user.email;
+  let error = [];
+  if (typeof email !== "string") error.push("Email address must be a string!");
+  if (email.trim().length === 0)
+    error.push("Email address cannot be an empty string or just spaces!");
+  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  if (!bleh.test(email)) error.push("Invalid email address!");
+  if (error.length !== 0)
+    return res.status(400).render("error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
+    phoneInput = parseInt(phoneInput);
+    let newEntity = await entityData.addNewEntity(
+      nameInput,
+      phoneInput,
+      email,
+      websiteInput,
+      licenseInput
+    );
+
+    if (!newEntity)
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Internal Server Error"],
+      });
+
+    await credentialData.updateProfileStatus(
+      req.session.user.credentialId,
+      true
+    );
+    res.status(200).render("approvalWaiting", {
+      title: "Approval pending",
+    });
+  } catch (error) {
+    return res
+      .status(400)
+      .render("error", { title: "Error", hasError: true, error: [error] });
+  }
+};
+
+const updationFrom = async (req, res) => {
+  const entityId = req.params.entityId;
+  let error = [];
+  if (!exists(entityId)) error.push("ID parameter does not exists");
+  if (!ObjectId.isValid(entityId)) error.push("Invalid Object ID");
+  if (error.length !== 0)
+    return res
+      .status(400)
+      .render("error", { title: "Error", hasError: true, error: error });
+
+  try {
+    const entity = await entityData.getEntityById(entityId);
+
+    if (!entity)
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Internal Server Error"],
+      });
+
+    let details = {};
+    details.emailId = entity.emailId;
+    details.url = `/entity/myProfile`;
+    details.entity = true;
+    details.role = entity.role;
+    res.status(200).render("authentication/profileSetUp", {
+      title: "Profile Set up",
+      details,
+    });
+  } catch (error) {
+    return res
+      .status(400)
+      .render("error", { title: "Error", hasError: true, error: [error] });
+  }
+};
+
+const update = async (req, res) => {
+  const email = req.session.user.email;
+  let error = [];
+  if (typeof email !== "string") error.push("Email address must be a string!");
+  if (email.trim().length === 0)
+    error.push("Email address cannot be an empty string or just spaces!");
+  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  if (!bleh.test(email)) error.push("Invalid email address!");
+  if (error.length !== 0)
+    return res.status(400).render("error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
+    phoneInput = parseInt(phoneInput);
+    let newEntity = await entityData.addNewEntity(
+      nameInput,
+      phoneInput,
+      email,
+      websiteInput,
+      licenseInput
+    );
+
+    if (!newEntity)
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Internal Server Error"],
+      });
+
+    res.status(200).render("approvalWaiting", {
+      title: "Approval pending",
+    });
+  } catch (error) {
+    return res
+      .status(400)
+      .render("error", { title: "Error", hasError: true, error: [error] });
+  }
+};
+
 const allTransacs = async (req, res) => {
   let id = req.params.entityId;
   let error = [];
@@ -129,6 +260,8 @@ const allTransacs = async (req, res) => {
     if (entity.role === "title company") title_company = true;
     if (entity.role === "government") government = true;
     res.render("entity/allTrans", {
+      length: Boolean(trans.length),
+      id: id,
       transactions: trans,
       landSurveyor: land_surveyor,
       titleC: title_company,
@@ -169,6 +302,8 @@ const pendingTransacs = async (req, res) => {
     if (entity.role === "title company") title_company = true;
     if (entity.role === "government") government = true;
     res.render("entity/pendingTrans", {
+      length: Boolean(trans.length),
+      id: id,
       transactions: trans,
       landSurveyor: land_surveyor,
       titleC: title_company,
@@ -182,6 +317,7 @@ const pendingTransacs = async (req, res) => {
 };
 
 const transDetails = async (req, res) => {
+  let entityId = req.params.entityId;
   let transactionId = req.params.transactionId;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -192,9 +328,10 @@ const transDetails = async (req, res) => {
       .render("error", { title: "Error", hasError: true, error: error });
 
   try {
+    let entity = await entityData.getEntityById(entityId);
     let transaction = await transactionData.getTransactionById(transactionId);
 
-    if (!transaction)
+    if (!entity || !transaction)
       return res.status(500).render("error", {
         title: "Error",
         hasError: true,
@@ -221,14 +358,42 @@ const transDetails = async (req, res) => {
     let buyerRating = (buyer.rating.totalRating / buyer.rating.count).toFixed(
       1
     );
+
+    let entityRole = entity.role;
+    let isPending = undefined;
+    let isApproved = undefined;
+    let isRejected = undefined;
+    let comment = undefined;
+    if (entityRole === "landsurveyor") {
+      isPending = transaction.surveyor.status.toLowerCase() === "pending";
+      isApproved = transaction.surveyor.status.toLowerCase() === "approved";
+      isRejected = transaction.surveyor.status.toLowerCase() === "rejected";
+      comment = transaction.surveyor.Comment;
+    } else if (entityRole === "titlecompany") {
+      isPending = transaction.titleCompany.status.toLowerCase() === "pending";
+      isApproved = transaction.titleCompany.status.toLowerCase() === "approved";
+      isRejected = transaction.titleCompany.status.toLowerCase() === "rejected";
+      comment = transaction.titleCompany.Comment;
+    } else if (entityRole === "government") {
+      isPending = transaction.government.status.toLowerCase() === "pending";
+      isApproved = transaction.government.status.toLowerCase() === "approved";
+      isRejected = transaction.government.status.toLowerCase() === "rejected";
+      comment = transaction.government.Comment;
+    }
+
     res.status(200).render("entity/transDetail", {
       title: "Transaction details",
-      transaction: transactiontransaction,
+      id: entity._id,
+      transaction: transaction,
       seller: seller,
       sellerRating: sellerRating,
       buyer: buyer,
       buyerRating: buyerRating,
       land: land,
+      isPending,
+      isApproved,
+      isRejected,
+      comment,
     });
   } catch (error) {
     return res
@@ -237,40 +402,44 @@ const transDetails = async (req, res) => {
   }
 };
 
-const response = async (req, res) => {};
-
-const setUpProfile = async (req, res) => {
-  const email = req.session.user.email;
-  let error = [];
-  if (typeof email !== "string") error.push("Email address must be a string!");
-  if (email.trim().length === 0)
-    error.push("Email address cannot be an empty string or just spaces!");
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
-  if (!bleh.test(email)) error.push("Invalid email address!");
-  if (error.length !== 0)
-    return res.status(400).render("error", {
-      title: "Error",
-      hasError: true,
-      error: error,
-    });
+const response = async (req, res) => {
+  const status = req.body.approval;
+  const com = req.body.comment;
+  const entityId = req.params.entityId;
+  const transactionId = req.params.transactionId;
+  let entityRole = undefined;
 
   try {
-    let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
-    phoneInput = parseInt(phoneInput);
-    await entityData.addNewEntity(
-      nameInput,
-      phoneInput,
-      email,
-      websiteInput,
-      licenseInput
-    );
-    await credentialData.updateProfileStatus(
-      res.session.user.credentialId,
-      true
-    );
-    res.status(200).render("approvalWaiting", {
-      title: "Approval pending",
-    });
+    const entity = await entityData.getEntityById(entityId);
+
+    if (!entity)
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Internal Server Error"],
+      });
+
+    entityRole = entity.role;
+    let success = undefined;
+
+    if (status === "approved") {
+      success = await entityData.entityApproved(transactionId, com, entityRole);
+    } else if (status === "rejected") {
+      success = await entityData.entityTerminateTransaction(
+        transactionId,
+        com,
+        entityRole
+      );
+    }
+
+    if (typeof success === "undefined")
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Internal Server Error"],
+      });
+
+    return res.redirect("/:entityId/transactionDetails/:transactionId");
   } catch (error) {
     return res
       .status(400)
@@ -281,9 +450,11 @@ const setUpProfile = async (req, res) => {
 export {
   getHome,
   getProfile,
+  setUpProfile,
+  updationFrom,
+  update,
   allTransacs,
   pendingTransacs,
   transDetails,
   response,
-  setUpProfile,
 };

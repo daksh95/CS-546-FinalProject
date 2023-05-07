@@ -5,9 +5,9 @@
                 <a class="navbar-brand" href="#">WebSite Name</a>
             </div>
             <ul class="nav navbar-nav">
-                <li class="nav-item"><a href="/home" class="nav-link text-light">Home</a></li>
-                <li class="nav-item"><a href="/entity/allTransactions/:{{id}}" class="nav-link text-light">View all transactions</a></li>
-                <li class="nav-item"><a href="/entity/pendingTransactions/:{{id}}" class="nav-link text-light">View pending transactions</a></li>
+                <li class="nav-item"><a href="/" class="nav-link text-light">Home</a></li>
+                <li class="nav-item"><a href="/entity/allTransactions/{{id}}" class="nav-link text-light">View all transactions</a></li>
+                <li class="nav-item"><a href="/entity/pendingTransactions/{{id}}" class="nav-link text-light">View pending transactions</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
@@ -18,8 +18,9 @@
 </header>
 
 <main>
+    {{#if length}}
     <h1>Below are all the pending transactions on your account:</h1>
-    {{#forEach transactions}}
+    {{#each transactions}}
     <ul class="transactions list">
         <li class="transaction id">Transaction ID: <a href="/entity/transactionDetails/:{{transactions._id}}">{{transactions._id}}</a></li>
         {{#if landSurveyor}}
@@ -32,5 +33,8 @@
         <li class="transaction status">Transaction status: {{transactions.government.status}}</li>
         {{/if}}
     </ul>
-    {{/forEach}}
+    {{/each}}
+    {{else}}
+    You have no pending transactions! Good job! Enjoy your day!
+    {{/if}}
 </main>
