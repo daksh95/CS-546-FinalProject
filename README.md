@@ -11,4 +11,4 @@
 - [ ] Verify all status codes
 - [x] Generate json for zipcode or API
 - [ ] Change password functionality
-- [x] Logout button on all pages
+- [ ] Logout button on all pages

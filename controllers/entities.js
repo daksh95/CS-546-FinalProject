@@ -39,6 +39,10 @@ const getHome = async (req, res) => {
         title: "Approval pending",
       });
 
+    if (entity.approved === "rejected")
+      return res.status(200).render("accountRejected", {
+        title: "Approval rejected",
+      });
     res.status(200).render("entity/entityHome", {
       id: id,
       name: entityName,
