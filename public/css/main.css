@@ -17,3 +17,15 @@ body {
     max-width: 100%;
     overflow-x: hidden;
 }
+
+span.status-approved {
+    color: #218838;
+}
+
+span.status-pending {
+    color: rgb(95, 0, 150);
+}
+
+span.status-rejected {
+    color: #c82333;
+}

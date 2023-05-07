@@ -11,7 +11,6 @@ const getAccountsListForApproval = async (req, res) => {
     if (!accountList) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
     const accountsExist = accountList.length !== 0 ? true : false;
-    console.log(accountList);
     return res.render('admin/accountApprovalList', { title: 'Account Approvals', accountsExist, accountList });
   } catch (e) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [e] });
@@ -19,21 +18,47 @@ const getAccountsListForApproval = async (req, res) => {
 };
 
 const getApprovalAccount = async (req, res) => {
-  const accountId = req.params.accountId;
+  let accountId = req.params.accountId;
   
   try {
     accountId = validation.validObjectId(accountId, 'accountId');
     const account = await adminData.getAccountById(accountId);
     if (!account) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
-
-    const isUser = account.user.toLowerCase() === 'user';
+    const isUser = account.role.toLowerCase() === 'user';
     const isEntity = !isUser;
 
-    return res.render('approveAccount', { title: "Approve Account", account, isUser, isEntity });
+    const isPending = account.approved.toLowerCase() === 'pending';
+    const isApproved = account.approved.toLowerCase() === 'approved';
+    const isRejected = account.approved.toLowerCase() === 'rejected';
+
+    return res.render('admin/approveAccount', {
+      title: "Approve Account",
+      account, isUser, isEntity,
+      isPending, isApproved, isRejected
+    });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
 };
+
+const approveAccount = async (req, res) => {
+  const approvalInfo = req.body;
+
+  try {
+    if (!('approval' in approvalInfo && 'comment'))
+    throw 'Request header does not match the correct format';
+
+    const status = validation.validApprovalStatus(approvalInfo.approval, 'Approval Status');
+    let comment;
+    if (status === 'rejected') comment = validation.validString(approvalInfo.comment, 'Approval Comment');
+    const accountId = validation.validObjectId(req.params.accountId, 'accountId');
+    const approvalResult = await adminData.approveAccount(accountId, status, comment);
+    if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    return res.redirect(`/admin/approvals/account/${accountId}`)
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+}
 
 const getLandsListForApproval = async (req, res) => {
   try {
@@ -56,6 +81,10 @@ const getApprovalLand = async (req, res) => {
     const land = await landData.getLand(landId);
     if (!land) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
+    const isPending = land.approved.toLowerCase() === 'pending';
+    const isApproved = land.approved.toLowerCase() === 'approved';
+    const isRejected = land.approved.toLowerCase() === 'rejected';
+    
     return res.json(land);
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -83,6 +112,10 @@ const getApprovalTransaction = async (req, res) => {
     const transaction = await transactionData.getTransactionById(transactionId);
     if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
+    const isPending = transaction.approved.toLowerCase() === 'pending';
+    const isApproved = transaction.approved.toLowerCase() === 'approved';
+    const isRejected = transaction.approved.toLowerCase() === 'rejected';
+
     return res.json(transaction);
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -95,5 +128,6 @@ export {
   getLandsListForApproval,
   getApprovalLand,
   getTransactionsListForApproval,
-  getApprovalTransaction
+  getApprovalTransaction,
+  approveAccount
 };

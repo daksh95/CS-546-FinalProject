@@ -79,7 +79,7 @@ const createUser = async (
     },
     dob: dob,
     gender: gender,
-    approved: false,
+    approved: "pending",
     rating: {
       totalRating: 0,
       noOfRating: 0,

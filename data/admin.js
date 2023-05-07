@@ -12,7 +12,7 @@ const getUnapprovedAccounts = async () => {
   let unapprovedUsers = await client
     .collection('users')
     .find(
-      { approved: false },
+      { approved: 'pending' },
       { projection: { _id: 1, name: 1, emailId: 1 }}
     ).toArray();
 
@@ -24,7 +24,7 @@ const getUnapprovedAccounts = async () => {
 
   let unapprovedEntities = await client
     .collection('entity')
-    .find({ approved: false },
+    .find({ approved: 'pending' },
       { projection: { _id: 1, name: 1, emailId: 1, role: 1 }}
     ).toArray();
 
@@ -45,13 +45,13 @@ const getAccountById = async (accountId) => {
   const accountUser = await client
     .collection('users')
     .findOne(
-      { _id: ObjectId(accountId) }
+      { _id: new ObjectId(accountId) }
     );
 
   const accountEntity = await client
-    .collection('entities')
+    .collection('entity')
     .findOne(
-      { _id: ObjectId(accountId) }
+      { _id: new ObjectId(accountId) }
     );
 
   if (!accountUser && !accountEntity) throw 'No account found for the given ID';
@@ -71,7 +71,7 @@ const getUnapprovedLands = async () => {
   let unapprovedLands = await client
     .collection('land')
     .find(
-      { approved: false },
+      { approved: 'pending' },
     ).toArray();
 
   if (!unapprovedLands) throw 'Unable to fetch unapproved lands';
@@ -91,10 +91,10 @@ const getUnapprovedTransactions = async () => {
   let unapprovedTransactions = await client
     .collection('transaction')
     .find (
-      { 'surveyor.status': true,
-        'titleCompany.status': true,
-        'government.status': true,
-        'admin.status': false
+      { 'surveyor.status': 'approved',
+        'titleCompany.status': 'approved',
+        'government.status': 'approved',
+        'admin.status': 'pending'
       }
     ).toArray();
 
@@ -109,36 +109,60 @@ const getUnapprovedTransactions = async () => {
   return unapprovedTransactions;
 }
 
-const approveUser = async (userId) => {
-  userId = validation.validObjectId(userId);
-  const user = await userData.getUserById(userId);
+const approveAccount = async (accountId, status, comment) => {
+  accountId = validation.validObjectId(accountId, 'accountId');
   
   const client = getClient();
+  const user = await client.collection('users').findOne({ _id: new ObjectId(accountId) });
+  const entity = await client.collection('entity').findOne({ _id: new ObjectId(accountId) });
+
+  if (!user && !entity) throw `Account not found for given Id`;
+
+  const collectionName = user ? 'users' : 'entity';
+
+  status = validation.validString(status, 'Approval status');
+  status = status.toLowerCase();
+  if (!status === 'approved' || !status === 'rejected') throw 'Unable to update approval status'
+
+  if (status === 'rejected') comment = validation.validString(comment, 'Approval comment')
+
   const result = await client
-    .collection("users")
+    .collection(collectionName)
     .findOneAndUpdate(
-      { _id: userId },
-      { $set: { approved: true } },
+      { _id: new ObjectId(accountId) },
+      { $set: {
+        approved: status,
+        approvalComment: comment
+      } },
       { returnDocument: "after" }
     );
 
   if (result.lastErrorObject.n < 1) {
-    throw `user ${userId} could not be approved`;
+    throw `account status could not be updated`;
   }
 
   return result;
 };
 
-const approveLand = async (landId) => {
-  landId = validation.validObjectId(landId);
+const approveLand = async (landId, status, comment) => {
+  landId = validation.validObjectId(landId, 'landId');
   const land = await landData.getLand(landId);
+
+  status = validation.validString(status, 'Approval status');
+  status = status.toLowerCase();
+  if (!status === 'approved' || !status === 'rejected') throw 'Unable to update approval status'
+
+  if (status === 'rejected') comment = validation.validString(comment, 'Approval comment')
 
   const client = getClient();
   const result = await client
     .collection("land")
     .findOneAndUpdate(
       { _id: landId },
-      { $set: { approved: true }},
+      { $set: {
+        approved: status,
+        approvalComment: comment
+      }},
       { returnDocument: "after" }
     );
 
@@ -150,7 +174,7 @@ const approveLand = async (landId) => {
   
 };
 
-const adminApproved = async (transactionId, buyerId, sellerId) => {};
+const adminApproved = async (transactionId, buyerId, sellerId, status, comment) => {};
 
 const getAdminId = async () => {
   const client = getClient();
@@ -162,7 +186,7 @@ const getAdminId = async () => {
 }
 
 const adminData = {
-  approveUser,
+  approveAccount,
   approveLand,
   adminApproved,
   getUnapprovedAccounts,
