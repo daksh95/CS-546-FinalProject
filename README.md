@@ -9,15 +9,20 @@
         - addNewLand left
 - [ ] Complete Middlewares
 - [ ] Check for totally on all pages
-        - displayLandByState
-        - displayLandDetails
-        - myProperties
-        - myTransactions
-        - profile
-        - login
-        - logout
-        - signup
+  - displayLandByState
+  - displayLandDetails
+  - myProperties
+  - myTransactions
+  - profile
+  - login
+  - logout
+  - signup
+  - allTrans
+  - entityHome
+  - pendingTrans
+  - prile (entity)
+  - transDetail
 - [ ] Verify all status codes
 - [x] Generate json for zipcode or API
 - [ ] Change password functionality
-- [ ] Logout button on all pages
+- [x] Logout button on all pages
