@@ -140,9 +140,9 @@
     }
 
     function validSSN(ssn){
-        ssn = validString(ssn, "SSN number", 9);
+        ssn = validString(ssn, "SSN number", 11);
         let ssnFormat = /^\d{3}-\d{2}-\d{4}$/g;
-        if(!ssnFormat.match(snn)){
+        if(!ssn.match(ssnFormat)){
             throw `please provide valid ssn with "-" in between`;
         }
         return ssn;

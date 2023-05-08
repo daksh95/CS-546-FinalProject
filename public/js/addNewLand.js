@@ -41,7 +41,7 @@
         try {
             state = validState(state);
         } catch (e) {
-            error.push(e);
+            errors.push(e);
         }
 
         //zipcode
@@ -49,27 +49,27 @@
             zipCode = validZip(zipCode);
     
         } catch (e) {
-            error.push(e);
+            errors.push(e);
         }
 
         //type of land
         try {
             type = validLandType(type);
         } catch (e) {
-            error.push(e);
+            errors.push(e);
         }
-
+ 
         //length
         try {
             length = validNumber(length, "length", 1);
         } catch (e) {
-            error.push(e);
+            errors.push(e);
         }
         //breadth
         try {
             breadth = validNumber(breadth, "breadth", 1);
         } catch (e) {
-            error.push(e);
+            errors.push(e);
         }
     
     
@@ -109,8 +109,8 @@
             throw `valid zipcode is needed`;
         }
         zip = parseInt(zip);
-        if(zip<501 && zip>99950){
-            throw 'zipcode is bound';
+        if(zip<501 || zip>99950){
+            throw 'Please provide a valid zipcode';
         }
     }
 
@@ -137,11 +137,6 @@
           if (min) {
             if (num < min) {
               throw `${parameter} can must be greater than ${min}`;
-            }
-          }
-          if (max) {
-            if (num > max) {
-              throw `${parameter} can must be less than ${max}`;
             }
           }
           return num;
@@ -201,7 +196,8 @@
             "WY",
           ];
          state = validString(state, "State",2);
-         if(!validStateCodes.includes(gender)){
+         state = state.toUpperCase();
+         if(!validStateCodes.includes(state)){
             throw `please provide valid state`;
          } 
          return state;
