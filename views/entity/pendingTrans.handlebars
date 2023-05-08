@@ -1,21 +1,19 @@
-<header>
-    <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
-        <div class="container-fluid">
-            <div class="navbar-header text-light">
-                <a class="navbar-brand" href="#">WebSite Name</a>
-            </div>
-            <ul class="nav navbar-nav">
-                <li class="nav-item"><a href="/" class="nav-link text-light">Home</a></li>
-                <li class="nav-item"><a href="/entity/allTransactions/{{id}}" class="nav-link text-light">View all transactions</a></li>
-                <li class="nav-item"><a href="/entity/pendingTransactions/{{id}}" class="nav-link text-light">View pending transactions</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
-                <li class="nav-item"><a href="/entity/myProfile" class="nav-link text-light">Profile</a></li>
-            </ul>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
+    <div class="container-fluid">
+        <div class="navbar-header text-light">
+            WebSite Name
         </div>
-    </nav>
-</header>
+        <ul class="nav navbar-nav">
+            <li class="nav-item"><a href="/" class="nav-link text-light">Home</a></li>
+            <li class="nav-item"><a href="/entity/allTransactions/{{id}}" class="nav-link text-light">View all transactions</a></li>
+            <li class="nav-item"><a href="/entity/pendingTransactions/{{id}}" class="nav-link text-light">View pending transactions</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            <li class="nav-item"><a href="/entity/myProfile" class="nav-link text-light">Profile</a></li>
+        </ul>
+    </div>
+</nav>
 
 <main>
     {{#if length}}
@@ -38,11 +36,3 @@
     You have no pending transactions! Good job! Enjoy your day!
     {{/if}}
 </main>
-
-<footer>
-    <form action="/logout" id="logout" class="form-check" method="get">
-            <div class="d-grid gap-2 d-md-block">
-                <button type="submit" name="logout" id="logoutButton" class="btn btn-success">Logout</button>
-            </div>
-        </form>
-</footer>

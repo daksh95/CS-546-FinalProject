@@ -44,6 +44,7 @@ const getHome = async (req, res) => {
       return res.status(200).render("accountRejected", {
         title: "Approval rejected",
       });
+
     res.status(200).render("entity/entityHome", {
       id: id,
       name: entityName,
@@ -101,7 +102,7 @@ const getProfile = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    res.render("entity/profile", {
+    res.status(200).render("entity/profile", {
       entity: entity,
     });
   } catch (error) {
@@ -306,7 +307,7 @@ const pendingTransacs = async (req, res) => {
     if (entity.role === "land surveyor") land_surveyor = true;
     if (entity.role === "title company") title_company = true;
     if (entity.role === "government") government = true;
-    res.render("entity/pendingTrans", {
+    res.status(200).render("entity/pendingTrans", {
       length: Boolean(trans.length),
       id: id,
       transactions: trans,
@@ -357,12 +358,21 @@ const transDetails = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    let sellerRating = (
-      seller.rating.totalRating / seller.rating.count
-    ).toFixed(1);
-    let buyerRating = (buyer.rating.totalRating / buyer.rating.count).toFixed(
-      1
-    );
+    let sellerRating = undefined;
+    if (seller.rating.count === 0) {
+      sellerRating = 0;
+    } else {
+      sellerRating = (seller.rating.totalRating / seller.rating.count).toFixed(
+        1
+      );
+    }
+
+    let buyerRating = undefined;
+    if (buyer.rating.count === 0) {
+      buyerRating = 0;
+    } else {
+      buyerRating = (buyer.rating.totalRating / buyer.rating.count).toFixed(1);
+    }
 
     let entityRole = entity.role;
     let isPending = undefined;
@@ -428,7 +438,11 @@ const response = async (req, res) => {
     let success = undefined;
 
     if (status === "approved") {
-      success = await entityData.entityApproved(transactionId, xss(com), entityRole);
+      success = await entityData.entityApproved(
+        transactionId,
+        xss(com),
+        entityRole
+      );
     } else if (status === "rejected") {
       success = await entityData.entityTerminateTransaction(
         transactionId,
@@ -444,7 +458,9 @@ const response = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    return res.status(200).redirect("/:entityId/transactionDetails/:transactionId");
+    return res
+      .status(200)
+      .redirect("/:entityId/transactionDetails/:transactionId");
   } catch (error) {
     return res
       .status(400)
