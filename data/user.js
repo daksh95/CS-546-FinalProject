@@ -141,7 +141,7 @@ const initializeProfile = async(email)=>{
       approved: false,
       rating: {
         totalRating: 0,
-        noOfRating: 0,
+        count: 0,
       },
       land: [],
     };

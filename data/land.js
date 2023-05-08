@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
 import validation from "../utils/validation.js";
+import moment from "moment";
 import {
   exists,
   checkInputType,
@@ -36,31 +37,23 @@ const addNewLand = async (object) => {
   const queryData = {};
   let length = parseInt(dimensions.length);
   let breadth = parseInt(dimensions.breadth);
-  
+
   //valid numbers
-  length = validation.validNumber(
-    dimensions.length,
-    "length",
-    1
-  );
+  length = validation.validNumber(dimensions.length, "length", 1);
 
-  breadth = validation.validNumber(
-    dimensions.breadth,
-    "breadth",
-    1
-  );
+  breadth = validation.validNumber(dimensions.breadth, "breadth", 1);
 
-  queryData.dimensions ={
-    length:length,
-    breadth:breadth
-  }
+  queryData.dimensions = {
+    length: length,
+    breadth: breadth,
+  };
   //default behaviour
   queryData.sale = {
-    price: 1,
-    dateOfListing:"11/11/1234",
+    price: undefined,
+    dateOfListing: undefined,
     onSale: false,
-  }
- 
+  };
+
   //valid string and string of array
   queryData.type = validation.validString(type, "type of land", 20);
   queryData.restrictions = validation.validArrayOfStrings(
@@ -68,8 +61,8 @@ const addNewLand = async (object) => {
     "restrictions"
   );
 
-  queryData.area = (dimensions.length*dimensions.breadth).toString();
-  
+  queryData.area = (dimensions.length * dimensions.breadth).toString();
+
   address.line1 = validation.validString(address.line1, "line1", 46);
   address.line2 = validation.validString(address.line2, "line2", 46);
   address.city = validation.validString(address.city, "city", 17);
@@ -82,12 +75,12 @@ const addNewLand = async (object) => {
   );
 
   queryData.address = {
-    line1:address.line1,
-    line2:address.line2,
+    line1: address.line1,
+    line2: address.line2,
     city: address.city,
-    state:address.state,
-    zipCode:address.zipCode
-  }
+    state: address.state,
+    zipCode: address.zipCode,
+  };
 
   //valid status
   queryData.approved = validation.validApprovalStatus(approved, "approved");
@@ -107,9 +100,10 @@ const addNewLand = async (object) => {
 };
 
 const updateLand = async (object) => {
-  let { dimensions, type, restrictions, sale, address, approved, landId } = object;
+  let { dimensions, type, restrictions, sale, address, approved, landId } =
+    object;
   const queryData = {};
-  
+
   //valid numbers
   queryData.dimensions.length = validation.validNumber(
     dimensions.length,
@@ -140,7 +134,7 @@ const updateLand = async (object) => {
     "dateOfListing",
     10
   );
-  queryData.area = (dimensions.length*dimensions.breadth).toString();
+  queryData.area = (dimensions.length * dimensions.breadth).toString();
   queryData.address.line1 = validation.validString(address.line1, "line1", 46);
   queryData.address.line2 = validation.validString(address.line2, "line2", 46);
   queryData.address.city = validation.validString(address.city, "city", 17);
@@ -154,7 +148,9 @@ const updateLand = async (object) => {
   const client = getClient();
 
   //inserting new land
-  let result = await client.collection("land").findOneAndUpdate({id:landId},queryData, {});
+  let result = await client
+    .collection("land")
+    .findOneAndUpdate({ id: landId }, queryData, {});
 
   //error handling incase Insertion doesn't happen
   if (!result.acknowledged || !result.insertedId) throw "Could not update land"; //TODO check this functionality;
@@ -271,6 +267,36 @@ const filterByPrice = async (state, minPrice, maxPrice) => {
   return result;
 };
 
+const putOnSale = async (landId, price) => {
+  if (!exists(landId)) throw new Error("ID parameter does not exists");
+  if (!checkInputType(landId, "string"))
+    throw new Error("ID must be of type string only");
+  if (landId.trim().length === 0)
+    throw new Error("ID cannot be of empty spaces");
+  landId = landId.trim();
+  if (!ObjectId.isValid(landId)) throw new Error("Invalid Object ID");
+  if (!exists(price)) throw new Error("Price parameter does not exists");
+  if (!checkInputType(price, "number") || price === NaN || price === Infinity)
+    throw new Error("Price must be of type number only");
+
+  let date = moment();
+  const client = getClient();
+  const result = client.collection("land").findOneAndUpdate(
+    {
+      _id: new ObjectId(landId),
+    },
+    {
+      $set: {
+        "sale.onSale": true,
+        "sale.price": price,
+        "sale.dateOfListing": date.format("MM/DD/YYYY"),
+      },
+    },
+    {}
+  );
+  return;
+};
+
 const landData = {
   getAllLand: getAllLand,
   getLand: getLand,
@@ -280,6 +306,7 @@ const landData = {
   filterByArea: filterByArea,
   filterByPrice: filterByPrice,
   addNewLand: addNewLand,
+  putOnSale: putOnSale,
 };
 
 export default landData;

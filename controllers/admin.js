@@ -107,7 +107,7 @@ const approveLand = async (req, res) => {
     let comment = approvalInfo.comment;
     if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
     const landId = validation.validObjectId(req.params.landId, 'landId');
-    const approvalResult = await adminData.approveLand(landId, status, comment);
+    const approvalResult = await adminData.approveLand(landId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
     return res.redirect(`/admin/approvals/land/${landId}`)
   } catch (error) {
@@ -159,7 +159,7 @@ const approveTransaction = async (req, res) => {
     let comment = approvalInfo.comment;
     if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
     const transactionId = validation.validObjectId(req.params.transactionId, 'transactionId');
-    const approvalResult = await adminData.approveTransaction(transactionId, status, comment);
+    const approvalResult = await adminData.approveTransaction(transactionId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
     return res.redirect(`/admin/approvals/transaction/${transactionId}`)
   } catch (error) {

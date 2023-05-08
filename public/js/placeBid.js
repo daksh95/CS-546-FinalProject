@@ -8,17 +8,18 @@
   }
 
   const placeBid = document.getElementById("placeBid");
-  placeBid.addEventListener("click", () => {
-    const errorDiv = document.getElementById("bidError");
-    errorDiv.hidden = true;
-  });
-
+  if (placeBid) {
+    placeBid.addEventListener("click", () => {
+      const errorDiv = document.getElementById("bidError");
+      errorDiv.hidden = true;
+    });
+  }
   const bidForm = document.getElementById("bidForm");
   if (bidForm) {
     bidForm.addEventListener("submit", (event) => {
       event.preventDefault();
       let bid = document.getElementById("bidInput");
-      bid = parseInt(bid);
+      bid = parseInt(bid.value);
       const errorDiv = document.getElementById("bidError");
       try {
         errorDiv.hidden = true;

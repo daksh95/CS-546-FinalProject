@@ -35,7 +35,38 @@
             <p>Date of Listing: {{land.sale.dateOfListing}}</p>
             {{else}}
             <p>Sale: No</p>
+            <button id="sale" type="button" class="btn btn-dark mb-3" data-toggle="modal" data-target="#saleModal">
+                Put for Sale
+            </button>
             {{/if}}
+            <div class="modal" id="saleModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="modal-title">Enter the price to put on sale.
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/land/{{land._id}}" method="post" id="saleForm">
+                                <label for="priceInput">Price: </label>
+                                <input type="number" name="priceInput" id="priceInput">
+                                <button type="submit" class="btn" style="background-color: #008c00; color:black">Put on
+                                    sale</button>
+                            </form>
+                            <div id="saleError"></div>
+                            {{#if hasSaleError}}
+                            <ul class="error">
+                                {{#each error}}
+                                <li>
+                                    {{this}}
+                                </li>
+                                {{/each}}
+                            </ul>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
             {{#if isOwner}}
@@ -100,4 +131,5 @@
         </div>
     </div>
 </main>
+<script src="/public/js/putOnSale.js"></script>
 <script src="/public/js/placeBid.js"></script>

@@ -7,8 +7,6 @@
 - [x] Figure out front end for searching sorting and filtering
 - [ ] Ask professor or TAs about using XSS (whether we have to use only for forms, **or do we use it in GET /{id} routes too**)
         - addNewLand left
-        - admins functions left
-        
 - [ ] Complete Middlewares
 - [ ] Check for totally on all pages
         - displayLandByState

@@ -67,7 +67,6 @@ const getLand = async (req, res) => {
       error: [error.message],
     });
   }
-  // res.status(200).json({ data: result });/
 };
 
 const getLandByState = async (req, res) => {
@@ -230,7 +229,11 @@ const postFilterArea = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByArea(state, xss(minArea), xss(maxArea));
+    let filteredLands = await landData.filterByArea(
+      state,
+      xss(minArea),
+      xss(maxArea)
+    );
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -293,7 +296,12 @@ const placedBid = async (req, res) => {
       error: error,
     });
   try {
-    await transactionData.createTransaction(xss(bid), landId, sellerId, buyerId);
+    await transactionData.createTransaction(
+      xss(bid),
+      landId,
+      sellerId,
+      buyerId
+    );
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
     return res.status(400).render("Error", {
@@ -317,7 +325,8 @@ const updateLand = async (req, res) => {
     });
     return;
   } else {
-    let {dimensionsLengthInput: length,
+    let {
+      dimensionsLengthInput: length,
       dimensionsBreadthInput: breadth,
       typeInput: type,
       restrictionsInput: restrictions,
@@ -539,10 +548,44 @@ const addNewLand = async (req, res) => {
 
   res.status(200).redirect(`/user/${req.session.user.id}/land`);
 };
+
 const addNewLandForm = async (req, res) => {
   res
     .status(200)
     .render("addNewLand", { title: "Add Land", id: req.session.user.id });
+};
+
+const postLandonSale = async (req, res) => {
+  let price = req.body.priceInput;
+  let landId = req.params.id;
+  price = parseInt(price);
+  let error = [];
+  if (!exists(landId)) error.push("ID parameter does not exists");
+  if (!checkInputType(landId, "string"))
+    error.push("ID must be of type string only");
+  if (landId.trim().length === 0) error.push("ID cannot be of empty spaces");
+  landId = landId.trim();
+  if (!ObjectId.isValid(landId)) error.push("Invalid Object ID");
+  if (!exists(price)) error.push("Price parameter does not exists");
+  if (!checkInputType(price, "number") || price === NaN || price === Infinity)
+    error.push("Price must be of type number only");
+  if (error.length !== 0)
+    return res.status(400).render("error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    await landData.putOnSale(landId, price);
+    res.status(200).redirect("/land/" + landId);
+  } catch (error) {
+    return res.status(400).render("error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
 };
 
 export {
@@ -555,4 +598,5 @@ export {
   postFilterPrice,
   placedBid,
   addNewLandForm,
+  postLandonSale,
 };
