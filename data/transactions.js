@@ -255,6 +255,43 @@ const getTransactionById = async (transactionId) => {
   return result;
 };
 
+// This function is for admin usage
+const getTransactionsForAccount = async (accountId) => {
+  accountId = validation.validObjectId(accountId, 'accountId');
+
+  const client = getClient();
+  const result = await client
+    .collection('transaction')
+    .find(
+      { $or: [
+        { 'seller._id': new ObjectId(accountId) },
+        { 'seller._id': new ObjectId(accountId) },
+        { 'surveyor._id': new ObjectId(accountId) },
+        { 'titleCompany._id': new ObjectId(accountId) },
+        { 'government._id': new ObjectId(accountId) }
+      ] }
+    ).toArray();
+
+  if (!result) throw 'Could not fetch transactions from the database';
+
+  result = result.map((element) => {
+    element._id = element._id.toString();
+    element.seller._id = element.seller._id.toString();
+    element.buyer._id = element.buyer._id.toString();
+    if ('surveyor' in element && '_id' in element.surveyor && element.surveyor._id)
+      element.surveyor._id = element.surveyor._id.toString();
+    if ('titleCompany' in element && '_id' in element.titleCompany && element.titleCompany._id)
+      element.titleCompany._id = element.titleCompany._id.toString();
+    if ('government' in element && '_id' in element.government && element.government._id)
+      element.government._id = element.government._id.toString();
+    if ('admin' in element && '_id' in element.admin && element.admin._id)
+      element.admin._id = element.admin._id.toString();
+    return element;
+  });
+
+  return result;
+}
+
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,
   getTransactionsBySellerId: getTransactionsBySellerId,
@@ -263,6 +300,7 @@ const transactionData = {
   createTransaction: createTransaction,
   terminateTransaction: terminateTransaction,
   getTransactionById: getTransactionById,
+  getTransactionsForAccount: getTransactionsForAccount
 };
 
 export default transactionData;

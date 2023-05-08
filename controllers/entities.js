@@ -10,9 +10,18 @@ import xss from "xss";
 
 const getHome = async (req, res) => {
   let id = req.session.user.id;
+
+  if (!id)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Session details missing!"],
+    });
+
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+
   if (error.length !== 0)
     return res
       .status(400)
@@ -60,17 +69,39 @@ const getHome = async (req, res) => {
 
 const getProfile = async (req, res) => {
   let id = req.session.user.id;
+  let email = req.session.user.email;
+  let role = req.session.user.typeOfUser;
+
+  if (!id || !email || !typeOfUser)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Session details missing!"],
+    });
+
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+  if (typeof email !== "string") error.push("Email address must be a string!");
+  if (email.trim().length === 0)
+    error.push("Email address cannot be an empty string or just spaces!");
+  let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+  if (!bleh.test(email)) error.push("Invalid email address!");
+  email = email.trim().toLowerCase();
+  role = role.toLowerCase();
+  if (
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
+    role !== "government"
+  )
+    error.push("Invalid role!");
+
   if (error.length !== 0)
     return res
       .status(400)
       .render("error", { title: "Error", hasError: true, error: error });
 
-  const profileSetUp = await credentialData.getCredentialByEmailId(
-    req.session.user.email
-  );
+  const profileSetUp = await credentialData.getCredentialByEmailId(email);
 
   if (!profileSetUp)
     return res.status(500).render("error", {
@@ -81,10 +112,10 @@ const getProfile = async (req, res) => {
 
   if (!profileSetUp.profileSetUpDone) {
     let details = {};
-    details.emailId = req.session.user.email;
+    details.emailId = email;
     details.url = `/entity/myProfile`;
     details.entity = true;
-    details.role = req.session.user.typeOfUser;
+    details.role = role;
     res.status(200).render("authentication/profileSetUp", {
       title: "Profile Set up",
       details,
@@ -114,12 +145,21 @@ const getProfile = async (req, res) => {
 
 const setUpProfile = async (req, res) => {
   const email = req.session.user.email;
+
+  if (!email)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Session details missing!"],
+    });
+
   let error = [];
   if (typeof email !== "string") error.push("Email address must be a string!");
   if (email.trim().length === 0)
     error.push("Email address cannot be an empty string or just spaces!");
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   if (!bleh.test(email)) error.push("Invalid email address!");
+
   if (error.length !== 0)
     return res.status(400).render("error", {
       title: "Error",
@@ -129,7 +169,39 @@ const setUpProfile = async (req, res) => {
 
   try {
     let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
-    phoneInput = parseInt(phoneInput);
+
+    error = [];
+    if (!nameInput || !phoneInput || !websiteInput || !licenseInput)
+      error.push("Recheck your inputs, one or more inputs are missing!");
+    if (typeof nameInput !== "string")
+      error.push("Entity name must be a string!");
+    if (nameInput.trim().length === 0)
+      error.push("Entity name cannot be an empty string or just spaces!");
+    nameInput = nameInput.trim();
+    if (typeof phoneInput !== "string")
+      error.push("Contact number must be a string!");
+    if (phoneInput.length !== 10)
+      error.push("Input a valid 10-digit contact number!");
+    if (typeof websiteInput !== "string")
+      error.push("Band website must be a string!");
+    if (websiteInput.trim().length === 0)
+      error.push("Band website cannot be an empty string or just spaces!");
+    const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
+    if (!regex.test(websiteInput)) error.push("Invalid entity website!");
+    websiteInput = websiteInput.trim();
+    if (typeof licenseInput !== "string")
+      error.push("Entity license must be a string!");
+    if (licenseInput.trim().length === 0)
+      error.push("Entity license cannot be an empty string or just spaces!");
+    licenseInput = licenseInput.trim();
+
+    if (error.length !== 0)
+      return res.status(400).render("error", {
+        title: "Error",
+        hasError: true,
+        error: error,
+      });
+
     let newEntity = await entityData.addNewEntity(
       xss(nameInput),
       xss(phoneInput),
@@ -145,10 +217,16 @@ const setUpProfile = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    await credentialData.updateProfileStatus(
-      req.session.user.credentialId,
-      true
-    );
+    let creds = req.session.user.credentialId;
+
+    if (!creds)
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Session details missing!"],
+      });
+
+    await credentialData.updateProfileStatus(creds, true);
     res.status(200).render("approvalWaiting", {
       title: "Approval pending",
     });
@@ -161,9 +239,18 @@ const setUpProfile = async (req, res) => {
 
 const updationFrom = async (req, res) => {
   const entityId = req.params.entityId;
+
+  if (!entityId)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Params details missing!"],
+    });
+
   let error = [];
   if (!exists(entityId)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(entityId)) error.push("Invalid Object ID");
+
   if (error.length !== 0)
     return res
       .status(400)
@@ -177,6 +264,28 @@ const updationFrom = async (req, res) => {
         title: "Error",
         hasError: true,
         error: ["Internal Server Error"],
+      });
+
+    error = [];
+    if (typeof entity.emailId !== "string")
+      error.push("Email address must be a string!");
+    if (entity.emailId.trim().length === 0)
+      error.push("Email address cannot be an empty string or just spaces!");
+    let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+    if (!bleh.test(entity.emailId)) error.push("Invalid email address!");
+    entity.role = entity.role.toLowerCase();
+    if (
+      entity.role !== "landsurveyor" &&
+      entity.role !== "titlecompany" &&
+      entity.role !== "government"
+    )
+      error.push("Invalid role!");
+
+    if (error.length !== 0)
+      return res.status(400).render("error", {
+        title: "Error",
+        hasError: true,
+        error: error,
       });
 
     let details = {};
@@ -197,12 +306,21 @@ const updationFrom = async (req, res) => {
 
 const update = async (req, res) => {
   const email = req.session.user.email;
+
+  if (!email)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Session details missing!"],
+    });
+
   let error = [];
   if (typeof email !== "string") error.push("Email address must be a string!");
   if (email.trim().length === 0)
     error.push("Email address cannot be an empty string or just spaces!");
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   if (!bleh.test(email)) error.push("Invalid email address!");
+
   if (error.length !== 0)
     return res.status(400).render("error", {
       title: "Error",
@@ -212,7 +330,39 @@ const update = async (req, res) => {
 
   try {
     let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
-    phoneInput = parseInt(phoneInput);
+
+    error = [];
+    if (!nameInput || !phoneInput || !websiteInput || !licenseInput)
+      error.push("Recheck your inputs, one or more inputs are missing!");
+    if (typeof nameInput !== "string")
+      error.push("Entity name must be a string!");
+    if (nameInput.trim().length === 0)
+      error.push("Entity name cannot be an empty string or just spaces!");
+    nameInput = nameInput.trim();
+    if (typeof phoneInput !== "string")
+      error.push("Contact number must be a string!");
+    if (phoneInput.length !== 10)
+      error.push("Input a valid 10-digit contact number!");
+    if (typeof websiteInput !== "string")
+      error.push("Band website must be a string!");
+    if (websiteInput.trim().length === 0)
+      error.push("Band website cannot be an empty string or just spaces!");
+    const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
+    if (!regex.test(websiteInput)) error.push("Invalid entity website!");
+    websiteInput = websiteInput.trim();
+    if (typeof licenseInput !== "string")
+      error.push("Entity license must be a string!");
+    if (licenseInput.trim().length === 0)
+      error.push("Entity license cannot be an empty string or just spaces!");
+    licenseInput = licenseInput.trim();
+
+    if (error.length !== 0)
+      return res.status(400).render("error", {
+        title: "Error",
+        hasError: true,
+        error: error,
+      });
+
     let newEntity = await entityData.addNewEntity(
       xss(nameInput),
       xss(phoneInput),
@@ -240,6 +390,14 @@ const update = async (req, res) => {
 
 const allTransacs = async (req, res) => {
   let id = req.params.entityId;
+
+  if (!id)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Params details missing!"],
+    });
+
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
@@ -262,9 +420,17 @@ const allTransacs = async (req, res) => {
     let land_surveyor = false;
     let title_company = false;
     let government = false;
-    if (entity.role === "land surveyor") land_surveyor = true;
-    if (entity.role === "title company") title_company = true;
-    if (entity.role === "government") government = true;
+
+    if (entity.role === "landsurveyor") land_surveyor = true;
+    else if (entity.role === "titlecompany") title_company = true;
+    else if (entity.role === "government") government = true;
+    else
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Invalid role!"],
+      });
+
     res.status(200).render("entity/allTrans", {
       length: Boolean(trans.length),
       id: id,
@@ -282,6 +448,14 @@ const allTransacs = async (req, res) => {
 
 const pendingTransacs = async (req, res) => {
   let id = req.params.entityId;
+
+  if (!id)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Params details missing!"],
+    });
+
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
@@ -304,9 +478,16 @@ const pendingTransacs = async (req, res) => {
     let land_surveyor = false;
     let title_company = false;
     let government = false;
-    if (entity.role === "land surveyor") land_surveyor = true;
-    if (entity.role === "title company") title_company = true;
-    if (entity.role === "government") government = true;
+    if (entity.role === "landsurveyor") land_surveyor = true;
+    else if (entity.role === "titlecompany") title_company = true;
+    else if (entity.role === "government") government = true;
+    else
+      return res.status(500).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Invalid role!"],
+      });
+
     res.status(200).render("entity/pendingTrans", {
       length: Boolean(trans.length),
       id: id,
@@ -325,9 +506,20 @@ const pendingTransacs = async (req, res) => {
 const transDetails = async (req, res) => {
   let entityId = req.params.entityId;
   let transactionId = req.params.transactionId;
+
+  if (!entityId || !transactionId)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Params details missing!"],
+    });
+
   let error = [];
-  if (!exists(id)) error.push("ID parameter does not exists");
-  if (!ObjectId.isValid(id)) error.push("Invalid Object ID");
+  if (!exists(entityId) || !exists(transactionId))
+    error.push("ID parameter does not exists");
+  if (!ObjectId.isValid(entityId) || !ObjectId.isValid(transactionId))
+    error.push("Invalid Object ID");
+
   if (error.length !== 0)
     return res
       .status(400)
@@ -347,6 +539,16 @@ const transDetails = async (req, res) => {
     let sellerId = transaction.seller._id;
     let buyerId = transaction.buyer._id;
     let landId = transaction.land._id;
+
+    if (!exists(sellerId) || !exists(buyerId) || !exists(landId))
+      error.push("ID parameter does not exists");
+    if (
+      !ObjectId.isValid(sellerId) ||
+      !ObjectId.isValid(buyerId) ||
+      !ObjectId.isValid(landId)
+    )
+      error.push("Invalid Object ID");
+
     let seller = await userData.getUserById(sellerId);
     let buyer = await userData.getUserById(buyerId);
     let land = await landData.getLand(landId);
@@ -394,6 +596,12 @@ const transDetails = async (req, res) => {
       isApproved = transaction.government.status.toLowerCase() === "approved";
       isRejected = transaction.government.status.toLowerCase() === "rejected";
       comment = transaction.government.Comment;
+    } else {
+      return res.status(400).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Invalid role!"],
+      });
     }
 
     res.status(200).render("entity/transDetail", {
@@ -422,6 +630,31 @@ const response = async (req, res) => {
   const com = req.body.comment;
   const entityId = req.params.entityId;
   const transactionId = req.params.transactionId;
+
+  if (!status || !com || !entityId || !transactionId)
+    return res.status(500).render("error", {
+      title: "Error",
+      hasError: true,
+      error: ["Params or request body details missing!"],
+    });
+
+  let error = [];
+  if (status !== "approved" || status !== "rejected")
+    error.push("Invalid status update!");
+  if (typeof comment !== "string") error.push("Comment must be a string!");
+  if (comment.trim().length === 0)
+    error.push("Comment box cannot be empty or just spaces!");
+  comment = comment.trim();
+  if (!exists(entityId) || !exists(transactionId))
+    error.push("ID parameter does not exists");
+  if (!ObjectId.isValid(entityId) || !ObjectId.isValid(transactionId))
+    error.push("Invalid Object ID");
+
+  if (error.length !== 0)
+    return res
+      .status(400)
+      .render("error", { title: "Error", hasError: true, error: error });
+
   let entityRole = undefined;
 
   try {
@@ -435,6 +668,19 @@ const response = async (req, res) => {
       });
 
     entityRole = entity.role;
+
+    entityRole = entityRole.toLowerCase();
+    if (
+      entityRole !== "landsurveyor" &&
+      entityRole !== "titlecompany" &&
+      entityRole !== "government"
+    )
+      return res.status(400).render("error", {
+        title: "Error",
+        hasError: true,
+        error: ["Invalid role!"],
+      });
+
     let success = undefined;
 
     if (status === "approved") {
