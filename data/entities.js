@@ -38,26 +38,21 @@ const addNewEntity = async (name, contactInfo, emailId, website, license) => {
     throw `Entity name cannot be an empty string or just spaces!`;
   name = name.trim();
 
-  if (typeof contactInfo !== "number") throw `Contact number must be a number!`;
-  let numStr = contactInfo.toString();
-  if (numStr.length !== 10) throw `Input a valid 10-digit contact number!`;
+  if (typeof contactInfo !== "string") throw `Contact number must be a string!`;
+  if (contactInfo.length !== 10) throw `Input a valid 10-digit contact number!`;
 
   if (typeof emailId !== "string") throw `Email address must be a string!`;
   if (emailId.trim().length === 0)
     throw `Email address cannot be an empty string or just spaces!`;
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   if (!bleh.test(emailId)) throw `Invalid email address!`;
   emailId = emailId.trim().toLowerCase();
 
   if (typeof website !== "string") throw `Band website must be a string!`;
   if (website.trim().length === 0)
     throw `Band website cannot be an empty string or just spaces!`;
-  if (
-    !website.includes("http://www.") ||
-    !website.includes(".com") ||
-    website.trim().length < 17
-  )
-    throw `Invalid entity website!`;
+  const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
+  if (!regex.test(website)) throw `Invalid entity website!`;
   website = website.trim();
 
   if (typeof license !== "string") throw `Entity license must be a string!`;
@@ -73,7 +68,6 @@ const addNewEntity = async (name, contactInfo, emailId, website, license) => {
       $set: {
         name: name,
         contactInfo: contactInfo,
-        emailId: emailId,
         website: website,
         license: license,
         approved: "pending",
