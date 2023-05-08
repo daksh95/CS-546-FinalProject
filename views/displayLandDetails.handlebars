@@ -35,9 +35,25 @@
             <p>Date of Listing: {{land.sale.dateOfListing}}</p>
             {{else}}
             <p>Sale: No</p>
+            {{#if isOwner}}
+            {{#if (eq land.approved "pending")}}
+            <button id="sale" type="button" class="btn btn-dark mb-3" data-toggle="modal" data-target="#saleModal"
+                disabled>
+                Put for Sale
+            </button>
+            {{/if}}
+            {{#if (eq land.approved "rejected")}}
+            <button id="sale" type="button" class="btn btn-dark mb-3" data-toggle="modal" data-target="#saleModal"
+                disabled>
+                Put for Sale
+            </button>
+            {{/if}}
+            {{#if (eq land.approved "approved")}}
             <button id="sale" type="button" class="btn btn-dark mb-3" data-toggle="modal" data-target="#saleModal">
                 Put for Sale
             </button>
+            {{/if}}
+            {{/if}}
             {{/if}}
             <div class="modal" id="saleModal">
                 <div class="modal-dialog">
@@ -70,10 +86,17 @@
         </div>
         <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
             {{#if isOwner}}
-            <a class="mx-auto my-auto" href="#"><button type="button" class="btn btn-dark">Edit Property</button></a>
-            <br>
+            {{#if (eq land.approved "pending")}}
+            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button type="button" class="btn btn-dark"
+                    disabled>View Transaction</button></a>
+            {{/if}}
+            {{#if (eq land.approved "rejected")}}
+            <p>Your land approval has been rejected!</p>
+            {{/if}}
+            {{#if (eq land.approved "approved")}}
             <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button type="button"
                     class="btn btn-dark">View Transaction</button></a>
+            {{/if}}
             {{else}}
             {{#if land.sale.onSale}}
             {{#if pendingTransaction}}
@@ -82,9 +105,19 @@
                 Place Bid
             </button>
             {{else}}
+            {{#if (eq land.approved "pending")}}
+            <button id="placeBid" type="button" class="btn btn-dark" data-toggle="modal" data-target="#bidModal" disabled>
+                Place Bid
+            </button>
+            {{/if}}
+            {{#if (eq land.approved "rejected")}}
+            <p>The land has been rejected by the admin!</p>
+            {{/if}}
+            {{#if (eq land.approved "approved")}}
             <button id="placeBid" type="button" class="btn btn-dark" data-toggle="modal" data-target="#bidModal">
                 Place Bid
             </button>
+            {{/if}}
             {{/if}}
             <div class="modal" id="bidModal">
                 <div class="modal-dialog">

@@ -31,6 +31,10 @@ hbs.handlebars.registerHelper("divide", function (num1, num2) {
   else return (num1 / num2).toFixed(1);
 });
 
+hbs.handlebars.registerHelper("eq", function (val1,val2) {
+  return val1 === val2
+})
+
 //middleware
 app.use(
   session({
