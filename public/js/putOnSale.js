@@ -1,10 +1,14 @@
 (function () {
   function priceValidation(price) {
-
     if (!price && !(price == false))
       throw new Error("price parameter does not exists");
-    if (!typeof price === "number" || price === NaN || price === Infinity)
-      throw new Error("price must be of type number");
+    if (
+      !typeof price === "number" ||
+      price === NaN ||
+      price === Infinity ||
+      price <= 0
+    )
+      throw new Error("price must be of type number or a positive number");
     return price;
   }
 

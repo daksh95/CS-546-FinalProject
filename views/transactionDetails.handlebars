@@ -37,7 +37,7 @@
         <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/approve">Approve</a>
         <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/reject">Reject</a>
         {{else}}
-        <p>Status: {{transaction.seller.status}}</p>
+        <p>Status: You have {{transaction.seller.status}} the transaction!</p>
         {{/if}}
         {{/if}}
     </div>

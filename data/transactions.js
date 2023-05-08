@@ -54,7 +54,7 @@ const getTransactionsByLandId = async (id) => {
   const client = getClient();
   const result = client
     .collection("transaction")
-    .find({ landId: new ObjectId(id) })
+    .find({ land: new ObjectId(id) })
     .toArray();
   if (result.length < 1) {
     throw "No transaction from that ID";
@@ -77,10 +77,11 @@ const getTransactionsByLandId = async (id) => {
   return data;
 };
 
-const sellerApproved = async (transactionId, sellerId, value) => {
+const sellerApproved = async (transactionId, sellerId, value, landId) => {
   //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
   transactionId = validation.validObjectId(transactionId, "transactionId");
   sellerId = validation.validObjectId(sellerId, "sellersId");
+  landId = validation.validObjectId(landId, "landId");
 
   //validate value field same as route validation
 
@@ -125,6 +126,19 @@ const sellerApproved = async (transactionId, sellerId, value) => {
       },
       status: "pending",
     };
+
+    let transactions = await transactionData.getTransactionsByLandId(landId);
+    for (let i = 0; i < transactions.length; i++) {
+      if (transactions[i].transactionId.toString() !== transactionId) {
+        const result = await client.collection("transaction").findOneAndUpdate(
+          {
+            _id: new ObjectId(transactions[i].transactionId.toString()),
+          },
+          { $set: { status: "rejected" } },
+          {}
+        );
+      }
+    }
 
     const result = await client.collection("transaction").findOneAndUpdate(
       {
