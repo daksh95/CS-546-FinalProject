@@ -309,11 +309,10 @@ const setUpProfile = async (req, res) => {
       error: [error],
     });
   }
-
-  //TODO redirect users;
-  res.status(200).redirect("/land");
+  res.status(200).render("approvalWaiting", { title: "Approval Waiting" });
   return;
 };
+
 export {
   getPropertiesOfUser,
   getProfile,
