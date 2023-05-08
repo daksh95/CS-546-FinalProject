@@ -10,6 +10,7 @@ const getLogin = async (req, res) => {
 };
 
 const postLogin = async (req, res) => {
+  console.log(req.body);
   let { emailInput, passwordInput } = req.body;
   let errors = [];
   //validation for email
@@ -253,6 +254,7 @@ const postSignUp = async (req, res) => {
         });
         return;
       }
+
     }
     //successful creation
     if (signup) {
