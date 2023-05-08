@@ -2,6 +2,7 @@ import adminData from "../data/admin.js";
 import validation from "../utils/validation.js";
 import landData from "../data/land.js";
 import transactionData from "../data/transactions.js";
+import xss from "xss";
 
 
 const getAccountsListForApproval = async (req, res) => {
@@ -52,7 +53,7 @@ const approveAccount = async (req, res) => {
     let comment = approvalInfo.comment;
     if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
     const accountId = validation.validObjectId(req.params.accountId, 'accountId');
-    const approvalResult = await adminData.approveAccount(accountId, status, comment);
+    const approvalResult = await adminData.approveAccount(accountId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
     return res.redirect(`/admin/approvals/account/${accountId}`)
   } catch (error) {

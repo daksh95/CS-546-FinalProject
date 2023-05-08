@@ -11,6 +11,7 @@ import {
   arrayLength,
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
+import xss from "xss";
 
 const getPropertiesOfUser = async (req, res) => {
   let id = req.params.id;
@@ -250,7 +251,6 @@ const getTransactionDetails = async (req, res) => {
 };
 
 const setUpProfile = async (req, res) => {
-  console.log("inside set up profile");
   let {
     nameInput,
     phoneInput,
@@ -276,18 +276,18 @@ const setUpProfile = async (req, res) => {
     });
     return;
   }
-  console.log("here inside the set up profile");
-  console.log("Session id here is", req.session.user.id);
+  // console.log("here inside the set up profile");
+  // console.log("Session id here is", req.session.user.id);
   //TODO call create user
   try {
     const result = await userData.createUser(
-      nameInput,
-      phoneInput,
-      emailIdInput,
-      typeofGovernmentIdInput,
-      governmentIdInput,
-      dobInput,
-      genderInput
+      xss(nameInput),
+      xss(phoneInput),
+      xss(emailIdInput),
+      xss(typeofGovernmentIdInput),
+      xss(governmentIdInput),
+      xss(dobInput),
+      xss(genderInput)
     );
   } catch (error) {
     return res.status(500).render("Error", {

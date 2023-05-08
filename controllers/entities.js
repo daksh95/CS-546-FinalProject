@@ -6,6 +6,7 @@ import credentialData from "../data/credential.js";
 
 import { exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
+import xss from "xss";
 
 const getHome = async (req, res) => {
   let id = req.session.user.id;
@@ -129,11 +130,11 @@ const setUpProfile = async (req, res) => {
     let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
     phoneInput = parseInt(phoneInput);
     let newEntity = await entityData.addNewEntity(
-      nameInput,
-      phoneInput,
-      email,
-      websiteInput,
-      licenseInput
+      xss(nameInput),
+      xss(phoneInput),
+      xss(email),
+      xss(websiteInput),
+      xss(licenseInput)
     );
 
     if (!newEntity)
@@ -212,11 +213,11 @@ const update = async (req, res) => {
     let { nameInput, phoneInput, websiteInput, licenseInput } = req.body;
     phoneInput = parseInt(phoneInput);
     let newEntity = await entityData.addNewEntity(
-      nameInput,
-      phoneInput,
-      email,
-      websiteInput,
-      licenseInput
+      xss(nameInput),
+      xss(phoneInput),
+      xss(email),
+      xss(websiteInput),
+      xss(licenseInput)
     );
 
     if (!newEntity)
@@ -263,7 +264,7 @@ const allTransacs = async (req, res) => {
     if (entity.role === "land surveyor") land_surveyor = true;
     if (entity.role === "title company") title_company = true;
     if (entity.role === "government") government = true;
-    res.render("entity/allTrans", {
+    res.status(200).render("entity/allTrans", {
       length: Boolean(trans.length),
       id: id,
       transactions: trans,
@@ -427,7 +428,7 @@ const response = async (req, res) => {
     let success = undefined;
 
     if (status === "approved") {
-      success = await entityData.entityApproved(transactionId, com, entityRole);
+      success = await entityData.entityApproved(transactionId, xss(com), entityRole);
     } else if (status === "rejected") {
       success = await entityData.entityTerminateTransaction(
         transactionId,
@@ -443,7 +444,7 @@ const response = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    return res.redirect("/:entityId/transactionDetails/:transactionId");
+    return res.status(200).redirect("/:entityId/transactionDetails/:transactionId");
   } catch (error) {
     return res
       .status(400)

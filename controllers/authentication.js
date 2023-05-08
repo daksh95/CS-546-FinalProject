@@ -3,6 +3,7 @@ import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import userData from "../data/user.js";
 import entityData from "../data/entities.js";
+import xss from "xss";
 
 //Login
 const getLogin = async (req, res) => {
@@ -41,7 +42,7 @@ const postLogin = async (req, res) => {
 
   //check if user exist
   try {
-    validUser = await auth.getCredentialByEmailId(emailInput);
+    validUser = await auth.getCredentialByEmailId(xss(emailInput));
   } catch (error) {
     res.status(401).render("authentication/login", {
       title: "Login Page",
@@ -54,7 +55,10 @@ const postLogin = async (req, res) => {
   }
 
   //Checking if password is correct
-  const validPass = await hash.compareHash(passwordInput, validUser.password);
+  const validPass = await hash.compareHash(
+    xss(passwordInput),
+    validUser.password
+  );
 
   if (!validPass) {
     res.status(401).render("authentication/login", {
@@ -71,12 +75,12 @@ const postLogin = async (req, res) => {
   let id = undefined;
   try {
     if (validUser.typeOfUser === "user") {
-      let userObj = await userData.getUserByEmail(emailInput);
+      let userObj = await userData.getUserByEmail(xss(emailInput));
       id = userObj._id;
       console.log(id);
     } else if (validUser.typeOfUser === "admin") id = undefined;
     else {
-      let entityObj = await entityData.getEntityByEmail(emailInput);
+      let entityObj = await entityData.getEntityByEmail(xss(emailInput));
       id = entityObj._id;
     }
   } catch (error) {
@@ -86,11 +90,9 @@ const postLogin = async (req, res) => {
       error: [error.message],
     });
   }
-  console.log(id);
-
   //create session
   req.session.user = {
-    email: emailInput,
+    email: xss(emailInput),
     id: id,
     credentialId: validUser._id,
     typeOfUser: validUser.typeOfUser,
@@ -98,7 +100,7 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  console.log("THE FAMOUS VALID USER",validUser);
+  console.log("THE FAMOUS VALID USER", validUser);
   if (!validUser.profileSetUpDone) {
     if (validUser.typeOfUser == "user") {
       res.status(200).redirect("/user/" + id + "/profile");
@@ -112,7 +114,7 @@ const postLogin = async (req, res) => {
   if (validUser.isApproved == false) {
     return res
       .status(200)
-      .render("approvalWaiting", { title: "Approval waiting" }); 
+      .render("approvalWaiting", { title: "Approval waiting" });
   }
 
   //If profile is set up then we will redirect them to their appropriate pages
@@ -146,24 +148,23 @@ const getSignUp = async (req, res) => {
 
 const postSignUp = async (req, res) => {
   let { emailInput, passwordInput, rePasswordInput, roleInput } = req.body;
-  let queryData = {};
   let errors = [];
   //valid email
   try {
-    queryData.emailId = validation.validEmail(emailInput);
+    emailInput = validation.validEmail(emailInput);
   } catch (e) {
     errors.push(e);
   }
 
   //valid password
   try {
-    queryData.password = validation.validPassword(passwordInput);
+    passwordInput = validation.validPassword(passwordInput);
   } catch (e) {
     errors.push(e);
   }
 
   try {
-    queryData.repassword = validation.validPassword(rePasswordInput);
+    rePasswordInput = validation.validPassword(rePasswordInput);
   } catch (e) {
     errors.push(e);
   }
@@ -173,7 +174,7 @@ const postSignUp = async (req, res) => {
 
   //valid type of user
   try {
-    queryData.typeOfUser = validation.validTypeOfUser(roleInput);
+    roleInput = validation.validTypeOfUser(roleInput);
   } catch (e) {
     errors.push(e);
   }
@@ -189,12 +190,19 @@ const postSignUp = async (req, res) => {
     return;
   }
 
+  let queryData = {
+    emailId: xss(emailInput),
+    password: xss(passwordInput),
+    rePassword: xss(rePasswordInput),
+    typeOfUser: xss(roleInput),
+  };
+
   //add new credentials
   let signup;
   let flag = false;
   try {
     signup = await auth.addCredential(queryData);
-    console.log("here in signup",signup)
+    console.log("here in signup", signup);
   } catch (error) {
     //error due to server issue
     flag = true;
@@ -218,8 +226,8 @@ const postSignUp = async (req, res) => {
 
     return;
   }
-  if(!flag){
-     //add user to user collection
+  if (!flag) {
+    //add user to user collection
     if (queryData.typeOfUser === "user") {
       try {
         await userData.initializeProfile(queryData.emailId);
@@ -260,7 +268,6 @@ const postSignUp = async (req, res) => {
       return res.status(200).redirect("/login");
     }
   }
-  
 };
 
 const getLogout = async (req, res) => {

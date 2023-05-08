@@ -10,6 +10,7 @@ import {
 } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
+import xss from "xss";
 
 const getLand = async (req, res) => {
   // console.log("here");
@@ -110,7 +111,7 @@ const postLandByState = async (req, res) => {
     });
 
   try {
-    let landByState = await landData.getLandByState(state);
+    let landByState = await landData.getLandByState(xss(state));
     let empty_lands = false;
     if (!arrayLength(landByState, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -229,7 +230,7 @@ const postFilterArea = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByArea(state, minArea, maxArea);
+    let filteredLands = await landData.filterByArea(state, xss(minArea), xss(maxArea));
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -292,7 +293,7 @@ const placedBid = async (req, res) => {
       error: error,
     });
   try {
-    await transactionData.createTransaction(bid, landId, sellerId, buyerId);
+    await transactionData.createTransaction(xss(bid), landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
     return res.status(400).render("Error", {
@@ -442,7 +443,7 @@ const addNewLand = async (req, res) => {
   length = parseInt(length);
   breadth = parseInt(breadth);
 
-  console.log(length);
+  // console.log(length);
   //valid numbers
   // queryData.dimensions.length = length;
   length = validation.validNumber(length, "length", 1);
