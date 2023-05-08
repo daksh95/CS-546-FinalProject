@@ -170,7 +170,7 @@ const addLandToUser = async(userId, landId)=>{
   console.log(userId, landId);
 
   const client = getClient();
-  let result = await client.collection("users").findOneAndUpdate({_id: new ObjectId(userId)},{$push: {"land": landId}});
+  let result = await client.collection("users").findOneAndUpdate({_id: new ObjectId(userId)},{$push: {"land": new ObjectId(landId)}});
   return result;
 }
 

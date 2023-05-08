@@ -275,45 +275,35 @@ const setUpProfile = async (req, res) => {
       error: [error],
     });
     return;
-  }
-  console.log("here inside the set up profile");
-  console.log("Session id here is", req.session.user.id);
-  //TODO call create user
-  try {
-    const result = await userData.createUser(
-      nameInput,
-      phoneInput,
-      emailIdInput,
-      typeofGovernmentIdInput,
-      governmentIdInput,
-      dobInput,
-      genderInput
-    );
-  } catch (error) {
-    return res.status(500).render("Error", {
-      title: "Error",
-      hasError: true,
-      error: [error],
-    });
-  }
-  //TODO change profile status
-  try {
-    const result = await auth.updateProfileStatus(
-      req.session.user.credentialId,
-      true
-    );
-  } catch (error) {
-    return res.status(500).render("Error", {
-      title: "Error",
-      hasError: true,
-      error: [error],
-    });
-  }
+  } 
 
-  //TODO redirect users;
-  res.status(200).redirect("/land");
-  return;
-};
+    //TODO call create user
+    try {
+      const result = await userData.createUser(nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput);
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      }); 
+    }
+    //TODO change profile status
+    try {
+      const result = await auth.updateProfileStatus(req.session.user.credentialId, true);
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      });
+    }
+
+    //TODO redirect users;
+    res.status(200).render("approvalWaiting", {title: "Approval Waiting"});
+    return;
+  
+  };
+
 export {
   getPropertiesOfUser,
   getProfile,

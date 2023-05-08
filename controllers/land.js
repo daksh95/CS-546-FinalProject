@@ -316,8 +316,7 @@ const updateLand = async (req, res) => {
     });
     return;
   } else {
-    let {
-      dimensionsLengthInput: length,
+    let {dimensionsLengthInput: length,
       dimensionsBreadthInput: breadth,
       typeInput: type,
       restrictionsInput: restrictions,
@@ -533,8 +532,8 @@ const addNewLand = async (req, res) => {
     }
   }
   //if successfully added then redirect to my lands wala page
-  console.log(req.session.user.id, addLand._id);
-  // const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
+  // console.log(req.session.user.id, new ObjectId (addLand._id));
+  const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
   // console.log(resul);
 
   res.status(200).redirect(`/user/${req.session.user.id}/land`);
