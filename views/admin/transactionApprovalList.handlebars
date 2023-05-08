@@ -1,5 +1,5 @@
 <header>
-  <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
       <div class="container-fluid">
           <div class="navbar-header text-light">
               <a class="navbar-brand" href="#">WebSite Name</a>
@@ -11,7 +11,8 @@
               <li class="nav-item"><a href="/admin/approvals/transaction" class="nav-link text-light">Transaction Approvals</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-              <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
           </ul>
       </div>
   </nav>
@@ -31,7 +32,7 @@
     <div class="row">
       <div class="col-md-4"></div>
       <div class="col-md-4">
-        <p class="text-center">No transnactions to be approved</p>
+        <p class="text-center">No transactions to be approved</p>
       </div>
     </div>
   {{/if}}

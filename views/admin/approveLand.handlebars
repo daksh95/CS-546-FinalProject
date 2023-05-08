@@ -22,44 +22,19 @@
 <main class="container-fluid">
   <div class="row">
     <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
-      {{#if isUser }}
-        <dl>
-          <dt>ID:</dt>
-          <dd>{{ account._id }}</dd>
-          <dt>Name:</dt>
-          <dd>{{ account.name }}</dd>
-          <dt>Account Type:</dt>
-          <dd>User</dd>
-          <dt>Phone Number:</dt>
-          <dd>{{ account.phone }}</dd>
-          <dt>Email Address:</dt>
-          <dd>{{ account.emailId }}</dd>
-          <dt>Government ID:</dt>
-          <dd>{{ account.typeOfId }} - {{ account.Id }}</dd>
-          <dt>Date of Birth:</dt>
-          <dd>{{ account.dob }}</dd>
-          <dt>Gender:</dt>
-          <dd>{{ account.gender }}</dd>
-        </dl>
-      {{else }}
-        <dl>
-          <dt>ID:</dt>
-          <dd>{{ account._id }}</dd>
-          <dt>Name:</dt>
-          <dd>{{ account.name }}</dd>
-          <dt>Account Type:</dt>
-          <dd>{{ account.role }}</dd>
-          <dt>Phone Number:</dt>
-          <dd>{{ account.contactInfo }}</dd>
-          <dt>Email Address:</dt>
-          <dd>{{ account.emailId }}</dd>
-          <dt>Website:</dt>
-          <dd>{{ account.Website }}</dd>
-          <dt>License:</dt>
-          <dd>{{ account.license }}</dd>
-        </dl>
-      {{/if}}
+      <dt>ID:</dt>
+      <dd>{{ land._id }} </dd>
+      <dt>Address:</dt>
+      <dd>{{land.address.line1}} {{land.address.line2}},</dd>
+      <dd>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</dd>
+      <dt>Dimensions:</dt>
+      <dd>{{land.dimensions.length}}ft x {{land.dimensions.breadth}}ft</dd>
+      <dt>Restrictions:</dt>
+      {{#each land.restrictions}}
+        <dd>{{this}}</dd>
+      {{/each}}
     </div>
+
     <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
       <h4 class="ml-3 mb-3">Approval</h4>
       <h5 class="ml-3 mb-3">Approval State:

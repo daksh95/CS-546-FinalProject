@@ -5,7 +5,7 @@ import transactionData from "./transactions.js";
 import landData from "./land.js";
 import { ObjectId } from "mongodb";
 import { getFullAddress } from "../utils/helpers.js";
-import credentialData from "../data/credential.js";
+import credentialData from './credential.js';
 
 const getUnapprovedAccounts = async () => {
   const client = getClient();
@@ -186,7 +186,7 @@ const approveLand = async (landId, status, comment) => {
   const result = await client
     .collection("land")
     .findOneAndUpdate(
-      { _id: landId },
+      { _id: new ObjectId(landId) },
       { $set: {
         approved: status,
         approvalComment: comment
@@ -202,7 +202,48 @@ const approveLand = async (landId, status, comment) => {
   
 };
 
-const adminApproved = async (transactionId, buyerId, sellerId, status, comment) => {};
+const approveTransaction = async (transactionId, status, comment) => {
+  transactionId = validation.validObjectId(transactionId, 'transactionId');
+  const transaction = await transactionData.getTransactionById(transactionId);
+
+  const buyerId = transaction.buyer._id.toString();
+  const sellerId = transaction.seller._id.toString();
+  const landId = transaction._id.toString();
+
+  status = validation.validString(status, 'Approval status');
+  status = status.toLowerCase();
+  if (!status === 'approved' || !status === 'rejected') throw 'Unable to update approval status';
+
+  if (status === 'rejected') comment = validation.validString(comment, 'Approval comment');
+
+  const client = getClient();
+  const transactionApproval = await client
+    .collection('transaction')
+    .findOneAndUpdate(
+      { _id: new ObjectId(transactionId) },
+      { $set: {
+        approval: status,
+        "admin.status": true,
+        "admin.Comment": comment
+      }},
+      { returnDocument: "after" }
+    );
+  
+  if (transactionApproval.lastErrorObject.n < 1) {
+    throw `transaction ${transactionId} could not be approved`;
+  }
+
+  if (status === 'approved') {
+    try {
+      await userData.addLandToUser(sellerId, landId);
+      await userData.removeLandFromUser(buyerId, landId);
+    } catch (error) {
+      throw 'Ownership could not be transferred';
+    }
+  }
+
+  return result;
+};
 
 const getAdminId = async () => {
   const client = getClient();
@@ -216,7 +257,7 @@ const getAdminId = async () => {
 const adminData = {
   approveAccount,
   approveLand,
-  adminApproved,
+  approveTransaction,
   getUnapprovedAccounts,
   getAccountById,
   getUnapprovedLands,

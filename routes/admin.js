@@ -8,7 +8,9 @@ import {
   getApprovalAccount,
   getApprovalLand,
   getApprovalTransaction,
-  approveAccount
+  approveAccount,
+  approveLand,
+  approveTransaction
 } from "../controllers/admin.js";
 
 router.route('/profile').get((req, res) => {
@@ -19,9 +21,9 @@ router.route('/approvals/account').get(getAccountsListForApproval);
 router.route('/approvals/account/:accountId').get(getApprovalAccount).post(approveAccount);
 
 router.route('/approvals/land').get(getLandsListForApproval);
-router.route('/approvals/land/:landId').get(getApprovalLand).post();
+router.route('/approvals/land/:landId').get(getApprovalLand).post(approveLand);
 
 router.route('/approvals/transaction').get(getTransactionsListForApproval);
-router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post();
+router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post(approveTransaction);
 
 export default router;

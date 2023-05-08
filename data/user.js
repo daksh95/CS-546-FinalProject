@@ -170,7 +170,29 @@ const addLandToUser = async(userId, landId)=>{
   console.log(userId, landId);
 
   const client = getClient();
-  let result = await client.collection("users").findOneAndUpdate({_id: new ObjectId(userId)},{$push: {"land": new ObjectId(landId)}});
+  let result = await client.collection("users").findOneAndUpdate(
+    {_id: new ObjectId(userId)},
+    {$push: {"land": new ObjectId(landId)}},
+    {returnDocument: "after"}
+    );
+
+  if (result.lastErrorObject.n < 1) throw "Land could not be added";
+  return result;
+}
+
+const removeLandFromUser = async(userId, landId) => {
+  userId = validation.validObjectId(userId, "User Id");
+  landId = validation.validObjectId(landId, "Land Id")
+  console.log(userId, landId);
+
+  const client = getClient();
+  let result = await client.collection("users").findOneAndUpdate(
+    {_id: new ObjectId(userId)},
+    {$pull: {"land": new ObjectId(landId)}},
+    {returnDocument: "after"}
+    );
+
+  if (result.lastErrorObject.n < 1) throw "Land could not be added";
   return result;
 }
 
@@ -183,6 +205,7 @@ const userData = {
   getLandsOfUserID: getLandsOfUserID,
   initializeProfile:initializeProfile,
   addLandToUser: addLandToUser,
+  removeLandFromUser: removeLandFromUser
 };
 
 export default userData;

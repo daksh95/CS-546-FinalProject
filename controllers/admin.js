@@ -82,11 +82,34 @@ const getApprovalLand = async (req, res) => {
     const land = await landData.getLand(landId);
     if (!land) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
+    land.fullAddress = getFullAddress(land.address);
+
     const isPending = land.approved.toLowerCase() === 'pending';
     const isApproved = land.approved.toLowerCase() === 'approved';
     const isRejected = land.approved.toLowerCase() === 'rejected';
     
-    return res.json(land);
+    return res.render('admin/approveLand', {
+      title: "Approve Land", land, isPending, isApproved, isRejected
+    });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+}
+
+const approveLand = async (req, res) => {
+  const approvalInfo = req.body;
+
+  try {
+    if (!('approval' in approvalInfo && 'comment'))
+    throw 'Request header does not match the correct format';
+
+    const status = validation.validApprovalStatus(approvalInfo.approval, 'Approval Status');
+    let comment = approvalInfo.comment;
+    if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
+    const landId = validation.validObjectId(req.params.landId, 'landId');
+    const approvalResult = await adminData.approveLand(landId, status, comment);
+    if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    return res.redirect(`/admin/approvals/land/${landId}`)
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
@@ -117,7 +140,28 @@ const getApprovalTransaction = async (req, res) => {
     const isApproved = transaction.approved.toLowerCase() === 'approved';
     const isRejected = transaction.approved.toLowerCase() === 'rejected';
 
-    return res.json(transaction);
+    return res.render('admin/approveTransaction', {
+      title: "Approve Transaction", transaction, isPending, isApproved, isRejected
+    });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+}
+
+const approveTransaction = async (req, res) => {
+  const approvalInfo = req.body;
+
+  try {
+    if (!('approval' in approvalInfo && 'comment'))
+    throw 'Request header does not match the correct format';
+
+    const status = validation.validApprovalStatus(approvalInfo.approval, 'Approval Status');
+    let comment = approvalInfo.comment;
+    if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
+    const transactionId = validation.validObjectId(req.params.transactionId, 'transactionId');
+    const approvalResult = await adminData.approveTransaction(transactionId, status, comment);
+    if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    return res.redirect(`/admin/approvals/transaction/${transactionId}`)
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
@@ -130,5 +174,7 @@ export {
   getApprovalLand,
   getTransactionsListForApproval,
   getApprovalTransaction,
-  approveAccount
+  approveAccount,
+  approveLand,
+  approveTransaction
 };
