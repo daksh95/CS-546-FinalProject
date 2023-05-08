@@ -15,14 +15,15 @@ const addCredential = async(object) =>{
     queryData.emailId  = validation.validEmail(emailId); 
     
     //Checking if emailId already exists
+    let ans;
     try {
-       let ans = await getCredentialByEmailId( queryData.emailId);
-       if(ans){
-            throw `EmailId is already registered. Please login`;
-       }
+       ans = await getCredentialByEmailId(queryData.emailId);
     }catch(e){
        
     }
+    if(ans){
+        throw `EmailId is already registered. Please login`;
+   }
     
     // Validating string
     queryData.typeOfUser = validation.validTypeOfUser(typeOfUser);

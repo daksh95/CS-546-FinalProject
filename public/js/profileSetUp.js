@@ -84,7 +84,7 @@
 
             //Website URL
             try {
-                let website = document.getElementById("websiteInput");
+                let website = document.getElementById("websiteInput").value;
                     website = validWebsite(website);
             } catch (e) {
                 errors.push(e);  
@@ -92,13 +92,13 @@
             
             // License
             try {
-                let license = document.getElementById("licenseInput");
+                let license = document.getElementById("licenseInput").value;
                 license = validString(license, "License",15);
             } catch (e) {
                 errors.push(e);
             }
         }
-       
+        
     
         if(errors.length>0){
             for (let e of errors){
@@ -229,7 +229,7 @@
     }
 
     function validWebsite(website){
-        website = validString(website);
+        website = validString(website, "website");
         const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
         if (!regex.test(website)) {
           throw `Valid website URL needed ${website}`;

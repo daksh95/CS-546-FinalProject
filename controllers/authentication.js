@@ -220,11 +220,10 @@ const postSignUp = async (req, res) => {
     res.status(400).render("authentication/signUp", {
       title: "Registration Page",
       hasError: true,
-      error: errors,
+      error: [error],
       emailInput: emailInput,
       passwordInput: passwordInput,
     });
-
     return;
   }
   if (!flag) {
