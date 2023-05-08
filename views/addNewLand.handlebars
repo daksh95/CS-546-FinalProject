@@ -1,5 +1,4 @@
 <form action= "/user/{{id}}/land/add" method="POST" id = "addLand-form">
-        
         <label for = "line1Input" id = "line1-text">Line1: </label>
         <input type="text" name="line1Input" id = "line1Input"> <br>   
         
@@ -38,11 +37,12 @@
      
         <button type="submit" >submit </button>
     </form>   
-
 <ul id = "error">
-    {{#if error}}
+    {{#if hasError}}
         {{#each error}}
         <li>{{this}}</li>
-    {{/each}}
-{{/if}}
+        {{/each}}
+    {{/if}}
 </ul>
+
+<script src="/public/js/addNewLand.js"> </script>
