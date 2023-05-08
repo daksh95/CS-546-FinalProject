@@ -70,11 +70,27 @@ const getAccountById = async (accountId) => {
   if (!accountUser && !accountEntity) throw 'No account found for the given ID';
 
   const account = accountUser ? accountUser : accountEntity;
+
+  const credentialApproval = await client
+    .collection('credential')
+    .find(
+      { emailId: account.emailId },
+      { projection: { _id: 0, isApproved: 1, profileSetUpDone: 1 } }
+    );
+
+  if (!credentialApproval) throw 'Could not fetch credential information for the account';
+
+  account.credentialInfo = credentialApproval;
   
-  if (accountUser) account.role = 'User';
+  if (accountUser) {
+    account.role = 'User';
+    account.land = account.land.map((element) => {
+      element._id = element._id.toString();
+      return element._id;
+    });
+  }
 
   account._id = account._id.toString();
-
   return account;
 };
 
@@ -140,6 +156,12 @@ const approveAccount = async (accountId, status, comment) => {
 
   if (status === 'rejected') comment = validation.validString(comment, 'Approval comment')
 
+  if (status === account.approved) throw `This account has already been ${status}`;
+
+  const credential = await credentialData.getCredentialByEmailId(account.emailId);
+
+  if (!credential.profileSetUpDone) throw 'The user has not set up their profile yet.';
+
   const result = await client
     .collection(collectionName)
     .findOneAndUpdate(
@@ -154,8 +176,6 @@ const approveAccount = async (accountId, status, comment) => {
   if (result.lastErrorObject.n < 1) {
     throw `account status could not be updated`;
   }
-
-  const credential = await credentialData.getCredentialByEmailId(account.emailId);
 
   const credUpdate = await client
     .collection('credential')
@@ -210,11 +230,27 @@ const approveTransaction = async (transactionId, status, comment) => {
   const sellerId = transaction.seller._id.toString();
   const landId = transaction._id.toString();
 
+  if (transaction.seller.status !== 'approved' ||
+  transaction.surveyor.status !== 'approved' ||
+  transaction.titleCompany.status !== 'approved' ||
+  transaction.government.status !== 'approved') throw 'Cannot approve this transaction, since it requires approval from other parties first';
+
   status = validation.validString(status, 'Approval status');
   status = status.toLowerCase();
   if (!status === 'approved' || !status === 'rejected') throw 'Unable to update approval status';
 
   if (status === 'rejected') comment = validation.validString(comment, 'Approval comment');
+
+  let priceSoldFor = null;
+  if (status === 'approved') {
+    priceSoldFor = transaction.buyer.bid;
+    try {
+      await userData.addLandToUser(sellerId, landId);
+      await userData.removeLandFromUser(buyerId, landId);
+    } catch (error) {
+      throw 'Ownership could not be transferred';
+    }
+  }
 
   const client = getClient();
   const transactionApproval = await client
@@ -224,7 +260,8 @@ const approveTransaction = async (transactionId, status, comment) => {
       { $set: {
         approval: status,
         "admin.status": true,
-        "admin.Comment": comment
+        "admin.Comment": comment,
+        priceSoldFor: priceSoldFor
       }},
       { returnDocument: "after" }
     );

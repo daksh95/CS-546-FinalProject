@@ -3,6 +3,7 @@ import validation from "../utils/validation.js";
 import landData from "../data/land.js";
 import transactionData from "../data/transactions.js";
 import xss from "xss";
+import userData from "../data/user.js";
 
 
 const getAccountsListForApproval = async (req, res) => {
@@ -32,10 +33,12 @@ const getApprovalAccount = async (req, res) => {
     const isApproved = account.approved.toLowerCase() === 'approved';
     const isRejected = account.approved.toLowerCase() === 'rejected';
 
+    const approvalRequired = account.credentialInfo.profileSetUpDone;
+
     return res.render('admin/approveAccount', {
       title: "Approve Account",
       account, isUser, isEntity,
-      isPending, isApproved, isRejected
+      isPending, isApproved, isRejected, approvalRequired
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -84,12 +87,26 @@ const getApprovalLand = async (req, res) => {
 
     land.fullAddress = getFullAddress(land.address);
 
+    land.approved = validation.validApprovalStatus(land.approved)
+
     const isPending = land.approved.toLowerCase() === 'pending';
     const isApproved = land.approved.toLowerCase() === 'approved';
     const isRejected = land.approved.toLowerCase() === 'rejected';
+
+    const owner = await userData.getOwnerByLandId(landId);
+    if (!owner) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+
+    let transactions = [];
+    try {
+      transactions = await transactionData.getTransactionsByLandId(landId);
+    } catch (error) {
+      // pass
+    }
+    if (!transactions) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    const transactionsCount = transactions.length;
     
     return res.render('admin/approveLand', {
-      title: "Approve Land", land, isPending, isApproved, isRejected
+      title: "Approve Land", land, isPending, isApproved, isRejected, owner, transactionsCount
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -136,12 +153,65 @@ const getApprovalTransaction = async (req, res) => {
     const transaction = await transactionData.getTransactionById(transactionId);
     if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
+    transaction.buyer._id = transaction.buyer._id.toString();
+    transaction.seller._id = transaction.seller._id.toString();
+    transaction.land = transaction.land.toString();
+
+    let surveyorExists = false;
+    let titleCompanyExists = false;
+    let governmentExists = false;
+    let adminExists = false;
+
+    if ('surveyor' in transaction && '_id' in transaction.surveyor && transaction.surveyor._id) {
+      transaction.surveyor._id = transaction.surveyor._id.toString();
+      transaction.surveyor._id = validation.validObjectId(transaction.surveyor._id, 'surveyorId');
+      transaction.surveyor.status = validation.validApprovalStatus(transaction.surveyor.status, 'surveyor transaction status');
+      transaction.surveyor.info = await adminData.getAccountById(transaction.surveyor._id);
+      surveyorExists = true;
+    }
+
+    if ('titleCompany' in transaction && '_id' in transaction.titleCompany && transaction.titleCompany._id) {
+      transaction.titleCompany._id = transaction.titleCompany._id.toString();
+      transaction.titleCompany._id = validation.validObjectId(transaction.titleCompany._id, 'titleCompanyId');
+      transaction.titleCompany.status = validation.validApprovalStatus(transaction.titleCompany.status, 'titleCompany transaction status');
+      transaction.titleCompany.info = await adminData.getAccountById(transaction.titleCompany._id);
+      titleCompanyExists = true;
+    }
+
+    if ('government' in transaction && '_id' in transaction.government && transaction.government._id) {
+      transaction.government._id = transaction.government._id.toString();
+      transaction.government._id = validation.validObjectId(transaction.government._id, 'governmentId');
+      transaction.government.status = validation.validApprovalStatus(transaction.government.status, 'government transaction status');
+      transaction.government.info = await adminData.getAccountById(transaction.government._id);
+      governmentExists = true;
+    }
+
+    if ('admin' in transaction && '_id' in transaction.admin && transaction.admin._id) {
+      transaction.admin._id = transaction.admin._id.toString();
+      transaction.admin._id = validation.validObjectId(transaction.admin._id, 'adminId');
+      transaction.admin.status = validation.validApprovalStatus(transaction.admin.status, 'admin transaction status');
+      transaction.admin.info = await adminData.getAccountById(transaction.admin._id);
+      adminExists = true;
+    }
+
+    transaction.status = validation.validApprovalStatus(transaction.status, 'Transaction Status');
+
+    const approvalRequired = transaction.surveyor.status === "approved" &&
+    transaction.titleCompany.status === "approved" &&
+    transaction.government.status === "approved" &&
+    transaction.status === "pending";
+
     const isPending = transaction.approved.toLowerCase() === 'pending';
     const isApproved = transaction.approved.toLowerCase() === 'approved';
     const isRejected = transaction.approved.toLowerCase() === 'rejected';
 
+    const buyer = await userData.getUserById(transaction.buyer._id);
+    const seller = await userData.getUserById(transaction.seller._id);
+    if (!buyer || !seller) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+
     return res.render('admin/approveTransaction', {
-      title: "Approve Transaction", transaction, isPending, isApproved, isRejected
+      title: "Approve Transaction", transaction, isPending, isApproved, isRejected,
+      approvalRequired, 
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
