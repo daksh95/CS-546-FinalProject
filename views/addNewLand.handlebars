@@ -1,48 +1,70 @@
-<form action= "/user/{{id}}/land/add" method="POST" id = "addLand-form">
-        <label for = "line1Input" id = "line1-text">Line1: </label>
-        <input type="text" name="line1Input" id = "line1Input"> <br>   
-        
-        <label for = "line2Input" id = "line2-text">Line2:</label>
-        <input type="text" name="line2Input" id = "line2Input">   
-        
-        <label for = "cityInput" id = "city-text">City:</label>
-        <input type="text" name="cityInput" id = "cityInput"> <br>
+<div id="mainResults">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
+        <div class="container-fluid">
+            <div class="navbar-header text-light">
+                WebSite Name
+            </div>
+            <ul class="nav navbar-nav">
+                <li class="nav-item"><a href="/land" class="nav-link text-light">Home</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link text-light">My Property</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link text-light">My
+                        Transactions</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link text-light">Profile</a></li>
+            </ul>
+        </div>
+    </nav>
+    <br>
+<div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
+    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
+        <form action= "/user/{{id}}/land/add" method="POST" id = "addLand-form">
+                <label for = "line1Input" id = "line1-text">Line1: </label>
+                <input type="text" name="line1Input" id = "line1Input"> <br>   
+                
+                <label for = "line2Input" id = "line2-text">Line2:</label>
+                <input type="text" name="line2Input" id = "line2Input">   
+                
+                <label for = "cityInput" id = "city-text">City:</label>
+                <input type="text" name="cityInput" id = "cityInput"> <br>
 
-        <label for = "stateInput" id = "state-text">State:</label>
-        <input type="text" name="stateInput" id = "stateInput">  
+                <label for = "stateInput" id = "state-text">State:</label>
+                <input type="text" name="stateInput" id = "stateInput">  
 
-        <label for = "zipCodeInput" id = "zipCode-num">Zip:</label>
-        <input type="number" name="zipCodeInput" id = "zipCodeInput"> <br>   
-        
-        <label for = "typeInput" id = "type-dropdown">Type of Property:</label>
-        <select name="typeInput" id="typeInput">
-            <option value="residential">Residential</option>
-            <option value="commercial">Commercial</option>    
-            <option value="industrial">Industrial</option>    
-            <option value="agricultural">Agricultural</option>    
-        </select>
-        <br>  
+                <label for = "zipCodeInput" id = "zipCode-num">Zip:</label>
+                <input type="number" name="zipCodeInput" id = "zipCodeInput"> <br>   
+                
+                <label for = "typeInput" id = "type-dropdown">Type of Property:</label>
+                <select name="typeInput" id="typeInput">
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>    
+                    <option value="industrial">Industrial</option>    
+                    <option value="agricultural">Agricultural</option>    
+                </select>
+                <br>  
 
-        <label for="dimensionsLengthInput" id = "dimensionsLength-num">Length</label>
-        <input type="number" name="dimensionsLengthInput" id = "dimensionsLengthInput">  <br>
+                <label for="dimensionsLengthInput" id = "dimensionsLength-num">Length</label>
+                <input type="number" name="dimensionsLengthInput" id = "dimensionsLengthInput">  <br>
 
-        <label for="dimensionsBreadthInput" id = "dimensionsB',.'readth-num">Breadth</label>
-        <input type="number" name="dimensionsBreadthInput" id = "dimensionsBreadthInput">   <br>
-        
-        {{!-- TODO dynamic restriction thing --}}
-        {{!-- for the time being --}}
+                <label for="dimensionsBreadthInput" id = "dimensionsB',.'readth-num">Breadth</label>
+                <input type="number" name="dimensionsBreadthInput" id = "dimensionsBreadthInput">   <br>
+                
+                {{!-- TODO dynamic restriction thing --}}
+                {{!-- for the time being --}}
 
-        <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
-        <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br> 
-     
-        <button type="submit" >submit </button>
-    </form>   
-<ul id = "error">
-    {{#if hasError}}
-        {{#each error}}
-        <li>{{this}}</li>
-        {{/each}}
-    {{/if}}
-</ul>
-
+                <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
+                <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br> 
+            
+                <button type="submit" >submit </button>
+            </form>   
+        <ul id = "error">
+            {{#if hasError}}
+                {{#each error}}
+                <li>{{this}}</li>
+                {{/each}}
+            {{/if}}
+        </ul>
+    </main>
+</div>
 <script src="/public/js/addNewLand.js"> </script>
