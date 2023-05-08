@@ -8,13 +8,13 @@
 
 <div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
     <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">    
-        <form action="{{details.url}}" method="post" id="profileSetUp form">
-            <label for="nameInput" id ="name-text"> Name:</label>
+        <form action="{{details.url}}" method="post" id="profileSetUp-form">
+            <label for="nameInput" id ="name-text">Full Name:</label>
             <input type="text" id = "nameInput" name="nameInput"><br>
             <label for ="phoneInput"id ="phone-number"> Phone:</label>
             <input type="number" id = "phoneInput" name="phoneInput"> <br>
             <label for ="emailIdInput"id ="email-text"> Email address:</label>
-            <input type="emsil" id = "emailIdInput" name="emailIdInput" value="{{details.emailId}}" readonly> <br>
+            <input type="email" id = "emailIdInput" name="emailIdInput" value="{{details.emailId}}" readonly> <br>
 
             {{#if details.user}}
             <label for="typeofGovernmentIdInput" id = "typeOfId-dropdown">Government ID:</label>
@@ -37,13 +37,18 @@
             {{/if}}
 
             {{#if details.entity}}
+            <label for ="roleInput"id ="role-text">Role:</label>
+            <input type="role" id = "roleInput" name="roleInput" value="{{details.role}}" readonly> <br>
+
             <label for ="websiteInput"id ="website-text">Website: </label>
             <input type="url" id = "websiteInput" name="websiteInput"> <br> 
             <label for ="licenseInput"id ="license-text">License: </label>
             <input type="text" id = "licenseInput" name="licenseInput"> <br> 
             {{/if}}
             <button type="submit">Submit </button>
-        </form>   
+        </form> 
+        <ul id="error"></ul>  
+        <script src="/public/js//profileSetUp.js"></script>
     {{#if hasError}}
       <ul>
         {{#each error}}

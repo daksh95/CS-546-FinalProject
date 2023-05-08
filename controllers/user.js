@@ -275,6 +275,7 @@ const setUpProfile = async (req, res) => {
       error: [error],
     });
     return;
+<<<<<<< Updated upstream
   }
   // console.log("here inside the set up profile");
   // console.log("Session id here is", req.session.user.id);
@@ -312,6 +313,34 @@ const setUpProfile = async (req, res) => {
   res.status(200).render("approvalWaiting", { title: "Approval Waiting" });
   return;
 };
+=======
+  } 
+
+    //TODO call create user
+    try {
+      const result = await userData.createUser(nameInput, phoneInput, emailIdInput,typeofGovernmentIdInput, governmentIdInput, dobInput,genderInput);
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      }); 
+    }
+    //TODO change profile status
+    try {
+      const result = await auth.updateProfileStatus(req.session.user.credentialId, true);
+    } catch (error) {
+      return res.status(500).render("Error", {
+        title: "Error",
+        hasError: true,
+        error: [error],
+      });
+    }
+    //TODO redirect users;
+    res.status(200).render("approvalWaiting", {title: "Approval Waiting"});
+    return;
+  };
+>>>>>>> Stashed changes
 
 export {
   getPropertiesOfUser,

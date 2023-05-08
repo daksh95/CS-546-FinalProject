@@ -155,7 +155,7 @@ const validTypeOfUser = (user) => {
 const validApprovalStatus = (status, parameter = 'status') => {
   status = validString(status, parameter);
   status = status.toLowerCase();
-
+ 
   const validStatus = ['pending', 'approved', 'rejected'];
   if (!validStatus.includes(status)) throw 'Invalid approval status';
   return status;
