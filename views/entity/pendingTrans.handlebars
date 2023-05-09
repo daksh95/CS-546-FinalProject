@@ -19,7 +19,7 @@
     {{#if length}}
     <h1>Below are all the pending transactions on your account:</h1>
     {{#each transactions}}
-    <ul class="transactions list">
+    <ul class="transactions list" id="transactionsList">
         <li class="transaction id">Transaction ID: <a href="/entity/{{ ../id }}/transactionDetails/{{this._id}}">{{this._id}}</a></li>
         {{#if ../landSurveyor}}
         <li class="transaction status">Transaction status: {{this.surveyor.status}}</li>
@@ -33,6 +33,6 @@
     </ul>
     {{/each}}
     {{else}}
-    You have no pending transactions! Good job! Enjoy your day!
+    <p id="noWork">You have no pending transactions! Good job! Enjoy your day!</p>
     {{/if}}
 </main>
