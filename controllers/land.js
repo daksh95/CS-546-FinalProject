@@ -452,6 +452,7 @@ const addNewLand = async (req, res) => {
   // // console.log(length);
   //valid numbers
   // queryData.dimensions.length = length;
+  
   length = validation.validNumber(length, "length", 1);
   breadth = validation.validNumber(breadth, "breadth", 1);
 
@@ -460,16 +461,16 @@ const addNewLand = async (req, res) => {
     breadth: breadth,
   };
   //default behaviour
-  queryData.sale = {
-    price: 1,
-    dateOfListing: "11/11/1234",
-    onSale: false,
-  };
+  // queryData.sale = {
+  //   price: 1,
+  //   dateOfListing: "11/11/1234",
+  //   onSale: false,
+  // };
   queryData.approved = "pending";
   queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
 
   //valid string and string of array
-  queryData.type = validation.validString(type, "type of land", 20);
+  queryData.type = validation.validLandType(type);
 
   //if not default then validation
   // queryData.restrictions = validation.validArrayOfStrings(
@@ -481,8 +482,8 @@ const addNewLand = async (req, res) => {
   line1 = validation.validString(line1, "line1", 46);
   line2 = validation.validString(line2, "line2", 46);
   city = validation.validString(city, "city", 17);
-  state = validation.validString(state, "state", 2);
-  zipCode = validation.validString(zipCode, "zipCode", 501, 99950);
+  state = validation.validState(state);
+  zipCode = validation.validZip(zipCode,state, city);
   queryData.address = {
     line1: line1,
     line2: line2,
@@ -495,32 +496,8 @@ const addNewLand = async (req, res) => {
   queryData.area = (
     queryData.dimensions.length * queryData.dimensions.breadth
   ).toString();
-  // console.log(queryData);
-  /*
-  queryData has following structure
-  queryDate = {
-    dimensions:{
-      lenght, 
-      breadth
-    },
-    sale:{
-      price,
-      dateOfListing,
-      onSale,
-    },
-    approved,
-    restrictions:[],
-    type,
-    address:{
-      line1,
-      line2,
-      city,
-      state,
-      zipCode
-    },
-    area
-  }
-  */
+  console.log(queryData);
+
   let addLand;
   try {
     addLand = await landData.addNewLand(queryData);
@@ -528,12 +505,13 @@ const addNewLand = async (req, res) => {
     if (error == "Could not add land") {
       res
         .status(500)
-        .render("error", { title: "Server Error", error: [error] });
+        .render("error", { title: "Server Error", hasError: true, error: [error] });
       return;
     } else {
       res.status(400).render("addNewLand", {
         title: "Add Land",
         id: req.session.user.id,
+        hasError: true,
         error: [error],
       }); //TODO: to be decided
       return;

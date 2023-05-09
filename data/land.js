@@ -55,24 +55,20 @@ const addNewLand = async (object) => {
   };
 
   //valid string and string of array
-  queryData.type = validation.validString(type, "type of land", 20);
-  queryData.restrictions = validation.validArrayOfStrings(
-    restrictions,
-    "restrictions"
-  );
+  queryData.type = validation.validLandType(type);
+  // queryData.restrictions = validation.validArrayOfStrings(
+  //   restrictions,
+  //   "restrictions"
+  // );
 
   queryData.area = (dimensions.length * dimensions.breadth).toString();
 
   address.line1 = validation.validString(address.line1, "line1", 46);
   address.line2 = validation.validString(address.line2, "line2", 46);
   address.city = validation.validString(address.city, "city", 17);
-  address.state = validation.validString(address.state, "state", 2);
-  address.zipCode = validation.validString(
-    address.zipCode,
-    "zipCode",
-    501,
-    99950
-  );
+  address.state = validation.validState(address.state);
+  address.zipCode = address.zipCode.toString();
+  address.zipCode = validation.validZip(address.zipCode,address.state, address.city);
 
   queryData.address = {
     line1: address.line1,
@@ -90,7 +86,7 @@ const addNewLand = async (object) => {
 
   //inserting new land
   let result = await client.collection("land").insertOne(queryData);
-
+ 
   //error handling incase Insertion doesn't happen
   if (!result.acknowledged || !result.insertedId) throw "Could not add land";
 

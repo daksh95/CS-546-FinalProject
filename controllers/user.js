@@ -266,11 +266,15 @@ const setUpProfile = async (req, res) => {
   } = req.body;
   try {
     nameInput = validation.validString(nameInput);
-    phoneInput = validation.validString(phoneInput);
+    phoneInput = validation.validPhone(phoneInput);
     emailIdInput = validation.validEmail(emailIdInput);
-    typeofGovernmentIdInput = validation.validString(typeofGovernmentIdInput);
-    governmentIdInput = validation.validString(governmentIdInput);
-    // dobInput = validation.validDOB(dobInput);
+    typeofGovernmentIdInput = validation.validGovernmentIdType(typeofGovernmentIdInput);
+    if(typeofGovernmentIdInput== "ssn"){
+      governmentIdInput = validation.validSSN(governmentIdInput);
+    }else{
+      governmentIdInput = validation.validDriverLicense(governmentIdInput);
+    }
+    dobInput = validation.validDob(dobInput);
     genderInput = validation.validGender(genderInput);
   } catch (error) {
     res.status(400).render("authentication/profileSetUp", {

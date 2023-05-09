@@ -61,11 +61,17 @@ const createUser = async (
   name = validation.validString(name);
   phone = validation.validString(phone);
   emailId = validation.validEmail(emailId);
-  govtIdType = validation.validString(govtIdType);
-  govtIdNumber = validation.validString(govtIdNumber);
-  // dob = validation.validDOB(dob);
+  govtIdType = validation.validGovernmentIdType(govtIdType);
+  if(govtIdType== "ssn"){
+    govtIdNumber = validation.validSSN(govtIdNumber);
+  }
+  else{
+    govtIdNumber = validation.validDriverLicense(govtIdNumber);
+  }
+  dob = validation.validDob(dob);
   gender = validation.validGender(gender);
-
+  let dobArray = dob.split("-");
+  let newDob = `${dobArray[1]}/${dobArray[2]}/${dobArray[0]}`
   const govtIdHashed = await hash.generateHash(govtIdNumber); //TODO: Gotta hash this (BCRYPT)
 
   // Initialize
@@ -76,7 +82,7 @@ const createUser = async (
       typeofId: govtIdType,
       id: govtIdHashed,
     },
-    dob: dob,
+    dob: newDob,
     gender: gender,
     approved: "pending",
     rating: {

@@ -72,7 +72,6 @@
             errors.push(e);
         }
     
-    
         if(errors.length>0){
             for (let e of errors){
                 var li = document.createElement("li");
@@ -115,7 +114,7 @@
     }
 
     function validLandType(type){
-        type = validString(type, "Type of Land");
+        type = validString(type, "Type of Land", 20);
         if(type != "residential" && type!= "commercial" && type != "industrial" && type != "agricultural"){
             throw  `Valid Land Type is needed`;
         }
