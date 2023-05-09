@@ -54,9 +54,6 @@
                 
                 {{!-- TODO dynamic restriction thing --}}
                 {{!-- for the time being --}}
-
-                <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
-                <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br> 
                 
                 {{else}}
                 <label for = "line1Input" id = "line1-text">Line1: </label>
@@ -92,11 +89,29 @@
                 {{!-- TODO dynamic restriction thing --}}
                 {{!-- for the time being --}}
 
-                <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
-                <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br> 
-
+                {{!-- <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
+                <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br>  --}}
                 {{/if}}
-                <button type="submit" >Add </button>
+                <label for="zoningRestrictions" id = "zoningRestrictions-checkbox">Zoning restrictions</label>
+                <input type="checkbox" name="restrictions" id="zoningRestrictions" value="Zoning restrictions">
+
+                <label for="deedRestrictions" id = "deedRestrictions-checkbox">Deed restrictions</label>
+                <input type="checkbox" name="restrictions" id="deedRestrictions" value="Deed restrictions">
+
+                <label for="environmentalRestrictions" id = "environmentalRestrictions-checkbox" >Environmental restrictions</label>
+                <input type="checkbox" name="restrictions" id="environmentalRestrictions" value="Environmental restrictions">
+
+                <label for="noRestrictions" id = "noRestrictions-checkbox">No restrictions</label>
+
+                <input type="checkbox" name="restrictions" id="noRestrictions" value="No restrictions">
+                {{#if hasDetails}}
+                <label for ="restrictionsInput" id = "restrictions-text">Other Restriction(s) if any: </label>
+                <input type="text" name="restrictionsInput" id = "restrictionsInput" value="{{details.restrictionsText}}"> <br> 
+                {{else}}
+                <label for ="restrictionsInput" id = "restrictions-text">Other Restriction(s) if any: </label>
+                <input type="text" name="restrictionsInput" id = "restrictionsInput"> <br> 
+                {{/if}}
+                <button type="submit" >Add</button>
             </form>   
         <ul id = "error">
             {{#if hasError}}

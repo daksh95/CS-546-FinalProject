@@ -175,7 +175,7 @@ const validZip= (zip, state, city)=>{
   if(!numbersOnly.test(zip)){
       throw `valid zipcode is needed`;
   }
-  zip = parseInt(zip);
+  // zip = parseInt(zip);
   state = validState(state); 
   city = validString(city, "City", 30);
   const zipLookUp = zip_lookup;

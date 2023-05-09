@@ -438,52 +438,126 @@ const addNewLand = async (req, res) => {
     dimensionsLengthInput: length,
     dimensionsBreadthInput: breadth,
     typeInput: type,
-    restrictionsInput: restrictions,
+    restrictionsInput: restrictionsText,
     line1Input: line1,
     line2Input: line2,
     zipCodeInput: zipCode,
     cityInput: city,
     stateInput: state,
-  } = req.body; //elaborated address
+    restrictions
+  } = req.body; 
+  console.log(req.body);
   const queryData = {};
+  const details={};
+
   length = parseInt(length);
   breadth = parseInt(breadth);
+  let errors =[];
 
-  // // console.log(length);
-  //valid numbers
-  // queryData.dimensions.length = length;
-  
-  length = validation.validNumber(length, "length", 1);
-  breadth = validation.validNumber(breadth, "breadth", 1);
+  //length validation
+  try {
+    if(typeof length == "undefined"){
+      details["length"] = "";
+    }
+    else{
+      details["length"] = length;
+    }
+    length = validation.validNumber(length, "length", 1);
+  } catch (e) {
+    errors.push(e);
+  }
 
-  queryData.dimensions = {
-    length: length,
-    breadth: breadth,
-  };
-  //default behaviour
-  // queryData.sale = {
-  //   price: 1,
-  //   dateOfListing: "11/11/1234",
-  //   onSale: false,
-  // };
+  //breadth validation
+  try {
+    if(typeof breadth == "undefined"){
+      details["breadth"] = "";
+    }
+    else{
+      details["breadth"] = breadth;
+    }
+    breadth = validation.validNumber(breadth, "breadth", 1);
+  } catch (e) {
+    errors.push(e);
+  }
+
+  //default values
   queryData.approved = "pending";
-  queryData.restrictions = ["N/A"]; //TODO: having a default value in text field.
 
-  //valid string and string of array
-  queryData.type = validation.validLandType(type);
+  //valid land type
+  try {
+    if(typeof type == "undefined"){
+      details["type"] = "";
+    }
+    else{
+      details["type"] = type;
+    }
+    queryData.type = validation.validLandType(type);
+  } catch (e) {
+    errors.push(e);
 
-  //if not default then validation
-  // queryData.restrictions = validation.validArrayOfStrings(
-  //   restrictions,
-  //   "restrictions"
-  // );
+  }
 
-  // valid address
-  line1 = validation.validString(line1, "line1", 46);
-  line2 = validation.validString(line2, "line2", 46);
-  city = validation.validString(city, "city", 17);
-  state = validation.validState(state);
-  zipCode = validation.validZip(zipCode,state, city);
+  // valid address line 1
+  try {
+    if(typeof line1 == "undefined"){
+      details["line1"] = "";
+    }
+    else{
+      details["line1"] = line1;
+    }
+    line1 = validation.validString(line1, "line1", 46);
+  } catch (e) {
+    error.push(e)
+  }
+
+  // valid address line 2
+    if(typeof line2 == "undefined"){
+      details["line2"] = "";
+    }else{
+      details["line2"] = line2;
+    }
+    line2 = line2.trim();
+    if(line2.length>46){
+      errors.push("line2 shouldn't be longer that 46 characters");
+    }
+  
+
+  // valid address city
+  try {
+    if(typeof city == "undefined"){
+      details["city"] = "";
+    }else{
+      details["city"] = city;
+    }
+    city = validation.validString(city, "city", 17);
+  } catch (e) {
+    errors.push(e);
+  }
+
+  //valid address state
+  try {
+    if(typeof state == "undefined"){
+      details["state"] = "";
+    }else{
+      details["state"] = state;
+    }
+    state = validation.validState(state);
+  } catch (e) {
+    errors.push(e);
+  }
+
+  //valid address zipcode
+  try {
+    if(typeof zipCode == "undefined"){
+      details["zipCode"] = "";
+    }else{
+      details["zipCode"] = zipCode;
+    }
+    zipCode = validation.validZip(zipCode,state, city);
+  } catch (e) {
+    errors.push(e);
+  }
+
   queryData.address = {
     line1: line1,
     line2: line2,
@@ -491,12 +565,65 @@ const addNewLand = async (req, res) => {
     state: state,
     zipCode: zipCode,
   };
+  //if no restriction and no text.
+  if(typeof restrictions == "undefined" && restrictionsText.length==0){
+    errors.push('Please select no restriction if you dont have any');
+  }
+  //validating check restrictions
+  try {
+    if(typeof restrictions != "undefined"){
+      if(typeof restrictions == "string"){
+        let temp = restrictions;
+        restrictions =[temp];
+      }
+      restrictions = validation.validArrayOfStrings(restrictions,"Restriction list");
+      console.log("line 580", restrictions);
+      queryData["restrictions"] = restrictions;
+    }
+  } catch (e) {
+    errors.push(e);
+  } 
+  //validating text restriction
+  if(restrictionsText.length>0){ 
+    details["restrictionsText"] = restrictionsText;
+    restrictionsText = validation.validString(restrictionsText, "restriction text");
+    let restrictionsTextArray = restrictionsText.split(",");
+    try {
+      restrictionsTextArray= validation.validArrayOfStrings(restrictionsTextArray,"Restriction text list");
+      console.log("line 593",restrictionsTextArray );
+      //adding text restriction into restrictions array
+      if(typeof restrictions != "undefined"){
+        for(let restrict of restrictionsTextArray ){
+          console.log("inside the loop", restrict)
+            restrictions.push(restrict);
+        }
+        queryData["restrictions"] = restrictions;
+      }//if no restrictions array exist then store the values in queryData 
+      else{
+        queryData["restrictions"] = restrictionsTextArray;
+      }
+    } catch (e) {
+      errors.push(e);
+      }
+  }
 
   // Calculated field
-  queryData.area = (
-    queryData.dimensions.length * queryData.dimensions.breadth
-  ).toString();
   console.log(queryData);
+  queryData.dimensions = {
+    length: length,
+    breadth: breadth,
+  };
+  if(errors.length>0){
+    res.status(400).render("addNewLand", {  
+      title: "Add Land",
+      id: req.session.user.id,
+      hasError: true,
+      error: [errors],
+      hasDetails:true,
+      details
+   });
+   return;
+  }
 
   let addLand;
   try {
@@ -519,10 +646,12 @@ const addNewLand = async (req, res) => {
   }
   //if successfully added then redirect to my lands wala page
   // // console.log(req.session.user.id, new ObjectId (addLand._id));
+  
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
   // // console.log(resul);
 
   res.redirect(`/user/${req.session.user.id}/land`);
+  return;
 };
 
 const addNewLandForm = async (req, res) => {

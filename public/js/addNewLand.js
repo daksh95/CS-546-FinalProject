@@ -25,11 +25,9 @@
         }
 
         //valid line2
-        try {
-            line2 = validString(line2, "line2", 46);
-        } catch (e) {
-            errors.push(e);
-        }
+       if (line2.length>46){
+            errors.push("line2 shouldnt be more than 46 characters");
+       }
 
         //valid city
         try {

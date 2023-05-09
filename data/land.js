@@ -56,15 +56,15 @@ const addNewLand = async (object) => {
 
   //valid string and string of array
   queryData.type = validation.validLandType(type);
-  // queryData.restrictions = validation.validArrayOfStrings(
-  //   restrictions,
-  //   "restrictions"
-  // );
+  queryData.restrictions = validation.validArrayOfStrings(restrictions, "restrictions");
 
   queryData.area = (dimensions.length * dimensions.breadth).toString();
 
   address.line1 = validation.validString(address.line1, "line1", 46);
-  address.line2 = validation.validString(address.line2, "line2", 46);
+  address.line2 = address.line2.trim();
+  if(address.line2.length>46){
+    throw "line2 shouldn't be longer that 46 characters";
+  }
   address.city = validation.validString(address.city, "city", 17);
   address.state = validation.validState(address.state);
   address.zipCode = address.zipCode.toString();
