@@ -13,7 +13,7 @@ import {
   approveTransaction
 } from "../controllers/admin.js";
 
-router.route('/profile').get((req, res) => {
+router.route('/').get((req, res) => {
   res.render('admin/adminHome', { title: 'Home' });
 });
 

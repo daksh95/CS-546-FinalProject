@@ -72,7 +72,7 @@ const sellerApproved = async (req, res) => {
       value,
       landId
     );
-    res.status(200).redirect("/user/transaction/" + transactionId);
+    res.redirect("/user/transaction/" + transactionId);
   } catch (error) {
     return res.status(500).render("Error", {
       title: "Error",

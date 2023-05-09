@@ -259,7 +259,7 @@ const getTransactionsForAccount = async (accountId) => {
   accountId = validation.validObjectId(accountId, 'accountId');
 
   const client = getClient();
-  const result = await client
+  let result = await client
     .collection('transaction')
     .find(
       { $or: [
