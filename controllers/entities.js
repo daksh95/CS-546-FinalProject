@@ -72,7 +72,7 @@ const getProfile = async (req, res) => {
   let email = req.session.user.email;
   let role = req.session.user.typeOfUser;
 
-  if (!id || !email || !typeOfUser)
+  if (!id || !email || !role)
     return res.status(500).render("error", {
       title: "Error",
       hasError: true,
@@ -410,6 +410,11 @@ const allTransacs = async (req, res) => {
     let trans = await entityData.getTransactionsByEntityId(id);
     let entity = await entityData.getEntityById(id);
 
+    let transactions = [];
+    for (let transactionId of trans) {
+      transactions.push(await transactionData.getTransactionById(transactionId));
+    }
+
     if (!entity || !trans)
       return res.status(500).render("error", {
         title: "Error",
@@ -431,10 +436,14 @@ const allTransacs = async (req, res) => {
         error: ["Invalid role!"],
       });
 
-    res.status(200).render("entity/allTrans", {
+    // console.log(`land_surveyor: ${land_surveyor}`)
+    // console.log(`title_company: ${title_company}`)
+    // console.log(`government: ${government}`)
+    
+    return res.status(200).render("entity/allTrans", {
       length: Boolean(trans.length),
       id: id,
-      transactions: trans,
+      transactions: transactions,
       landSurveyor: land_surveyor,
       titleC: title_company,
       govt: government,
@@ -536,9 +545,11 @@ const transDetails = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    let sellerId = transaction.seller._id;
-    let buyerId = transaction.buyer._id;
-    let landId = transaction.land._id;
+    // console.log(transaction);
+
+    let sellerId = transaction.seller._id.toString();
+    let buyerId = transaction.buyer._id.toString();
+    let landId = transaction.land.toString();
 
     if (!exists(sellerId) || !exists(buyerId) || !exists(landId))
       error.push("ID parameter does not exists");
@@ -626,12 +637,13 @@ const transDetails = async (req, res) => {
 };
 
 const response = async (req, res) => {
-  const status = req.body.approval;
-  const com = req.body.comment;
-  const entityId = req.params.entityId;
-  const transactionId = req.params.transactionId;
+  console.log(req.body);
+  let status = req.body.approval;
+  let comment = req.body.comment;
+  let entityId = req.params.entityId;
+  let transactionId = req.params.transactionId;
 
-  if (!status || !com || !entityId || !transactionId)
+  if (!status || !comment || !entityId || !transactionId)
     return res.status(500).render("error", {
       title: "Error",
       hasError: true,
@@ -639,7 +651,7 @@ const response = async (req, res) => {
     });
 
   let error = [];
-  if (status !== "approved" || status !== "rejected")
+  if (status !== "approved" && status !== "rejected")
     error.push("Invalid status update!");
   if (typeof comment !== "string") error.push("Comment must be a string!");
   if (comment.trim().length === 0)
@@ -686,13 +698,13 @@ const response = async (req, res) => {
     if (status === "approved") {
       success = await entityData.entityApproved(
         transactionId,
-        xss(com),
+        xss(comment),
         entityRole
       );
     } else if (status === "rejected") {
       success = await entityData.entityTerminateTransaction(
         transactionId,
-        com,
+        comment,
         entityRole
       );
     }
@@ -706,7 +718,7 @@ const response = async (req, res) => {
 
     return res
       .status(200)
-      .redirect("/:entityId/transactionDetails/:transactionId");
+      .redirect(`/entity/${entityId}/transactionDetails/${transactionId}`);
   } catch (error) {
     return res
       .status(400)

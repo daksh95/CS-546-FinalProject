@@ -15,7 +15,7 @@ import xss from "xss";
 
 const getPropertiesOfUser = async (req, res) => {
   let id = req.params.id;
-  console.log(id);
+  // console.log(id);
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!checkInputType(id, "string"))
@@ -203,7 +203,7 @@ const getTransactionDetails = async (req, res) => {
     else if (transaction.seller._id === req.session.user.id) role = "seller";
     else role = "admin";
   } catch (error) {
-    // console.log("first error");
+    // // console.log("first error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -215,7 +215,7 @@ const getTransactionDetails = async (req, res) => {
     buyerInfo = await userData.getUserById(transaction.buyer._id);
     buyerInfo._id = buyerInfo._id.toString();
   } catch (error) {
-    // console.log("second error");
+    // // console.log("second error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -227,7 +227,7 @@ const getTransactionDetails = async (req, res) => {
     sellerInfo = await userData.getUserById(transaction.seller._id);
     sellerInfo._id = sellerInfo._id.toString();
   } catch (error) {
-    // console.log("third error");
+    // // console.log("third error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -280,8 +280,8 @@ const setUpProfile = async (req, res) => {
     });
     return;
   }
-  // console.log("here inside the set up profile");
-  // console.log("Session id here is", req.session.user.id);
+  // // console.log("here inside the set up profile");
+  // // console.log("Session id here is", req.session.user.id);
   //TODO call create user
   try {
     const result = await userData.createUser(

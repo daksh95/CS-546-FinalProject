@@ -14,72 +14,72 @@ const homeMiddleware = (req, res, next) => {
     isAuthenticated = true;
   }
 
-  if (req.path === '/login' || req.path === '/signup') {
+  if (req.path === '/login' || req.path === '/signup' || req.path === '/') {
     if (isAuthenticated) {
-      if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
-      else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
-      else if (!profileSetUpDone) {
-        if (typeOfUser === 'user') return res.redirect("/user/" + id + "/profile");
-        else if (typeOfUser === 'entity') return res.redirect(`/entity/myProfile`);
+      if (!profileSetUpDone) {
+        if (typeOfUser === 'user') res.redirect("/user/" + id + "/profile");
+        else if (typeOfUser === 'entity') res.redirect(`/entity/myProfile`);
       }
-      else if (typeOfUser === 'user') return res.redirect('/land');
-      else if (typeOfUser === 'admin') return res.redirect('/admin');
-      else return res.redirect('/entity');
+      else if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
+      else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
+      else if (typeOfUser === 'user') res.redirect('/land');
+      else if (typeOfUser === 'admin') res.redirect('/admin');
+      else res.redirect('/entity');
     }
     return next();
   }
   else if (req.path === '/logout') {
-    if (!isAuthenticated) return res.redirect('/login');
+    if (!isAuthenticated) res.redirect('/login');
     return next();
   }
   else if (!isAuthenticated) {
-    return res.redirect('/login');
+    res.redirect('/login');
   }
   else if (req.path === '/') {
-    if (!isAuthenticated) return res.redirect("/login");
-    if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
-    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
-    else if (!profileSetUpDone) {
-      if (typeOfUser === 'user') return res.redirect("/user/" + id + "/profile");
-      else if (typeOfUser === 'entity') return res.redirect(`/entity/myProfile`);
+    if (!isAuthenticated) res.redirect("/login");
+    if (!profileSetUpDone) {
+      if (typeOfUser === 'user') res.redirect("/user/" + id + "/profile");
+      else if (typeOfUser === 'entity') res.redirect(`/entity/myProfile`);
     }
+    else if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
+    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
     else if (typeOfUser === 'user')
-      return res.redirect("/land");
+      res.redirect("/land");
     else if (typeOfUser === 'admin')
-      return res.redirect("/admin");
-    else return res.redirect("/entity");
+      res.redirect("/admin");
+    else res.redirect("/entity");
   }
   else if (req.path.startsWith('/land') || req.path.startsWith('/user') || req.path.startsWith('/transactions')) {
-    if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
-    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
-    else if (!profileSetUpDone) {
-      if (typeOfUser === 'user') return res.redirect("/user/" + id + "/profile");
-      else if (typeOfUser === 'entity') return res.redirect(`/entity/myProfile`);
+    if (!profileSetUpDone) {
+      if (typeOfUser === 'user') res.redirect("/user/" + id + "/profile");
+      else if (typeOfUser === 'entity') res.redirect(`/entity/myProfile`);
     }
-    else if (typeOfUser === 'admin') return res.redirect('/admin');
+    else if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
+    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
+    else if (typeOfUser === 'admin') res.redirect('/admin');
     else if (typeOfUser === 'user') return next();
-    else return res.redirect('/entity');
+    else res.redirect('/entity');
   }
   else if (req.path.startsWith('/admin')) {
-    if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
-    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
-    else if (!profileSetUpDone) {
-      if (typeOfUser === 'user') return res.redirect("/user/" + id + "/profile");
-      else if (typeOfUser === 'entity') return res.redirect(`/entity/myProfile`);
+    if (!profileSetUpDone) {
+      if (typeOfUser === 'user') res.redirect("/user/" + id + "/profile");
+      else if (typeOfUser === 'entity') res.redirect(`/entity/myProfile`);
     }
+    else if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
+    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
     else if (typeOfUser === 'admin') return next();
-    else if (typeOfUser === 'user') return res.redirect('/land');
-    else return res.redirect('/entity');
+    else if (typeOfUser === 'user') res.redirect('/land');
+    else res.redirect('/entity');
   }
   else if (req.path.startsWith('/entity')) {
-    if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
-    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
-    else if (!profileSetUpDone) {
-      if (typeOfUser === 'user') return res.redirect("/user/" + id + "/profile");
-      else if (typeOfUser === 'entity') return res.redirect(`/entity/myProfile`);
+    if (!profileSetUpDone) {
+      if (typeOfUser === 'user') res.redirect("/user/" + id + "/profile");
+      else if (typeOfUser === 'entity') res.redirect(`/entity/myProfile`);
     }
-    else if (typeOfUser === 'admin') return res.redirect('/admin');
-    else if (typeOfUser === 'user') return res.redirect('/land');
+    else if (isPending) return res.render("approvalWaiting", { title: "Account Approval Pending" });
+    else if (isRejected) return res.render("accountRejected", { title: "Account Rejected" });
+    else if (typeOfUser === 'admin') res.redirect('/admin');
+    else if (typeOfUser === 'user') res.redirect('/land');
     else return next();
   }
   return next();

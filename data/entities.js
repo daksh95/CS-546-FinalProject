@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { connectionClose, getClient } from "../config/connection.js";
 import { entityCollection, transacsCollection } from "./collectionNames.js";
 import validation from "../utils/validation.js";
+import transactionData from "./transactions.js";
 
 const initializeEntityProfile = async (email, role) => {
   email = validation.validEmail(email);
@@ -256,30 +257,31 @@ const pendingTransactionsByEntityId = async (id) => {
   if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
 
-  const transactions = await getTransactionsByEntityId(id);
+  const transactionIds = await getTransactionsByEntityId(id);
   const entity = await getEntityById(id);
   let result = [];
-  for (let i = 0; i < transactions.length; i++) {
+  for (let i = 0; i < transactionIds.length; i++) {
+    let transactions = await transactionData.getTransactionById(transactionIds[i]);
     if (entity.role === "landsurveyor") {
       if (
-        transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].surveyor.status === "pending"
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.surveyor.status === "pending"
       ) {
-        result.push(transactions[i]);
+        result.push(transactions);
       }
     } else if (entity.role === "titlecompany") {
       if (
-        transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].titleCompany.status === "pending"
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.titleCompany.status === "pending"
       ) {
-        result.push(transactions[i]);
+        result.push(transactions);
       }
     } else if (entity.role === "government") {
       if (
-        transactions[i].status.toLowerCase() === "pending" &&
-        transactions[i].government.status === "pending"
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.government.status === "pending"
       ) {
-        result.push(transactions[i]);
+        result.push(transactions);
       }
     }
   }
@@ -301,37 +303,62 @@ const assignEntity = async (id, role) => {
   const client = await getClient();
   const transaction = await client
     .collection(transacsCollection)
-    .findOne({ _id: id });
+    .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
+
 
   const entityData = client.collection(entityCollection);
 
-  if (transaction.seller.status === "approved") {
-    let meh = await entityData.find({ role: role, approval: true }).toArray();
-    const random = Math.floor(Math.random() * meh.length + 1);
-    for (let i = 0; i < meh.length; i++) {
-      if (meh[random].transactions.length === 25 && random < meh.length) {
-        random = random + 1;
-      } else if (
-        meh[random].transactions.length === 25 &&
-        random > meh.length
-      ) {
-        random = 0;
-      } else if (meh[random].transactions.length < 25 && random < meh.length) {
-        if (role === "landsurveyor") {
-          return meh._id.toString();
-        } else if (role === "titlecompany") {
-          return meh._id.toString();
-        } else if (role === "government") {
-          return meh._id.toString();
-        }
-        break;
+  
+  let meh = await entityData.find({ role: role, approved: "approved" }).toArray();
+  const random = Math.floor(Math.random() * meh.length);
+  for (let i = 0; i < meh.length; i++) {
+    if (meh[random].transactions.length === 25 && random < meh.length) {
+      random = random + 1;
+    } else if (
+      meh[random].transactions.length === 25 &&
+      random > meh.length
+    ) {
+      random = 0;
+    } else if (meh[random].transactions.length < 25 && random < meh.length) {
+      if (role === "landsurveyor") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+        // console.log('landsurveyor');
+        return meh[random]._id.toString();
+      } else if (role === "titlecompany") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+        // console.log('titlecompany');
+        return meh[random]._id.toString();
+      } else if (role === "government") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+        // console.log('government');
+        return meh[random]._id.toString();
       }
+      break;
     }
-  } else {
-    throw `This transaction has all entities assigned!`;
   }
+  
 };
+
+const addTransactionToEntity = async (transactionId, entityId) => {
+  transactionId = validation.validObjectId(transactionId);
+  entityId = validation.validObjectId(entityId);
+
+  const client = getClient();
+  const result = await client
+    .collection(entityCollection)
+    .findOneAndUpdate(
+      { _id: new ObjectId(entityId) },
+      { $push: { transactions: transactionId } },
+      { returnDocument: "after" }
+    );
+  // console.log(result)
+  
+  if (result.lastErrorObject.n < 1)
+    throw 'Transaction could not be added to entity';
+
+  return result;
+}
 
 const pendingTransactionsCount = async (id) => {
   let transactions = [];
@@ -366,6 +393,7 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
+  addTransactionToEntity
 };
 
 export default entityData;

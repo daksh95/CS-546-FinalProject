@@ -1,6 +1,6 @@
 $(document).ready(() => {
   $("#get-state-form").submit((event) => {
-    // console.log("here");
+    // // console.log("here");
     event.preventDefault();
 
     const state = $('input[name="stateInput"]').val();
@@ -11,7 +11,7 @@ $(document).ready(() => {
       success: (response) => {
         const results = response;
         $("#mainResults").html(results);
-        // console.log(results);
+        // // console.log(results);
         //     $("#result").empty();
         //     $("#stateError").empty();
         //     if (results.length === 0) {
@@ -63,7 +63,7 @@ $(document).ready(() => {
         //     }
       },
       error: (error) => {
-        // console.log("here");
+        // // console.log("here");
         $("#stateError").empty();
         ulElement = document.createElement("ul");
         liElement = document.createElement("li");

@@ -20,15 +20,15 @@
     <h1>Below are all the pending transactions on your account:</h1>
     {{#each transactions}}
     <ul class="transactions list">
-        <li class="transaction id">Transaction ID: <a href="/entity/transactionDetails/:{{transactions._id}}">{{transactions._id}}</a></li>
-        {{#if landSurveyor}}
-        <li class="transaction status">Transaction status: {{transactions.surveyor.status}}</li>
+        <li class="transaction id">Transaction ID: <a href="/entity/{{ ../id }}/transactionDetails/{{this._id}}">{{this._id}}</a></li>
+        {{#if ../landSurveyor}}
+        <li class="transaction status">Transaction status: {{this.surveyor.status}}</li>
         {{/if}}
-        {{#if titleC}}
-        <li class="transaction status">Transaction status: {{transactions.titleCompany.status}}</li>
+        {{#if ../titleC}}
+        <li class="transaction status">Transaction status: {{this.titleCompany.status}}</li>
         {{/if}}
-        {{#if govt}}
-        <li class="transaction status">Transaction status: {{transactions.government.status}}</li>
+        {{#if ../govt}}
+        <li class="transaction status">Transaction status: {{this.government.status}}</li>
         {{/if}}
     </ul>
     {{/each}}

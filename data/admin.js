@@ -73,7 +73,7 @@ const getAccountById = async (accountId) => {
 
   const credentialApproval = await client
     .collection('credential')
-    .find(
+    .findOne(
       { emailId: account.emailId },
       { projection: { _id: 0, isApproved: 1, profileSetUpDone: 1 } }
     );
@@ -129,7 +129,7 @@ const getUnapprovedTransactions = async () => {
       { 'surveyor.status': 'approved',
         'titleCompany.status': 'approved',
         'government.status': 'approved',
-        'admin.status': 'pending'
+        status: 'pending'
       }
     ).toArray();
 
@@ -234,7 +234,7 @@ const approveTransaction = async (transactionId, status, comment) => {
 
   const buyerId = transaction.buyer._id.toString();
   const sellerId = transaction.seller._id.toString();
-  const landId = transaction._id.toString();
+  const landId = transaction.land.toString();
 
   if ((transaction.seller.status !== 'approved' ||
   transaction.surveyor.status !== 'approved' ||
@@ -260,13 +260,13 @@ const approveTransaction = async (transactionId, status, comment) => {
         .findOneAndUpdate(
         { _id: new ObjectId(landId) },
         { $set: { sale: {
-          onSale: false
+          onSale: false,
+          price: null,
+          dateOfListing: null
         } } },
         { returnDocument: "after" }
       );
       if (removeFromSale.lastErrorObject.n < 1) throw 'Could not remove from sale';
-      await userData.addLandToUser(buyerId, landId);
-      await userData.removeLandFromUser(sellerId, landId);
     } catch (error) {
       throw 'Ownership could not be transferred';
     }
@@ -277,7 +277,7 @@ const approveTransaction = async (transactionId, status, comment) => {
     .findOneAndUpdate(
       { _id: new ObjectId(transactionId) },
       { $set: {
-        approval: status,
+        status: status,
         "admin.status": adminStatus,
         "admin.Comment": comment,
         priceSoldFor: priceSoldFor
@@ -289,16 +289,17 @@ const approveTransaction = async (transactionId, status, comment) => {
     throw `transaction ${transactionId} could not be approved`;
   }
 
+
   if (status === 'approved') {
     try {
-      await userData.addLandToUser(sellerId, landId);
-      await userData.removeLandFromUser(buyerId, landId);
+      const add = await userData.addLandToUser(buyerId, landId);
+      const remove = await userData.removeLandFromUser(sellerId, landId);
     } catch (error) {
       throw 'Ownership could not be transferred';
     }
   }
 
-  return result;
+  return transactionApproval;
 };
 
 const getAdminId = async () => {

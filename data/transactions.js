@@ -89,11 +89,11 @@ const sellerApproved = async (transactionId, sellerId, value, landId) => {
   if (value === "approve") {
     const landSurveyorId = await entityData.assignEntity(
       transactionId,
-      "land surveyor"
+      "landsurveyor"
     );
     const titleCompanyId = await entityData.assignEntity(
       transactionId,
-      "title company"
+      "titlecompany"
     );
     const governmentId = await entityData.assignEntity(
       transactionId,
@@ -114,7 +114,7 @@ const sellerApproved = async (transactionId, sellerId, value, landId) => {
         status: "pending",
         Comment: null,
       },
-      titleCompanyId: {
+      titleCompany: {
         _id: new ObjectId(titleCompanyId),
         status: "pending",
         Comment: null,
@@ -129,10 +129,10 @@ const sellerApproved = async (transactionId, sellerId, value, landId) => {
 
     let transactions = await transactionData.getTransactionsByLandId(landId);
     for (let i = 0; i < transactions.length; i++) {
-      if (transactions[i].transactionId.toString() !== transactionId) {
+      if (transactions[i].transactionId !== transactionId) {
         const result = await client.collection("transaction").findOneAndUpdate(
           {
-            _id: new ObjectId(transactions[i].transactionId.toString()),
+            _id: new ObjectId(transactions[i].transactionId),
           },
           { $set: { status: "rejected" } },
           {}
@@ -145,9 +145,10 @@ const sellerApproved = async (transactionId, sellerId, value, landId) => {
         _id: new ObjectId(transactionId),
         "seller._id": new ObjectId(sellerId),
       },
-      { $set: { approvalupdates } },
+      { $set: approvalupdates },
       { returnDocument: "after" }
     );
+    // console.log(result)
     if (result.lastErrorObject.n < 1) {
       throw "Could not be approved";
     }

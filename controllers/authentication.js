@@ -11,7 +11,7 @@ const getLogin = async (req, res) => {
 };
 
 const postLogin = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let { emailInput, passwordInput } = req.body;
   let errors = [];
   //validation for email
@@ -81,7 +81,7 @@ const postLogin = async (req, res) => {
       let userObj = await userData.getUserByEmail(xss(emailInput));
       id = userObj._id;
       approvalStatus = userObj.approved;
-      console.log(id);
+      // console.log(id);
     } else if (validUser.typeOfUser === "admin") {
       id = undefined;
       approvalStatus = 'approved';
@@ -110,7 +110,7 @@ const postLogin = async (req, res) => {
   };
 
   //if profile is not set up
-  console.log("THE FAMOUS VALID USER", validUser);
+  // console.log("THE FAMOUS VALID USER", validUser);
   if (!validUser.profileSetUpDone) {
     if (validUser.typeOfUser == "user") {
       res.redirect("/user/" + id + "/profile");
@@ -217,7 +217,7 @@ const postSignUp = async (req, res) => {
   let flag = false;
   try {
     signup = await auth.addCredential(queryData);
-    console.log("here in signup", signup);
+    // console.log("here in signup", signup);
   } catch (error) {
     //error due to server issue
     flag = true;

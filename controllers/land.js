@@ -13,7 +13,7 @@ import validation from "../utils/validation.js";
 import xss from "xss";
 
 const getLand = async (req, res) => {
-  // console.log("here");
+  // // console.log("here");
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -301,7 +301,7 @@ const placedBid = async (req, res) => {
     await transactionData.createTransaction(bid, landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -449,7 +449,7 @@ const addNewLand = async (req, res) => {
   length = parseInt(length);
   breadth = parseInt(breadth);
 
-  // console.log(length);
+  // // console.log(length);
   //valid numbers
   // queryData.dimensions.length = length;
   length = validation.validNumber(length, "length", 1);
@@ -495,7 +495,7 @@ const addNewLand = async (req, res) => {
   queryData.area = (
     queryData.dimensions.length * queryData.dimensions.breadth
   ).toString();
-  console.log(queryData);
+  // console.log(queryData);
   /*
   queryData has following structure
   queryDate = {
@@ -540,9 +540,9 @@ const addNewLand = async (req, res) => {
     }
   }
   //if successfully added then redirect to my lands wala page
-  // console.log(req.session.user.id, new ObjectId (addLand._id));
+  // // console.log(req.session.user.id, new ObjectId (addLand._id));
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
-  // console.log(resul);
+  // // console.log(resul);
 
   res.redirect(`/user/${req.session.user.id}/land`);
 };

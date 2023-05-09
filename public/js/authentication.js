@@ -17,7 +17,7 @@ function loginValidation(event){
     let email = document.getElementById("emailInput").value;
     let password = document.getElementById("passwordInput").value;
  
-    console.log(password);
+    // console.log(password);
     //valid email
     try {
         email = validEmail(email);
@@ -53,7 +53,7 @@ function signUpValidation(event){
     let rePassword = document.getElementById("rePasswordInput").value;
     let role = document.getElementById("roleInput").value;
 
-    console.log(password);
+    // console.log(password);
     //valid email
     try {
         email = validEmail(email);

@@ -57,7 +57,7 @@ const approveAccount = async (req, res) => {
   const approvalInfo = req.body;
 
   try {
-    if (!('approval' in approvalInfo && 'comment'))
+    if (!('approval' in approvalInfo && 'comment' in approvalInfo))
     throw 'Request header does not match the correct format';
 
     const status = validation.validApprovalStatus(approvalInfo.approval, 'Approval Status');

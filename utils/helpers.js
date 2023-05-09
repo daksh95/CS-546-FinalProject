@@ -25,7 +25,7 @@ export let isObjectDeepEqual = (object1, object2) => {
   let object2Keys = Object.keys(object2);
   if (object1Keys.length != object2Keys.length) return false;
   else {
-    // console.log("here");
+    // // console.log("here");
     for (let key of object1Keys) {
       if (
         !object2Keys.includes(key) ||
@@ -49,7 +49,7 @@ export let objectSameKeys = (obj1, obj2) => {
 };
 
 export let checkInputType = (input, type) => {
-  // console.log(input, type);
+  // // console.log(input, type);
   if (type == "Array") {
     if (Array.isArray(input)) return true;
     else return false;
@@ -57,7 +57,7 @@ export let checkInputType = (input, type) => {
     if (typeof input === type && !Array.isArray(input)) return true;
     else return false;
   } else {
-    // console.log(typeof input);
+    // // console.log(typeof input);
     if (typeof input === type) return true;
     else return false;
   }
