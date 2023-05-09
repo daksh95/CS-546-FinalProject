@@ -4,7 +4,7 @@ const users = {
   name: String,
   phone: String,
   emailId: String,
-  government_id: {
+  governmentId: {
     typeOfId: String,
     Id: String,
   },

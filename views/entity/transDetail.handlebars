@@ -20,7 +20,7 @@
         <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
             <h1>Below are all the required details:</h1>
             <h3>Below are the land details:</h3>
-            <dl>
+            <dl id="land">
                 <dt>ID:</dt>
                 <dd>{{land._id}}</dd>
                 <dt>Dimensions:</dt>
@@ -50,7 +50,7 @@
                 <dd>{{land.approved}}</dd>
             </dl>
             <h3>Below are the seller details:</h3>
-            <dl>
+            <dl id="seller">
                 <dt>Seller ID:</dt>
                 <dd>{{seller._id}}</dd>
                 <dt>Seller name:</dt>
@@ -69,7 +69,7 @@
                 <dd>{{seller.approved}}</dd>
             </dl>
             <h3>Below are the buyer details:</h3>
-            <dl>
+            <dl id="buyer">
                 <dt>Buyer ID:</dt>
                 <dd>{{buyer._id}}</dd>
                 <dt>Buyer name:</dt>

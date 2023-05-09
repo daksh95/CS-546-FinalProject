@@ -19,15 +19,17 @@
 </header>
 <br>
 <main>
-  <div class="container-xl border border-dark rounded"; style="height: 85vh">
+  <div class="container-xl border border-dark rounded"; style="min-height: 85vh">
   {{#if accountsExist}}
-  <ul class="list-group">
     {{#each accountList}}
       <a href="/admin/account/{{this._id}}">
-        <li class="list-group-item">{{this.name}} - {{this.emailId}} - {{this.role}}</li>
+        <div class="card border-info rounded-lg shadow-lg p-2 my-3">
+          <p class="my-0">{{this.name}}</p>
+          <p class="my-0">{{this.emailId}}</p>
+          <p class="my-0">{{this.role}}</p>
+        </div>
       </a>
     {{/each}}
-  </ul>
   {{else}}
     <div class="row">
       <div class="col-md-4"></div>

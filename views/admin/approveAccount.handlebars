@@ -38,9 +38,7 @@
           <dd>User</dd>
           <dt>Phone Number:</dt>
           <dd>{{ account.phone }}</dd>
-          <dt>Government ID:</dt>
-          <dd>{{ account.typeOfId }} - {{ account.Id }}</dd>
-          <dt>Date of Birth:</dt>
+          <dt>Date of Birth:<dt>
           <dd>{{ account.dob }}</dd>
           <dt>Gender:</dt>
           <dd>{{ account.gender }}</dd>
@@ -92,7 +90,7 @@
         {{#if isPending }} 
           <span class="status-pending">Pending</span>
           </h5>
-          <form action="/admin/approvals/account/{{ account._id }}" id="approvalForm" class="form-check" method="post">
+          <form action="/admin/account/{{ account._id }}" id="approvalForm" class="form-check" method="post">
           <div class="d-grid gap-2 d-md-block">
               <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
               <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected" disabled>REJECT</button>

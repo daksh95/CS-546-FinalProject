@@ -5,7 +5,212 @@ import transactionData from "../data/transactions.js";
 import xss from "xss";
 import userData from "../data/user.js";
 import { getFullAddress } from "../utils/helpers.js";
+import {
+  checkInputType,
+  exists,
+  validStateCodes,
+  inputValidation,
+  arrayLength,
+} from "../utils/helpers.js";
 
+const getLandByState = async (req, res) => {
+  try {
+    let lands = await landData.getAllLand();
+    let empty_lands = false;
+    if (!arrayLength(lands, 1)) empty_lands = true;
+    res.status(200).render("admin/adminHome", {
+      title: "Lands",
+      landByState: lands,
+      state: undefined,
+      empty_lands: empty_lands,
+    });
+  } catch (error) {
+    res.status(404).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const postLandByState = async (req, res) => {
+  let state = req.body.state;
+  if (!exists(state))
+    return res.status(400).send({ message: "State not provided" });
+  if (!checkInputType(state, "string"))
+    return res
+      .status(400)
+      .send({ message: "State must be of type string only" });
+  if (state.trim().length === 0)
+    return res
+      .status(400)
+      .send({ message: "State cannot contain empty spaces only" });
+  state = state.trim();
+  if (!validStateCodes.includes(state.toUpperCase()))
+    return res.status(400).send({
+      message:
+        "State parameter must be a valid statecode in abbreviations only",
+    });
+
+  try {
+    let landByState = await landData.getLandByState(xss(state));
+    let empty_lands = false;
+    if (!arrayLength(landByState, 1)) empty_lands = true;
+    return res.status(200).render("admin/adminHome", {
+      title: "Lands",
+      landByState: landByState,
+      state: state,
+      empty_lands: empty_lands,
+      layout: false,
+    });
+    // return res.json(landByState);
+  } catch (error) {
+    return res.status(400).render("admin/adminHome", {
+      title: "Lands",
+      landByState: [],
+      state: undefined,
+      hasSearchError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const postFilterPrice = async (req, res) => {
+  let state = req.params.state;
+  let minPrice = parseInt(req.body.minPriceInput);
+  let maxPrice = parseInt(req.body.maxPriceInput);
+  let errors = [];
+  try {
+    state = inputValidation("state", state, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    minPrice = inputValidation("minPrice", minPrice, "number");
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    maxPrice = inputValidation("maxPrice", maxPrice, "number");
+  } catch (error) {
+    errors.push(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    errors.push(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
+  if (maxPrice < minPrice) errors.push("maxPrice cannot be less than minPrice");
+  if (errors.length !== 0)
+    return res.status(400).render("admin/adminHome", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
+    });
+
+  try {
+    let filteredLands = await landData.filterByPrice(state, minPrice, maxPrice);
+    let empty_lands = false;
+    if (!arrayLength(filteredLands, 1)) empty_lands = true;
+    return res.status(200).render("admin/adminHome", {
+      title: "Lands",
+      landByState: filteredLands,
+      state: state,
+      empty_lands: empty_lands,
+    });
+  } catch (error) {
+    return res.status(400).render("admin/adminHome", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const postFilterArea = async (req, res) => {
+  let state = req.params.state;
+  let minArea = parseInt(req.body.minAreaInput);
+  let maxArea = parseInt(req.body.maxAreaInput);
+  let errors = [];
+  try {
+    state = inputValidation("state", state, "string").trim();
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    minArea = inputValidation("minArea", minArea, "number");
+  } catch (error) {
+    errors.push(error.message);
+  }
+  try {
+    maxArea = inputValidation("maxArea", maxArea, "number");
+  } catch (error) {
+    errors.push(error.message);
+  }
+  if (!validStateCodes.includes(state.toUpperCase()))
+    errors.push(
+      "State parameter must be a valid statecode in abbreviations only"
+    );
+  if (maxArea < minArea) errors.push("maxArea cannot be less than minArea");
+  if (errors.length !== 0)
+    return res.status(400).render("admin/adminHome", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: errors,
+    });
+
+  try {
+    let filteredLands = await landData.filterByArea(state, minArea, maxArea);
+    let empty_lands = false;
+    if (!arrayLength(filteredLands, 1)) empty_lands = true;
+    return res.status(200).render("admin/adminHome", {
+      title: "Lands",
+      landByState: filteredLands,
+      state: state,
+      empty_lands: empty_lands,
+    });
+  } catch (error) {
+    return res.status(400).render("admin/adminHome", {
+      title: "Lands",
+      landByState: [],
+      state: state,
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
+const getAdminHome = async (req, res) => {
+  try {
+    const accountList = await adminData.getUnapprovedAccounts();
+    console.log(accountList);
+    const landList = await adminData.getUnapprovedLands();
+    const transactionList = await adminData.getUnapprovedTransactions();
+  
+    if (!accountList || !landList || !transactionList)
+      return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  
+    const pendingAccounts = accountList.length;
+    const pendingLands = landList.length;
+    const pendingTransactions = transactionList.length;
+
+    console.log(`pendingAccounts: ${pendingAccounts}`)
+    console.log(`pendingLands: ${pendingLands}`)
+    console.log(`pendingTransactions: ${pendingTransactions}`)
+  
+    res.render('admin/adminHome', { 
+      title: 'Home', pendingAccounts,
+      pendingLands, pendingTransactions
+      });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+}
 
 const getAccountsListForApproval = async (req, res) => {
   try {
@@ -166,12 +371,22 @@ const getTransactionsListForApproval = async (req, res) => {
 
 const getApprovalTransaction = async (req, res) => {
   let transactionId = req.params.transactionId;
+  let transaction;
 
   try {
     transactionId = validation.validObjectId(transactionId, 'transactionId');
-    const transaction = await transactionData.getTransactionById(transactionId);
-    if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
 
+  try {
+    transaction = await transactionData.getTransactionById(transactionId);
+    if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  } catch (error) {
+    return res.status(404).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+
+  try {
     transaction.buyer._id = transaction.buyer._id.toString();
     transaction.seller._id = transaction.seller._id.toString();
     transaction.land = transaction.land.toString();
@@ -179,7 +394,6 @@ const getApprovalTransaction = async (req, res) => {
     let surveyorExists = false;
     let titleCompanyExists = false;
     let governmentExists = false;
-    let adminExists = false;
 
     if ('surveyor' in transaction && '_id' in transaction.surveyor && transaction.surveyor._id) {
       transaction.surveyor._id = transaction.surveyor._id.toString();
@@ -208,7 +422,6 @@ const getApprovalTransaction = async (req, res) => {
     if ('admin' in transaction && '_id' in transaction.admin && transaction.admin._id) {
       transaction.admin._id = transaction.admin._id.toString();
       transaction.admin._id = validation.validObjectId(transaction.admin._id, 'adminId');
-      adminExists = true;
     }
     transaction.status = validation.validApprovalStatus(transaction.status, 'Transaction Status');
 
@@ -223,12 +436,15 @@ const getApprovalTransaction = async (req, res) => {
 
     const buyer = await userData.getUserById(transaction.buyer._id);
     const seller = await userData.getUserById(transaction.seller._id);
-    if (!buyer || !seller) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    const land = await landData.getLand(transaction.land);
+    land.fullAddress = getFullAddress(land.address);
+    
+    if (!buyer || !seller || !land) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
     return res.render('admin/approveTransaction', {
       title: "Approve Transaction", transaction, isPending, isApproved, isRejected,
       approvalRequired, buyer, seller, surveyorExists, titleCompanyExists,
-      governmentExists, adminExists
+      governmentExists, land
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -264,5 +480,10 @@ export {
   getApprovalTransaction,
   approveAccount,
   approveLand,
-  approveTransaction
+  approveTransaction,
+  getAdminHome,
+  getLandByState,
+  postLandByState,
+  postFilterPrice,
+  postFilterArea
 };

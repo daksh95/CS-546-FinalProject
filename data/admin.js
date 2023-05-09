@@ -132,9 +132,9 @@ const getUnapprovedLands = async () => {
     return land;
   });
 
-  for (let i in unapprovedLands) {
-    unapprovedLands[i].owner = await userData.getOwnerByLandId(unapprovedLands[i]._id);
-  }
+  // for (let i in unapprovedLands) {
+  //   unapprovedLands[i].owner = await userData.getOwnerByLandId(unapprovedLands[i]._id);
+  // }
   
   return unapprovedLands;
 }
@@ -155,10 +155,29 @@ const getUnapprovedTransactions = async () => {
   if (!unapprovedTransactions) throw 'Unable to fetch unapproved transactions';
 
   unapprovedTransactions = unapprovedTransactions.map((transaction) => {
-    transaction._id = transaction._id.toString()
+    transaction._id = transaction._id.toString();
+    transaction.land = transaction.land.toString();
+    transaction.buyer._id = transaction.buyer._id.toString();
+    transaction.seller._id = transaction.seller._id.toString();
+    transaction.surveyor._id = transaction.surveyor._id.toString();
+    transaction.titleCompany._id = transaction.titleCompany._id.toString();
+    transaction.government._id = transaction.government._id.toString();
+    transaction.admin._id = transaction.admin._id.toString();
     return transaction;
-  } 
-  );
+  });
+
+  let land;
+  let buyer;
+  let seller;
+
+  for (let i in unapprovedTransactions) {
+    land = await landData.getLand(unapprovedTransactions[i].land);
+    buyer = await userData.getUserById(unapprovedTransactions[i].buyer._id);
+    seller = await userData.getUserById(unapprovedTransactions[i].seller._id);
+    unapprovedTransactions[i].landAddress = getFullAddress(land.address);
+    unapprovedTransactions[i].sellerName = seller.name;
+    unapprovedTransactions[i].buyerName = buyer.name;
+  }
 
   return unapprovedTransactions;
 }
@@ -278,11 +297,10 @@ const approveTransaction = async (transactionId, status, comment) => {
         .collection('land')
         .findOneAndUpdate(
         { _id: new ObjectId(landId) },
-        { $set: { sale: {
-          onSale: false,
-          price: null,
-          dateOfListing: null
-        } } },
+        { $set: { 
+          'sale.onSale': false,
+          'sale.dateOfListing': null
+        } },
         { returnDocument: "after" }
       );
       if (removeFromSale.lastErrorObject.n < 1) throw 'Could not remove from sale';

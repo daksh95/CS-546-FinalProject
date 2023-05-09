@@ -19,15 +19,17 @@
 </header>
 <br>
 <main>
-  <div class="container-xl border border-dark rounded"; style="height: 85vh">
+  <div class="container-xl border border-dark rounded"; style="min-height: 85vh">
   {{#if transactionsExist}}
-  <ul class="list-group">
     {{#each transactionList}}
-      <a href="/admin/transaction/{{this._id}}">
-        <li class="list-group-item">{{this._id}}</li>
-      </a>
+    <a href="/admin/transaction/{{this._id}}">
+      <div class="card border-info rounded-lg shadow-lg p-2 my-3">
+        <p class="my-0">{{this.landAddress}}</p>
+        <p class="my-0">{{this.sellerName}}</p>
+        <p class="my-0">{{this.buyerName}}</p>
+      </div>
+    </a>
     {{/each}}
-  </ul>
   {{else}}
     <div class="row">
       <div class="col-md-4"></div>

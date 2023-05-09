@@ -1,22 +1,15 @@
 /* CSS file */
-/* body {
-    background-image: url("../background.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: auto;
-    position: relative;
-    z-index: 0;
-}
 
-.navbar {
-    position: relative;
-    z-index: 1;
-} */
 *{
     font-family:'Segoe UI', "Tahoma", "Geneva", "Verdana", "sans-serif";
 }
+
 #links a:hover{
     color: rgb(0, 0, 255);
+}
+
+a:visited {
+    color:brown;
 }
 
 body {
@@ -39,9 +32,50 @@ span.status-rejected {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
+/* form {
+    background-color: antiquewhite;
+    border-style: dotted;
+    border-color: aqua;
+} */
 
+input {
+    border-color: #ff0000;
+}
 
+#transactionsList a:hover{
+    color: rgb(0, 0, 255);
+}
+
+a:visited {
+    color:brown;
+}
+
+#transactionsList {
+    border-style: solid;
+    border-color: black;
+}
+
+#noWork {
+    border-style: dotted;
+    border-color: grey;
+    background-color: bisque;
+}
+
+#land {
+    border-style: solid;
+    border-color: black;
+}
+
+#seller {
+    border-style: solid;
+    border-color: black;
+}
+
+#buyer {
+    border-style: solid;
+    border-color: black;
+}

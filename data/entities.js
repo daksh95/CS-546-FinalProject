@@ -209,7 +209,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
     .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
   let result = undefined;
-  if (role === "land surveyor") {
+  if (role === "landsurveyor") {
     result = await client.collection(transacsCollection).findOneAndUpdate(
       { _id: new ObjectId(id) },
       {
@@ -221,7 +221,7 @@ const entityTerminateTransaction = async (id, comment, role) => {
       },
       { returnDocument: "after" }
     );
-  } else if (role === "title company") {
+  } else if (role === "titlecompany") {
     result = await client.collection(transacsCollection).findOneAndUpdate(
       { _id: new ObjectId(id) },
       {
@@ -261,7 +261,9 @@ const pendingTransactionsByEntityId = async (id) => {
   const entity = await getEntityById(id);
   let result = [];
   for (let i = 0; i < transactionIds.length; i++) {
-    let transactions = await transactionData.getTransactionById(transactionIds[i]);
+    let transactions = await transactionData.getTransactionById(
+      transactionIds[i]
+    );
     if (entity.role === "landsurveyor") {
       if (
         transactions.status.toLowerCase() === "pending" &&
@@ -306,19 +308,16 @@ const assignEntity = async (id, role) => {
     .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
 
-
   const entityData = client.collection(entityCollection);
 
-  
-  let meh = await entityData.find({ role: role, approved: "approved" }).toArray();
+  let meh = await entityData
+    .find({ role: role, approved: "approved" })
+    .toArray();
   const random = Math.floor(Math.random() * meh.length);
   for (let i = 0; i < meh.length; i++) {
     if (meh[random].transactions.length === 25 && random < meh.length) {
       random = random + 1;
-    } else if (
-      meh[random].transactions.length === 25 &&
-      random > meh.length
-    ) {
+    } else if (meh[random].transactions.length === 25 && random > meh.length) {
       random = 0;
     } else if (meh[random].transactions.length < 25 && random < meh.length) {
       if (role === "landsurveyor") {
@@ -337,7 +336,6 @@ const assignEntity = async (id, role) => {
       break;
     }
   }
-  
 };
 
 const addTransactionToEntity = async (transactionId, entityId) => {
@@ -353,12 +351,12 @@ const addTransactionToEntity = async (transactionId, entityId) => {
       { returnDocument: "after" }
     );
   // console.log(result)
-  
+
   if (result.lastErrorObject.n < 1)
-    throw 'Transaction could not be added to entity';
+    throw "Transaction could not be added to entity";
 
   return result;
-}
+};
 
 const pendingTransactionsCount = async (id) => {
   let transactions = [];
@@ -393,7 +391,7 @@ const entityData = {
   pendingTransactionsCount,
   totalTransactionsCount,
   getEntityByEmail,
-  addTransactionToEntity
+  addTransactionToEntity,
 };
 
 export default entityData;
