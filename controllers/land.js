@@ -302,7 +302,7 @@ const placedBid = async (req, res) => {
       sellerId,
       buyerId
     );
-    return res.status(200).redirect("/land/" + landId);
+    return res.redirect("/land/" + landId);
   } catch (error) {
     return res.status(400).render("Error", {
       title: "Error",
@@ -431,7 +431,7 @@ const updateLand = async (req, res) => {
     }
 
     //if successfully added then redirect to my lands wala page
-    res.status(200).redirect(`/land/${landId}`);
+    res.redirect(`/land/${landId}`);
   }
 };
 
@@ -546,7 +546,7 @@ const addNewLand = async (req, res) => {
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
   // console.log(resul);
 
-  res.status(200).redirect(`/user/${req.session.user.id}/land`);
+  res.redirect(`/user/${req.session.user.id}/land`);
 };
 
 const addNewLandForm = async (req, res) => {
@@ -578,7 +578,7 @@ const postLandonSale = async (req, res) => {
 
   try {
     await landData.putOnSale(landId, price);
-    res.status(200).redirect("/land/" + landId);
+    res.redirect("/land/" + landId);
   } catch (error) {
     return res.status(400).render("error", {
       title: "Error",

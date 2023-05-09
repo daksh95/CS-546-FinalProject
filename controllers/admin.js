@@ -34,11 +34,18 @@ const getApprovalAccount = async (req, res) => {
     const isRejected = account.approved.toLowerCase() === 'rejected';
 
     const approvalRequired = account.credentialInfo.profileSetUpDone;
+    let landsCount = 0;
+    if (isUser) landsCount = account.land.length;
+
+    const accountTransactions = await transactionData.getTransactionsForAccount(accountId);
+    if (!accountTransactions) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    let transactionCount = accountTransactions.length;
 
     return res.render('admin/approveAccount', {
       title: "Approve Account",
       account, isUser, isEntity,
-      isPending, isApproved, isRejected, approvalRequired
+      isPending, isApproved, isRejected, approvalRequired,
+      landsCount, transactionCount
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -189,8 +196,6 @@ const getApprovalTransaction = async (req, res) => {
     if ('admin' in transaction && '_id' in transaction.admin && transaction.admin._id) {
       transaction.admin._id = transaction.admin._id.toString();
       transaction.admin._id = validation.validObjectId(transaction.admin._id, 'adminId');
-      transaction.admin.status = validation.validApprovalStatus(transaction.admin.status, 'admin transaction status');
-      transaction.admin.info = await adminData.getAccountById(transaction.admin._id);
       adminExists = true;
     }
 
@@ -211,7 +216,8 @@ const getApprovalTransaction = async (req, res) => {
 
     return res.render('admin/approveTransaction', {
       title: "Approve Transaction", transaction, isPending, isApproved, isRejected,
-      approvalRequired, 
+      approvalRequired, buyer, seller, surveyorExists, titleCompanyExists,
+      governmentExists, adminExists
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -229,6 +235,7 @@ const approveTransaction = async (req, res) => {
     let comment = approvalInfo.comment;
     if (status === 'rejected') comment = validation.validString(comment, 'Approval Comment');
     const transactionId = validation.validObjectId(req.params.transactionId, 'transactionId');
+    
     const approvalResult = await adminData.approveTransaction(transactionId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
     return res.redirect(`/admin/approvals/transaction/${transactionId}`)

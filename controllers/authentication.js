@@ -74,15 +74,22 @@ const postLogin = async (req, res) => {
 
   //gettiing the ID of the user
   let id = undefined;
+  let approvalStatus = undefined;
+  let profileSetUpDone = undefined;
   try {
     if (validUser.typeOfUser === "user") {
       let userObj = await userData.getUserByEmail(xss(emailInput));
       id = userObj._id;
+      approvalStatus = userObj.approved;
       console.log(id);
-    } else if (validUser.typeOfUser === "admin") id = undefined;
+    } else if (validUser.typeOfUser === "admin") {
+      id = undefined;
+      approvalStatus = 'approved';
+    }
     else {
       let entityObj = await entityData.getEntityByEmail(xss(emailInput));
       id = entityObj._id;
+      approvalStatus = entityObj.approved;
     }
   } catch (error) {
     res.status(400).render("Error", {
@@ -98,36 +105,43 @@ const postLogin = async (req, res) => {
     credentialId: validUser._id,
     typeOfUser: validUser.typeOfUser,
     isApproved: validUser.isApproved,
+    profileSetUpDone: validUser.profileSetUpDone,
+    approvalStatus: approvalStatus
   };
 
   //if profile is not set up
   console.log("THE FAMOUS VALID USER", validUser);
   if (!validUser.profileSetUpDone) {
     if (validUser.typeOfUser == "user") {
-      res.status(200).redirect("/user/" + id + "/profile");
+      res.redirect("/user/" + id + "/profile");
       return;
     } else if (validUser.typeOfUser != "admin") {
-      res.status(200).redirect(`/entity/myProfile`);
+      res.redirect(`/entity/myProfile`);
       return;
     }
   }
 
-  if (validUser.isApproved == false) {
+  if (approvalStatus === 'pending') {
     return res
       .status(200)
-      .render("approvalWaiting", { title: "Approval waiting" });
+      .render("approvalWaiting", { title: "Account Approval Pending" });
+  }
+  else if (approvalStatus === 'rejected') {
+    return res
+      .status(200)
+      .render("accountRejected", { title: "Account Rejected" });
   }
 
   //If profile is set up then we will redirect them to their appropriate pages
   // For admin
   if (validUser.typeOfUser == "admin") {
-    res.status(200).redirect("/admin/profile");
+    res.redirect("/admin");
     return;
   }
 
   // For users buyer or seller
   if (validUser.typeOfUser == "user") {
-    res.status(200).redirect("/land");
+    res.redirect("/land");
     return;
   }
 
@@ -137,7 +151,7 @@ const postLogin = async (req, res) => {
     validUser.typeOfUser == "titlecompany" ||
     validUser.typeOfUser == "government"
   ) {
-    res.status(200).redirect("/entity");
+    res.redirect("/entity");
     return;
   }
 };
@@ -266,7 +280,7 @@ const postSignUp = async (req, res) => {
     //successful creation
     if (signup) {
       // redirect user to login page
-      return res.status(200).redirect("/login");
+      return res.redirect("/login");
     }
   }
 };

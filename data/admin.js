@@ -90,7 +90,9 @@ const getAccountById = async (accountId) => {
     });
   }
 
+
   account._id = account._id.toString();
+
   return account;
 };
 
@@ -230,10 +232,11 @@ const approveTransaction = async (transactionId, status, comment) => {
   const sellerId = transaction.seller._id.toString();
   const landId = transaction._id.toString();
 
-  if (transaction.seller.status !== 'approved' ||
+  if ((transaction.seller.status !== 'approved' ||
   transaction.surveyor.status !== 'approved' ||
   transaction.titleCompany.status !== 'approved' ||
-  transaction.government.status !== 'approved') throw 'Cannot approve this transaction, since it requires approval from other parties first';
+  transaction.government.status !== 'approved') &&
+  status === 'approval') throw 'Cannot approve this transaction, since it requires approval from other parties first';
 
   status = validation.validString(status, 'Approval status');
   status = status.toLowerCase();
@@ -241,25 +244,37 @@ const approveTransaction = async (transactionId, status, comment) => {
 
   if (status === 'rejected') comment = validation.validString(comment, 'Approval comment');
 
+  const client = getClient();
   let priceSoldFor = null;
+  let adminStatus = false;
   if (status === 'approved') {
     priceSoldFor = transaction.buyer.bid;
+    adminStatus = true;
     try {
-      await userData.addLandToUser(sellerId, landId);
-      await userData.removeLandFromUser(buyerId, landId);
+      const removeFromSale = await client
+        .collection('land')
+        .findOneAndUpdate(
+        { _id: new ObjectId(landId) },
+        { $set: { sale: {
+          onSale: false
+        } } },
+        { returnDocument: "after" }
+      );
+      if (removeFromSale.lastErrorObject.n < 1) throw 'Could not remove from sale';
+      await userData.addLandToUser(buyerId, landId);
+      await userData.removeLandFromUser(sellerId, landId);
     } catch (error) {
       throw 'Ownership could not be transferred';
     }
   }
 
-  const client = getClient();
   const transactionApproval = await client
     .collection('transaction')
     .findOneAndUpdate(
       { _id: new ObjectId(transactionId) },
       { $set: {
         approval: status,
-        "admin.status": true,
+        "admin.status": adminStatus,
         "admin.Comment": comment,
         priceSoldFor: priceSoldFor
       }},
