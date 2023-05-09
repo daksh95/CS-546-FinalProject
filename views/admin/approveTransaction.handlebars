@@ -21,19 +21,41 @@
 
 <main class="container-fluid">
   <div class="row">
-    <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
-      <div class="row mt-3">
-        <div class="col-md-6">
-          <h4>Transaction Details</h4>
-          <dl>
-            <dt>ID:</dt>
-            <dd>{{ transaction._id }}</dd>
-          </dl>
-        </div>
-      </div>
+    <div class="col-md-8 card my-3 ml-3 p-3 border-info rounded-lg shadow-lg">
+      <h4>Land</h4>
+      <dl>
+        <dt>Address</dt>
+        <dd><a href="/admin/land/{{land._id}}">{{ land.fullAddress }}</a></dd>
+        <dt>Price</dt>
+        <dd>{{ land.sale.price }}</dd>
+      </dl>
+      <h4>Seller</h4>
+      <p class="ml-2">Name: <a href="/admin/account/{{seller._id}}">{{ seller.name }}</a></p>
+      <p class="ml-2">Email Address: {{ seller.emailId }}</p>
+      <h4>Buyer</h4>
+      <p class="ml-2">Name: <a href="/admin/account/{{buyer._id}}">{{ buyer.name }}</a></p>
+      <p class="ml-2">Email Address: {{ buyer.emailId }}</p>
+      <p class="ml-2">Bid: {{ transaction.buyer.bid }}</p>
+      <h4>Approvals</h4>
+      <dl>
+        <dt>Seller Approval</dt>
+        <dd>{{ transaction.seller.status }}</dd>
+        {{#if surveyorExists}}
+        <dt><a href="/admin/account/{{transaction.surveyor._id}}">Surveyor</a></dt>
+        <dd>{{ transaction.surveyor.status }}</dd>
+        {{/if}}
+        {{#if titleCompanyExists}}
+        <dt><a href="/admin/account/{{transaction.titleCompany._id}}">Title Company</a></dt>
+        <dd>{{ transaction.titleCompany.status }}</dd>
+        {{/if}}
+        {{#if governmentExists}}
+        <dt><a href="/admin/account/{{transaction.government._id}}">Government</a></dt>
+        <dd>{{ transaction.government.status }}</dd>
+        {{/if}}
+      </dl>
     </div>
 
-    <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
+    <div class="col-md-3 card my-3 ml-3 border-info rounded-lg shadow-lg pt-4">
       <h4 class="ml-3 mb-3">Approval</h4>
       <h5 class="ml-3 mb-3">Approval State:
         {{#if isPending }} 

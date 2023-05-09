@@ -6,6 +6,32 @@ import xss from "xss";
 import userData from "../data/user.js";
 import { getFullAddress } from "../utils/helpers.js";
 
+const getAdminHome = async (req, res) => {
+  try {
+    const accountList = await adminData.getUnapprovedAccounts();
+    console.log(accountList);
+    const landList = await adminData.getUnapprovedLands();
+    const transactionList = await adminData.getUnapprovedTransactions();
+  
+    if (!accountList || !landList || !transactionList)
+      return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  
+    const pendingAccounts = accountList.length;
+    const pendingLands = landList.length;
+    const pendingTransactions = transactionList.length;
+
+    console.log(`pendingAccounts: ${pendingAccounts}`)
+    console.log(`pendingLands: ${pendingLands}`)
+    console.log(`pendingTransactions: ${pendingTransactions}`)
+  
+    res.render('admin/adminHome', { 
+      title: 'Home', pendingAccounts,
+      pendingLands, pendingTransactions
+      });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+}
 
 const getAccountsListForApproval = async (req, res) => {
   try {
@@ -166,12 +192,22 @@ const getTransactionsListForApproval = async (req, res) => {
 
 const getApprovalTransaction = async (req, res) => {
   let transactionId = req.params.transactionId;
+  let transaction;
 
   try {
     transactionId = validation.validObjectId(transactionId, 'transactionId');
-    const transaction = await transactionData.getTransactionById(transactionId);
-    if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
 
+  try {
+    transaction = await transactionData.getTransactionById(transactionId);
+    if (!transaction) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+  } catch (error) {
+    return res.status(404).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+
+  try {
     transaction.buyer._id = transaction.buyer._id.toString();
     transaction.seller._id = transaction.seller._id.toString();
     transaction.land = transaction.land.toString();
@@ -179,7 +215,6 @@ const getApprovalTransaction = async (req, res) => {
     let surveyorExists = false;
     let titleCompanyExists = false;
     let governmentExists = false;
-    let adminExists = false;
 
     if ('surveyor' in transaction && '_id' in transaction.surveyor && transaction.surveyor._id) {
       transaction.surveyor._id = transaction.surveyor._id.toString();
@@ -208,7 +243,6 @@ const getApprovalTransaction = async (req, res) => {
     if ('admin' in transaction && '_id' in transaction.admin && transaction.admin._id) {
       transaction.admin._id = transaction.admin._id.toString();
       transaction.admin._id = validation.validObjectId(transaction.admin._id, 'adminId');
-      adminExists = true;
     }
     transaction.status = validation.validApprovalStatus(transaction.status, 'Transaction Status');
 
@@ -223,12 +257,15 @@ const getApprovalTransaction = async (req, res) => {
 
     const buyer = await userData.getUserById(transaction.buyer._id);
     const seller = await userData.getUserById(transaction.seller._id);
-    if (!buyer || !seller) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    const land = await landData.getLand(transaction.land);
+    land.fullAddress = getFullAddress(land.address);
+    
+    if (!buyer || !seller || !land) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
     return res.render('admin/approveTransaction', {
       title: "Approve Transaction", transaction, isPending, isApproved, isRejected,
       approvalRequired, buyer, seller, surveyorExists, titleCompanyExists,
-      governmentExists, adminExists
+      governmentExists, land
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -264,5 +301,6 @@ export {
   getApprovalTransaction,
   approveAccount,
   approveLand,
-  approveTransaction
+  approveTransaction,
+  getAdminHome
 };

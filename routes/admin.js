@@ -10,12 +10,11 @@ import {
   getApprovalTransaction,
   approveAccount,
   approveLand,
-  approveTransaction
+  approveTransaction,
+  getAdminHome
 } from "../controllers/admin.js";
 
-router.route('/').get((req, res) => {
-  res.render('admin/adminHome', { title: 'Home' });
-});
+router.route('/').get(getAdminHome);
 
 router.route('/approvals/account').get(getAccountsListForApproval);
 router.route('/account/:accountId').get(getApprovalAccount).post(approveAccount);

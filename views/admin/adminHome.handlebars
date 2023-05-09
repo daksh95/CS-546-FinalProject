@@ -18,5 +18,30 @@
   </nav>
 </header>
 <br>
-<main>
+<main class="container-fluid">
+
+  <div class="row">
+    <div class="col-md-4"></div>
+    <a href="/admin/approvals/account" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
+      <h4>Pending Account Approvals: {{ pendingAccounts }}</h4>
+    </a>
+    <div class="col-md-4"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4"></div>
+    <a href="/admin/approvals/land" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
+      <h4>Pending Land Approvals: {{ pendingLands }}</h4>
+    </a>
+    <div class="col-md-4"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4"></div>
+    <a href="/admin/approvals/transaction" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
+      <h4>Pending Transaction Approvals: {{ pendingTransactions }}</h4>
+    </a>
+    <div class="col-md-4"></div>
+  </div>
+
 </main>
