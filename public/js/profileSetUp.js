@@ -15,7 +15,7 @@
         let role = document.getElementById("roleInput");
         //valid name
         try {
-            name = validString(name, "name", 40);
+            name = validName(name);
         } catch (e) {
             errors.push(e);
         }
@@ -219,6 +219,14 @@
             } 
         }
         return dob;
+    }
+    function validName(name){   
+        name = validString(name, "name", 126);
+        const nameFormat = /^[a-zA-Z0-9.\s]+$/g;
+        if(!nameFormat.test(name)){
+            throw `Name can only have alphanumeric, '.' and whitespace in between`;
+        }
+        return name;
     }
     function validGovernmentIdType(governmentIdType){
         governmentIdType = validString(governmentIdType, "Government ID Type");

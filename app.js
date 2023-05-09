@@ -45,7 +45,7 @@ app.use(
     cookie: { maxAge: 6000000 },
   })
 );
-app.use("/", homeMiddleware);
+// app.use("/", homeMiddleware);
 
 //routing
 constructorMethod(app);
