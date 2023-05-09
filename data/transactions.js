@@ -11,7 +11,7 @@ import entityData from "./entities.js";
 const getTransactionsByBuyerId = async (id) => {
   id = validation.validObjectId(id, "Buyer Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
     .find({ "buyer._id": new ObjectId(id) })
     .toArray();
@@ -20,8 +20,8 @@ const getTransactionsByBuyerId = async (id) => {
   let data = [];
   for (let i = 0; i < result.length; i++) {
     data.push({
-      transactionId: result[i]._id,
-      landId: result[i].landId,
+      transactionId: result[i]._id.toString(),
+      landId: result[i].land.toString(),
       status: result[i].status,
     });
   }
@@ -32,7 +32,7 @@ const getTransactionsByBuyerId = async (id) => {
 const getTransactionsBySellerId = async (id) => {
   id = validation.validObjectId(id, "Seller Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
     .find({ "seller._id": new ObjectId(id) })
     .toArray();
@@ -41,8 +41,8 @@ const getTransactionsBySellerId = async (id) => {
   let data = [];
   for (let i = 0; i < result.length; i++) {
     data.push({
-      transactionId: result[i]._id,
-      landId: result[i].landId,
+      transactionId: result[i]._id.toString(),
+      landId: result[i].land.toString(),
       status: result[i].status,
     });
   }
@@ -52,7 +52,7 @@ const getTransactionsBySellerId = async (id) => {
 const getTransactionsByLandId = async (id) => {
   id = validation.validObjectId(id, "land Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
     .find({ land: new ObjectId(id) })
     .toArray();
@@ -66,7 +66,7 @@ const getTransactionsByLandId = async (id) => {
       result[i].buyer._id.toString()
     );
     data.push({
-      transactionId: result[i]._id,
+      transactionId: result[i]._id.toString(),
       buyerId: result[i].buyer._id.toString(),
       buyer: buyerName,
       bid: result[i].buyer.bid,
@@ -216,8 +216,7 @@ const createTransaction = async (bid, landId, sellerId, buyerId) => {
   if (!insertedInfo.acknowledged || !insertedInfo.insertedId)
     throw "Could not initiate a transaction";
 
-  const newTransaction = await getTransactionById(insertedInfo._id.toString());
-  return newTransaction;
+  return;
 };
 
 const terminateTransaction = async (transactionId, adminComment) => {

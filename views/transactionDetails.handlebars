@@ -16,10 +16,10 @@
     </div>
 </nav>
 <main class="container-fluid">
-    <div class="card mt-3 ml-3 border-info rounded-lg shadow-lg">
+    <div class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-3">
         <p class="m-0">{{land.address.line1}} {{land.address.line2}},</p>
         <p>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</p>
-        <p>Current Price: {{land.sale.price}}</p>
+        <p>Current Price: ${{land.sale.price}}</p>
         <p class="font-weight-bold">Buyer Info:</p>
         <p class="m-0">{{buyerInfo.name}}</p>
         <p class="m-0">{{buyerInfo.phone}}</p>
@@ -28,14 +28,16 @@
         <p class="m-0">{{sellerInfo.name}}</p>
         <p class="m-0">{{sellerInfo.phone}}</p>
         <p>{{sellerInfo.emailId}}</p>
-        <p>Bid Amount: {{transaction.buyer.bid}}</p>
+        <p>Bid Amount: ${{transaction.buyer.bid}}</p>
         {{#if (eq role "buyer")}}
         <p>Status: {{transaction.status}}</p>
         {{/if}}
         {{#if (eq role "seller")}}
         {{#if (eq transaction.seller.status "pending")}}
-        <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/approve">Approve</a>
-        <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/reject">Reject</a>
+        <div class="row">
+            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/approve" class="col-md-2 btn btn-success ml-2 mr-2">Approve</a>
+            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/reject" class="col-md-2 btn btn-danger mr-2 ml-2">Reject</a>
+        </div>
         {{else}}
         <p>Status: You have {{transaction.seller.status}} the transaction!</p>
         {{/if}}

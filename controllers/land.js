@@ -39,7 +39,9 @@ const getLand = async (req, res) => {
   let pendingTransaction = false;
   try {
     const buyerId = req.session.user.id;
-    let transactions = await transactionData.getTransactionsByLandId(id);
+    let transactions = await transactionData.getTransactionsByLandId(
+      id.toString()
+    );
     for (let i = 0; i < transactions.length; i++) {
       if (
         transactions[i].buyerId === buyerId &&
@@ -256,7 +258,7 @@ const postFilterArea = async (req, res) => {
 };
 
 const placedBid = async (req, res) => {
-  let bid = req.body.bidInput;
+  let bid = parseInt(req.body.bidInput);
   let landId = req.params.landId;
   let sellerId = req.params.sellerId;
   let landPrice = req.body.price;
@@ -296,14 +298,10 @@ const placedBid = async (req, res) => {
       error: error,
     });
   try {
-    await transactionData.createTransaction(
-      xss(bid),
-      landId,
-      sellerId,
-      buyerId
-    );
+    await transactionData.createTransaction(bid, landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
+    console.log(error);
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,

@@ -23,26 +23,18 @@
     You haven't placed bid for any properties!
 </div>
 {{else}}
-<div class="table-responsive p-3">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Land</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each buyerTransaction}}
-            <a href="/user/transaction/{{this.transactionId}}">
-                <td>
-                    <p class="m-0">{{this.name.line1}} {{this.namae.line2}},</p>
-                    <p>{{this.name.city}}, {{this.name.state}} {{this.name.zipCode}}</p>
-                </td>
-                <td>{{this.status}}</td>
-            </a>
-            {{/each}}
-        </tbody>
-    </table>
+<div class="container-fluid p-3">
+    {{#each buyerTransaction}}
+    <a href="/user/transaction/{{this.transactionId}}" class="text-decoration-none">
+        <div class="card border-info rounded-lg shadow-lg">
+            <div class="row p-2">
+                <p class="col-md-10 text-dark">{{this.name.line1}} {{this.name.line2}}, {{this.name.city}},
+                    {{this.name.state}} {{this.name.zipCode}}</p>
+                <p class="col-md-2 text-dark">{{this.status}}</p>
+            </div>
+        </div>
+    </a>
+    {{/each}}
 </div>
 {{/if}}
 <hr>
@@ -55,25 +47,17 @@
     You haven't received any bids for your property!
 </div>
 {{else}}
-<div class="table-responsive p-3">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Land</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each sellerTransaction}}
-            <a href="/user/transaction/{{this.transactionId}}">
-                <td>
-                    <p class="m-0">{{this.name.line1}} {{this.namae.line2}},</p>
-                    <p>{{this.name.city}}, {{this.name.state}} {{this.name.zipCode}}</p>
-                </td>
-                <td>{{this.status}}</td>
-            </a>
-            {{/each}}
-        </tbody>
-    </table>
+<div class="container-fluid p-3">
+    {{#each sellerTransaction}}
+    <a href="/user/transaction/{{this.transactionId}}" class="text-decoration-none">
+        <div class="card border-info rounded-lg shadow-lg">
+            <div class="row p-2">
+                <p class="col-md-10 text-dark">{{this.name.line1}} {{this.name.line2}}, {{this.name.city}},
+                    {{this.name.state}} {{this.name.zipCode}}</p>
+                <p class="col-md-2 text-dark">{{this.status}}</p>
+            </div>
+        </div>
+    </a>
+    {{/each}}
 </div>
 {{/if}}

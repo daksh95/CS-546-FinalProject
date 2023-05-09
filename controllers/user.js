@@ -15,6 +15,7 @@ import xss from "xss";
 
 const getPropertiesOfUser = async (req, res) => {
   let id = req.params.id;
+  console.log(id);
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
   if (!checkInputType(id, "string"))
@@ -125,15 +126,15 @@ const getTransactionsofUserID = async (req, res) => {
     let data = await transactionData.getTransactionsByBuyerId(id);
     if (!arrayLength(data, 1)) emptyBuyerTransaction = true;
     else {
-      data.forEach(async (element) => {
-        let land = await landData.getLand(element.landId);
+      for (let i = 0; i < data.length; i++) {
+        let land = await landData.getLand(data[i].landId);
         buyerTransaction.push({
-          transactionId: element.transactionId,
+          transactionId: data[i].transactionId,
           name: land.address,
-          landId: element.landId,
-          status: element.status,
+          landId: data[i].landId,
+          status: data[i].status,
         });
-      });
+      }
     }
   } catch (error) {
     return res.status(400).render("Error", {
@@ -149,15 +150,15 @@ const getTransactionsofUserID = async (req, res) => {
     let data = await transactionData.getTransactionsBySellerId(id);
     if (!arrayLength(data, 1)) emptySellerTransaction = true;
     else {
-      data.forEach(async (element) => {
-        let land = await landData.getLand(element.landId);
+      for (let i = 0; i < data.length; i++) {
+        let land = await landData.getLand(data[i].landId);
         sellerTransaction.push({
-          transactionId: element.transactionId,
+          transactionId: data[i].transactionId,
           name: land.address,
-          landId: element.landId,
-          status: element.status,
+          landId: data[i].landId,
+          status: data[i].status,
         });
-      });
+      }
     }
     return res.status(200).render("myTransactions", {
       title: "Transactions",
@@ -177,7 +178,7 @@ const getTransactionsofUserID = async (req, res) => {
 };
 
 const getTransactionDetails = async (req, res) => {
-  let transactionId = req.params.transactionId;
+  let transactionId = req.params.id;
   let error = [];
   if (!exists(transactionId)) error.push("ID parameter does not exists");
   if (!checkInputType(transactionId, "string"))
@@ -202,6 +203,7 @@ const getTransactionDetails = async (req, res) => {
     else if (transaction.seller._id === req.session.user.id) role = "seller";
     else role = "admin";
   } catch (error) {
+    // console.log("first error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -213,6 +215,7 @@ const getTransactionDetails = async (req, res) => {
     buyerInfo = await userData.getUserById(transaction.buyer._id);
     buyerInfo._id = buyerInfo._id.toString();
   } catch (error) {
+    // console.log("second error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -224,6 +227,7 @@ const getTransactionDetails = async (req, res) => {
     sellerInfo = await userData.getUserById(transaction.seller._id);
     sellerInfo._id = sellerInfo._id.toString();
   } catch (error) {
+    // console.log("third error");
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -231,7 +235,7 @@ const getTransactionDetails = async (req, res) => {
     });
   }
   try {
-    let land = await landData.getLand(transaction.landId);
+    let land = await landData.getLand(transaction.land.toString());
     res.status(200).render("transactionDetails", {
       title: "Transaction Details",
       transaction: transaction,
