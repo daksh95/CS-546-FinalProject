@@ -18,12 +18,12 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/approvals/account').get(getAccountsListForApproval);
-router.route('/approvals/account/:accountId').get(getApprovalAccount).post(approveAccount);
+router.route('/account/:accountId').get(getApprovalAccount).post(approveAccount);
 
 router.route('/approvals/land').get(getLandsListForApproval);
-router.route('/approvals/land/:landId').get(getApprovalLand).post(approveLand);
+router.route('/land/:landId').get(getApprovalLand).post(approveLand);
 
 router.route('/approvals/transaction').get(getTransactionsListForApproval);
-router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post(approveTransaction);
+router.route('/transaction/:transactionId').get(getApprovalTransaction).post(approveTransaction);
 
 export default router;

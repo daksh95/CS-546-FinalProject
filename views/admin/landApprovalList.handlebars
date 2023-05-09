@@ -22,7 +22,7 @@
   <div class="container-xl border border-dark rounded"; style="height: 85vh">
   {{#if landsExist}}
     {{#each landList}}
-      <a href="/admin/approvals/land/{{this._id}}">
+      <a href="/admin/land/{{this._id}}">
         <div class="card border-info rounded-lg shadow-lg p-2 my-3">
           <p class="my-1">{{this.address.fullAddress}}
           <p class="my-1">Owner: {{ this.owner.name }}

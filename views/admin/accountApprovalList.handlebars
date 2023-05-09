@@ -23,8 +23,8 @@
   {{#if accountsExist}}
   <ul class="list-group">
     {{#each accountList}}
-      <a href="/admin/approvals/account/{{this._id}}">
-        <li class="list-group-item">{{this.name}} - {{this.emailId}} - {{this.type}}</li>
+      <a href="/admin/account/{{this._id}}">
+        <li class="list-group-item">{{this.name}} - {{this.emailId}} - {{this.role}}</li>
       </a>
     {{/each}}
   </ul>
