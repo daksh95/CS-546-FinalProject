@@ -1,3 +1,4 @@
+<div id="mainResults">
 <header>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
       <div class="container-fluid">
@@ -18,30 +19,94 @@
   </nav>
 </header>
 <br>
-<main class="container-fluid">
+    <div class="container-fluid">
+        <div class="row" id="displayResults">
+            <div class="col-sm-4">
+                <form action="/admin" method="post" id="get-state-form">
+                    <div class="form-group">
+                        <label for="stateInput">State:</label>
+                        <input type="text" name="stateInput" id="stateInput" placeholder="Enter state (XX format)">
+                        <button type="submit" class="btn btn-dark">Search</button>
+                    </div>
+                </form>
+                <div id="stateError"></div>
+                {{#if hasSearchError}}
+                <ul class="error">
+                    {{#each error}}
+                    <li>
+                        {{this}}
+                    </li>
+                    {{/each}}
+                </ul>
+                {{/if}}
+                {{#if state}}
+                <div class="d-flex">
+                    <p class="pr-1">Sort by Price: </p>
+                    <select id="sort" class="form-select">
+                        <option value="priceAsc">A-Z</option>
+                        <option value="priceDesc">Z-A</option>
+                    </select>
+                </div>
+                <br>
+                <form action="/admin/area/{{state}}" method="post" id="filter-area">
+                    <label for="minAreaInput">Min Area</label>
+                    <input type="text" name="minAreaInput" id="minAreaInput">
+                    <br>
+                    <label for="maxAreaInput">Max Area</label>
+                    <input type="text" name="maxAreaInput" id="maxAreaInput">
+                    <br>
+                    <button type="submit" class="btn btn-dark">Filter</button>
+                </form>
+                <form action="/admin/price/{{state}}" method="post" id="filter-price">
+                    <label for="minPriceInput">Min Price</label>
+                    <input type="number" name="minPriceInput" id="minPriceInput">
+                    <br>
+                    <label for="maxPriceInput">Max Price</label>
+                    <input type="number" name="maxPriceInput" id="maxPriceInput">
+                    <br>
+                    <button type="submit" class="btn btn-dark">Filter</button>
+                </form>
+                {{/if}}
+                <div id="filterError"></div>
+                {{#if hasError}}
+                <ul class="error">
+                    {{#each error}}
+                    <li>
+                        {{this}}
+                    </li>
+                    {{/each}}
+                </ul>
+                {{/if}}
 
-  <div class="row">
-    <div class="col-md-4"></div>
-    <a href="/admin/approvals/account" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
-      <h4>Pending Account Approvals: {{ pendingAccounts }}</h4>
-    </a>
-    <div class="col-md-4"></div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-4"></div>
-    <a href="/admin/approvals/land" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
-      <h4>Pending Land Approvals: {{ pendingLands }}</h4>
-    </a>
-    <div class="col-md-4"></div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-4"></div>
-    <a href="/admin/approvals/transaction" class="pending-link col-md-4 card mt-3 ml-3 border-info rounded-lg shadow-lg justify-content-center align-items-center" style="min-height: 10vh">
-      <h4>Pending Transaction Approvals: {{ pendingTransactions }}</h4>
-    </a>
-    <div class="col-md-4"></div>
-  </div>
-
-</main>
+            </div>
+            <div class="col-sm-8" id="result">
+                {{#if empty_lands}}
+                <div class="card border-info rounded-lg shadow-lg p-2">
+                    No Lands available to display
+                </div>
+                {{else}}
+                {{#each landByState}}
+                <a href="/admin/land/{{this._id}}" class="text-decoration-none text-dark">
+                    <div class="card border-info rounded-lg shadow-lg p-2">
+                        <p class="m-0">{{this.address.line1}} {{this.address.line2}},</p>
+                        <p>{{this.address.city}}, {{this.address.state}} {{this.address.zipCode}}</p>
+                        <p>{{this.type}} Area</p>
+                        {{#if this.sale.onSale}}
+                        <p>Sale: Yes</p>
+                        {{else}}
+                        <p>Sale: No</p>
+                        {{/if}}
+                    </div>
+                </a>
+                <br>
+                {{/each}}
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>
+<div id="lands" data-landStates="{{json landByState}}"></div>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/public/js/displayLandByStateAjaxAdmin.js"></script>
+<script src="/public/js/displayLandByStateAdmin.js"></script>
+</div>

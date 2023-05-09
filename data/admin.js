@@ -278,7 +278,7 @@ const approveTransaction = async (transactionId, status, comment) => {
   transaction.surveyor.status !== 'approved' ||
   transaction.titleCompany.status !== 'approved' ||
   transaction.government.status !== 'approved') &&
-  status === 'approval') throw 'Cannot approve this transaction, since it requires approval from other parties first';
+  status === 'approved') throw 'Cannot approve this transaction, since it requires approval from other parties first';
 
   status = validation.validString(status, 'Approval status');
   status = status.toLowerCase();
