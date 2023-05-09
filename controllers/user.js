@@ -280,7 +280,7 @@ const setUpProfile = async (req, res) => {
     } else {
       details["nameInput"] =nameInput;
     }
-    nameInput = validation.validString(nameInput, "Name", 128);
+    nameInput = validation.validName(nameInput);
   } catch (e) {
     errors.push(e);
   }
@@ -353,7 +353,6 @@ const setUpProfile = async (req, res) => {
   
   // // console.log("here inside the set up profile");
   // // console.log("Session id here is", req.session.user.id);
-  //TODO call create user
   try {
     const result = await userData.createUser(
       xss(nameInput),

@@ -58,7 +58,7 @@ const createUser = async (
   gender
 ) => {
   // Validate input
-  name = validation.validString(name);
+  name = validation.validName(name);
   phone = validation.validString(phone);
   emailId = validation.validEmail(emailId);
   govtIdType = validation.validGovernmentIdType(govtIdType);

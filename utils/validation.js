@@ -19,6 +19,7 @@ const validString = (string, parameter = "input", maxLength = null) => {
   return string;
 };
 
+
 const validObjectId = (id, parameter = "input") => {
   id = validString(id, parameter);
   if (!ObjectId.isValid(id)) throw `Valid ObjectId required for ${parameter}`;
@@ -336,6 +337,14 @@ const validPhone = (phone)=>{
   return phone;
 }  
 
+const validName=(name)=>{
+    name = validString(name, "name", 126);
+    const nameFormat = /^[a-zA-Z0-9.\s]+$/g;
+    if(!nameFormat.test(name)){
+      throw `Name can only have alphanumeric, '.' and whitespace in between`;
+    }
+    return name;
+}
 
 const validation = {
   validString: validString,
@@ -357,7 +366,8 @@ const validation = {
   validSSN: validSSN,
   validDriverLicense:validDriverLicense,
   validPhone: validPhone,
-  validGovernmentIdType:validGovernmentIdType
+  validGovernmentIdType:validGovernmentIdType,
+  validName:validName,
 };
 
 export default validation;
