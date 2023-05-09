@@ -57,7 +57,7 @@ const getTransactionsByLandId = async (id) => {
     .find({ land: new ObjectId(id) })
     .toArray();
   if (result.length < 1) {
-    throw "No transaction from that ID";
+    throw new Error("No transaction from that ID");
   }
   let data = [];
   for (let i = 0; i < result.length; i++) {

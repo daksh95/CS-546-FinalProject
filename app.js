@@ -12,7 +12,7 @@ import { homeMiddleware } from "./middleware/middleware.js";
 import userData from "./data/user.js";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename); 
+const __dirname = dirname(__filename);
 const staticDir = express.static(__dirname + "/public");
 
 app.use("/public", staticDir);
@@ -31,9 +31,14 @@ hbs.handlebars.registerHelper("divide", function (num1, num2) {
   else return (num1 / num2).toFixed(1);
 });
 
-hbs.handlebars.registerHelper("eq", function (val1,val2) {
-  return val1 === val2
-})
+hbs.handlebars.registerHelper("eq", function (val1, val2) {
+  return val1 === val2;
+});
+
+hbs.handlebars.registerHelper("flagCheck", function (num) {
+  if (num < 1) return "freeze";
+  else if (num >= 1 && num <= 2) return "flag";
+});
 
 //middleware
 app.use(
@@ -45,7 +50,7 @@ app.use(
     cookie: { maxAge: 6000000 },
   })
 );
-// app.use("/", homeMiddleware);
+app.use("/", homeMiddleware);
 
 //routing
 constructorMethod(app);
@@ -62,4 +67,3 @@ const start = async () => {
   }
 };
 start();
-

@@ -36,10 +36,11 @@ const getAllTransactionsofLand = async (req, res) => {
       userId: req.session.user.id,
     });
   } catch (error) {
+    console.log(error)
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
-      error: [error.message],
+      error: [error],
     });
   }
 };

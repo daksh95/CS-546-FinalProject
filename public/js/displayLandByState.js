@@ -133,15 +133,9 @@
   function areaValidation(minArea, maxArea) {
     if (!minArea && !(minArea == false))
       throw new Error("minArea parameter does not exists");
-    if (minArea.trim().length === 0)
-      throw new Error("minArea cannot contain empty spaces only");
-    minArea = minArea.trim();
     if (!maxArea && !(maxArea == false))
       throw new Error("maxArea parameter does not exists");
-    if (maxArea.trim().length === 0)
-      throw new Error("maxArea cannot contain empty spaces only");
-    maxArea = maxArea.trim();
-    if (Number(maxArea) < Number(minArea))
+    if ((maxArea) < (minArea))
       throw new Error("minArea must be less than maxArea");
     return [minArea, maxArea];
   }
@@ -181,8 +175,9 @@
       let maxArea = document.getElementById("maxAreaInput");
       const errorDiv = document.getElementById("filterError");
       try {
+        // console.log(minArea, maxArea);
         errorDiv.hidden = true;
-        areaValidation(minArea.value, maxArea.value);
+        areaValidation(parseInt(minArea.value), parseInt(maxArea.value));
         event.target.submit();
       } catch (error) {
         errorDiv.textContent = error.message;

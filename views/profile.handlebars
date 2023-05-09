@@ -30,7 +30,10 @@
                 <dt>Gender:</dt>
                 <dd>{{user.gender}}</dd>
                 <dt>Rating:</dt>
-                <dd>{{divide user.rating.totalRating user.rating.count}} ({{user.rating.count}})</dd>
+                <dd>{{if divide user.rating.totalRating user.rating.count}} ({{user.rating.count}})</dd>
+                {{!-- {{#if flagCheck(divide user.rating.totalRating user.rating.count) === "freeze" }} 
+                <p></p> --}}
+                {{!-- {{/if}} --}}
             </div>
         </div>
     </div>

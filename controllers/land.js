@@ -196,8 +196,8 @@ const postFilterPrice = async (req, res) => {
 
 const postFilterArea = async (req, res) => {
   let state = req.params.state;
-  let minArea = req.body.minAreaInput;
-  let maxArea = req.body.maxAreaInput;
+  let minArea = parseInt(req.body.minAreaInput);
+  let maxArea = parseInt(req.body.maxAreaInput);
   let errors = [];
   try {
     state = inputValidation("state", state, "string").trim();
@@ -205,12 +205,12 @@ const postFilterArea = async (req, res) => {
     errors.push(error.message);
   }
   try {
-    minArea = inputValidation("minArea", minArea, "string").trim();
+    minArea = inputValidation("minArea", minArea, "number");
   } catch (error) {
     errors.push(error.message);
   }
   try {
-    maxArea = inputValidation("maxArea", maxArea, "string").trim();
+    maxArea = inputValidation("maxArea", maxArea, "number");
   } catch (error) {
     errors.push(error.message);
   }
@@ -218,8 +218,7 @@ const postFilterArea = async (req, res) => {
     errors.push(
       "State parameter must be a valid statecode in abbreviations only"
     );
-  if (Number(maxArea) < Number(minArea))
-    errors.push("maxArea cannot be less than minArea");
+  if (maxArea < minArea) errors.push("maxArea cannot be less than minArea");
   if (errors.length !== 0)
     return res.status(400).render("displayLandByState", {
       title: "Lands",
@@ -231,11 +230,7 @@ const postFilterArea = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByArea(
-      state,
-      xss(minArea),
-      xss(maxArea)
-    );
+    let filteredLands = await landData.filterByArea(state, minArea, maxArea);
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -313,7 +308,6 @@ const placedBid = async (req, res) => {
 const updateLand = async (req, res) => {
   // let landId = req.params.id;
   // landId = validation.validObjectId(id);
-
   // if (req.method == "get") {
   //   const result = await landData.getLand(landId);
   //   res.staus(200).render("editLand", {
@@ -337,7 +331,6 @@ const updateLand = async (req, res) => {
   //     onSaleInput: onSale,
   //   } = req.body;
   //   const queryData = {};
-
   //   //valid numbers
   //   queryData.dimensions.length = validation.validNumber(
   //     length,
@@ -352,23 +345,18 @@ const updateLand = async (req, res) => {
   //   queryData.sale.price = validation.validNumber(price, "Price", (min = 1));
   //   validation.validBool(onSale, "On sale");
   //   queryData.sale.onSale = onSale;
-
   //   //default behaviour
   //   queryData.landId = landId;
-
   //   if (onSale) {
   //     queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
   //   }
-
   //   //valid string and string of array
   //   queryData.type = validation.validString(type, "type of land", 20);
-
   //   //if not default then validation
   //   queryData.restrictions = validation.validArrayOfStrings(
   //     restrictions,
   //     "restrictions"
   //   );
-
   //   // valid address
   //   queryData.address.line1 = validation.validString(line1, "line1", 46);
   //   queryData.address.line2 = validation.validString(line2, "line2", 46);
@@ -380,15 +368,13 @@ const updateLand = async (req, res) => {
   //     (min = 501),
   //     (max = 99950)
   //   );
-
   //   // Calculated field
   //   queryData.area = (dimensions.length * dimensions.breadth).toString();
-
   //   /*
   //   queryData has following structure
   //   queryDate = {
   //     dimensions:{
-  //       lenght, 
+  //       lenght,
   //       breadth
   //     },
   //     sale:{
@@ -427,7 +413,6 @@ const updateLand = async (req, res) => {
   //       return;
   //     }
   //   }
-
   //   //if successfully added then redirect to my lands wala page
   //   res.redirect(`/land/${landId}`);
   // }
@@ -444,22 +429,21 @@ const addNewLand = async (req, res) => {
     zipCodeInput: zipCode,
     cityInput: city,
     stateInput: state,
-    restrictions
-  } = req.body; 
+    restrictions,
+  } = req.body;
   console.log(req.body);
   const queryData = {};
-  const details={};
+  const details = {};
 
   length = parseInt(length);
   breadth = parseInt(breadth);
-  let errors =[];
+  let errors = [];
 
   //length validation
   try {
-    if(typeof length == "undefined"){
+    if (typeof length == "undefined") {
       details["length"] = "";
-    }
-    else{
+    } else {
       details["length"] = length;
     }
     length = validation.validNumber(length, "length", 1);
@@ -469,10 +453,9 @@ const addNewLand = async (req, res) => {
 
   //breadth validation
   try {
-    if(typeof breadth == "undefined"){
+    if (typeof breadth == "undefined") {
       details["breadth"] = "";
-    }
-    else{
+    } else {
       details["breadth"] = breadth;
     }
     breadth = validation.validNumber(breadth, "breadth", 1);
@@ -485,48 +468,44 @@ const addNewLand = async (req, res) => {
 
   //valid land type
   try {
-    if(typeof type == "undefined"){
+    if (typeof type == "undefined") {
       details["type"] = "";
-    }
-    else{
+    } else {
       details["type"] = type;
     }
     queryData.type = validation.validLandType(type);
   } catch (e) {
     errors.push(e);
-
   }
 
   // valid address line 1
   try {
-    if(typeof line1 == "undefined"){
+    if (typeof line1 == "undefined") {
       details["line1"] = "";
-    }
-    else{
+    } else {
       details["line1"] = line1;
     }
     line1 = validation.validString(line1, "line1", 46);
   } catch (e) {
-    errors.push(e)
+    errors.push(e);
   }
 
   // valid address line 2
-    if(typeof line2 == "undefined"){
-      details["line2"] = "";
-    }else{
-      details["line2"] = line2;
-    }
-    line2 = line2.trim();
-    if(line2.length>46){
-      errors.push("line2 shouldn't be longer that 46 characters");
-    }
-  
+  if (typeof line2 == "undefined") {
+    details["line2"] = "";
+  } else {
+    details["line2"] = line2;
+  }
+  line2 = line2.trim();
+  if (line2.length > 46) {
+    errors.push("line2 shouldn't be longer that 46 characters");
+  }
 
   // valid address city
   try {
-    if(typeof city == "undefined"){
+    if (typeof city == "undefined") {
       details["city"] = "";
-    }else{
+    } else {
       details["city"] = city;
     }
     city = validation.validString(city, "city", 17);
@@ -536,9 +515,9 @@ const addNewLand = async (req, res) => {
 
   //valid address state
   try {
-    if(typeof state == "undefined"){
+    if (typeof state == "undefined") {
       details["state"] = "";
-    }else{
+    } else {
       details["state"] = state;
     }
     state = validation.validState(state);
@@ -548,12 +527,12 @@ const addNewLand = async (req, res) => {
 
   //valid address zipcode
   try {
-    if(typeof zipCode == "undefined"){
+    if (typeof zipCode == "undefined") {
       details["zipCode"] = "";
-    }else{
+    } else {
       details["zipCode"] = zipCode;
     }
-    zipCode = validation.validZip(zipCode,state, city);
+    zipCode = validation.validZip(zipCode, state, city);
   } catch (e) {
     errors.push(e);
   }
@@ -566,57 +545,74 @@ const addNewLand = async (req, res) => {
     zipCode: zipCode,
   };
   //if no restriction and no text.
-  if(typeof restrictions == "undefined" && restrictionsText.trim().length==0){
-    errors.push(`If you don't have any restrictions, please select 'No restrictions`);
+  if (
+    typeof restrictions == "undefined" &&
+    restrictionsText.trim().length == 0
+  ) {
+    errors.push(
+      `If you don't have any restrictions, please select 'No restrictions`
+    );
   }
   let count = 0;
-  let noRestriction =0;
+  let noRestriction = 0;
   //validating check restrictions
   try {
-    if(typeof restrictions != "undefined"){
-      if(typeof restrictions == "string"){
+    if (typeof restrictions != "undefined") {
+      if (typeof restrictions == "string") {
         let temp = restrictions;
-        restrictions =[temp];
-        for (let restri of restrictions){
-          count = count+1;
-            if(restri.toLowerCase() == "No restrictions".toLowerCase()){
-              noRestriction= true;
-            }
-          }      
+        restrictions = [temp];
+        for (let restri of restrictions) {
+          count = count + 1;
+          if (restri.toLowerCase() == "No restrictions".toLowerCase()) {
+            noRestriction = true;
+          }
+        }
       }
-      restrictions = validation.validArrayOfStrings(restrictions,"Restriction list");
+      restrictions = validation.validArrayOfStrings(
+        restrictions,
+        "Restriction list"
+      );
       queryData["restrictions"] = restrictions;
     }
   } catch (e) {
     errors.push(e);
-  } 
+  }
 
   //validating text restriction
-  if(restrictionsText.trim().length>0){ 
-    count = count+1;
-    details["restrictionsText"] = restrictionsText; 
-    restrictionsText = validation.validString(restrictionsText, "restriction text", 400);
+  if (restrictionsText.trim().length > 0) {
+    count = count + 1;
+    details["restrictionsText"] = restrictionsText;
+    restrictionsText = validation.validString(
+      restrictionsText,
+      "restriction text",
+      400
+    );
     let restrictionsTextArray = restrictionsText.split(",");
     try {
-      restrictionsTextArray= validation.validArrayOfStrings(restrictionsTextArray,"Restriction text list");
-      
+      restrictionsTextArray = validation.validArrayOfStrings(
+        restrictionsTextArray,
+        "Restriction text list"
+      );
+
       //adding text restriction into restrictions array
-      if(typeof restrictions != "undefined"){
-        for(let restrict of restrictionsTextArray ){
-            restrictions.push(restrict);
+      if (typeof restrictions != "undefined") {
+        for (let restrict of restrictionsTextArray) {
+          restrictions.push(restrict);
         }
         queryData["restrictions"] = restrictions;
       }
-      //if no restrictions array exist then store the values in queryData 
-      else{
+      //if no restrictions array exist then store the values in queryData
+      else {
         queryData["restrictions"] = restrictionsTextArray;
       }
     } catch (e) {
       errors.push(e);
-      }
+    }
   }
-  if(count>1 && noRestriction == true){
-    errors.push(`Please verify your input as it seems that you have selected "No restrictions" and other restrictions, which contradict each other.`)
+  if (count > 1 && noRestriction == true) {
+    errors.push(
+      `Please verify your input as it seems that you have selected "No restrictions" and other restrictions, which contradict each other.`
+    );
   }
 
   // Calculated field
@@ -625,16 +621,16 @@ const addNewLand = async (req, res) => {
     length: length,
     breadth: breadth,
   };
-  if(errors.length>0){
-    res.status(400).render("addNewLand", {  
+  if (errors.length > 0) {
+    res.status(400).render("addNewLand", {
       title: "Add Land",
       id: req.session.user.id,
       hasError: true,
       error: [errors],
-      hasDetails:true,
-      details
-   });
-   return;
+      hasDetails: true,
+      details,
+    });
+    return;
   }
 
   let addLand;
@@ -644,7 +640,11 @@ const addNewLand = async (req, res) => {
     if (error == "Could not add land") {
       res
         .status(500)
-        .render("error", { title: "Server Error", hasError: true, error: [error] });
+        .render("error", {
+          title: "Server Error",
+          hasError: true,
+          error: [error],
+        });
       return;
     } else {
       res.status(400).render("addNewLand", {
@@ -658,7 +658,7 @@ const addNewLand = async (req, res) => {
   }
   //if successfully added then redirect to my lands wala page
   // // console.log(req.session.user.id, new ObjectId (addLand._id));
-  
+
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
   // // console.log(resul);
 
