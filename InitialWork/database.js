@@ -1,7 +1,6 @@
 const users = {
   // buyers and sellers
   _id: new ObjectId(),
-  userId: String,
   name: String,
   phone: String,
   emailId: String,
@@ -45,7 +44,7 @@ const land = {
     state: String,
     zipCode: String,
   }, //Change here. there was no address field.
-  approved: String("pending, approved, rejected"),
+  status: String("pending, approved, rejected"),
 };
 
 const entity = {

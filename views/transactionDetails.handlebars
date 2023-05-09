@@ -32,15 +32,93 @@
         {{#if (eq role "buyer")}}
         <p>Status: {{transaction.status}}</p>
         {{/if}}
+        {{#if (eq transaction.status "approved")}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal">
+            Rate
+        </button>
+        {{else}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
+            Rate
+        </button>
+        {{/if}}
+        <div class="modal" id="ratingModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <p class="modal-title mx-auto">Rate on a scale of 0-5</p>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/user/transaction/{{transaction._id}}" method="post" id="ratingForm">
+                            <label for="ratingInput">Rate: </label>
+                            <input type="number" name="ratingInput" id="ratingInput">
+                            <button type="submit" class="btn"
+                                style="background-color: #008c00; color:black">Rate</button>
+                        </form>
+                        <div id="rateError"></div>
+                        {{#if hasRateError}}
+                        <ul class="error">
+                            {{#each error}}
+                            <li>
+                                {{this}}
+                            </li>
+                            {{/each}}
+                        </ul>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
         {{#if (eq role "seller")}}
         {{#if (eq transaction.seller.status "pending")}}
         <div class="row">
-            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/approve" class="col-md-2 btn btn-success ml-2 mr-2">Approve</a>
-            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/reject" class="col-md-2 btn btn-danger mr-2 ml-2">Reject</a>
+            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/approve"
+                class="col-md-2 btn btn-success ml-2 mr-2">Approve</a>
+            <a href="/transactions/{{transaction._id}}/{{transaction.seller._id}}/reject"
+                class="col-md-2 btn btn-danger mr-2 ml-2">Reject</a>
         </div>
         {{else}}
         <p>Status: You have {{transaction.seller.status}} the transaction!</p>
+        {{#if (eq transaction.status "approved")}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal">
+            Rate
+        </button>
+        {{else}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
+            Rate
+        </button>
+        {{/if}}
+        <div class="modal" id="ratingModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <p class="modal-title mx-auto">Rate on a scale of 0-5</p>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/user/transaction/{{transaction._id}}" method="post" id="ratingForm">
+                            <label for="ratingInput">Rate: </label>
+                            <input type="number" name="ratingInput" id="ratingInput">
+                            <button type="submit" class="btn"
+                                style="background-color: #008c00; color:black">Rate</button>
+                        </form>
+                        <div id="rateError"></div>
+                        {{#if hasRateError}}
+                        <ul class="error">
+                            {{#each error}}
+                            <li>
+                                {{this}}
+                            </li>
+                            {{/each}}
+                        </ul>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
         {{/if}}
         {{/if}}
     </div>
 </main>
+
+<script src="/public/js/rateUser.js"></script>

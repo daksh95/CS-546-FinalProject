@@ -268,10 +268,12 @@ const setUpProfile = async (req, res) => {
     nameInput = validation.validString(nameInput);
     phoneInput = validation.validPhone(phoneInput);
     emailIdInput = validation.validEmail(emailIdInput);
-    typeofGovernmentIdInput = validation.validGovernmentIdType(typeofGovernmentIdInput);
-    if(typeofGovernmentIdInput== "ssn"){
+    typeofGovernmentIdInput = validation.validGovernmentIdType(
+      typeofGovernmentIdInput
+    );
+    if (typeofGovernmentIdInput == "ssn") {
       governmentIdInput = validation.validSSN(governmentIdInput);
-    }else{
+    } else {
       governmentIdInput = validation.validDriverLicense(governmentIdInput);
     }
     dobInput = validation.validDob(dobInput);
@@ -321,10 +323,48 @@ const setUpProfile = async (req, res) => {
   return;
 };
 
+const postRateUser = async (req, res) => {
+  let transactionId = req.params.id;
+  let rate = parseInt(req.body.ratingInput);
+  // let role = req.session.user.typeOfUser;/
+  let userId = req.session.user.id;
+  let error = [];
+  if (!exists(transactionId)) error.push("ID parameter does not exists");
+  if (!checkInputType(transactionId, "string"))
+    error.push("ID must be of type string only");
+  if (transactionId.trim().length === 0)
+    error.push("ID cannot be of empty spaces");
+  transactionId = transactionId.trim();
+  if (!ObjectId.isValid(transactionId)) error.push("Invalid Object ID");
+  if (!exists(rate)) error.push("Rate parameter does not exists");
+  if (!checkInputType(rate, "number") || rate === NaN || rate === Infinity)
+    error.push("rate must be of type number only");
+  if (!Number.isInteger(rate)) error.push("rate cannot be in decimal place");
+  if (rate < 0 || rate > 5) error.push("Rating must be between 0-5");
+  if (error.length !== 0)
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: error,
+    });
+
+  try {
+    await userData.addRatingToUser(userId, rate);
+    return res.status(200).redirect("/user/transaction/" + transactionId);
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
+};
+
 export {
   getPropertiesOfUser,
   getProfile,
   getTransactionsofUserID,
   setUpProfile,
   getTransactionDetails,
+  postRateUser,
 };

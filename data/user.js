@@ -25,7 +25,7 @@ const getUserByEmail = async (email) => {
   email = validation.validEmail(email);
   const client = getClient();
   let result = await client.collection("users").findOne({ emailId: email });
-  if(result == null) throw "User not found";
+  if (result == null) throw "User not found";
   return result;
 };
 
@@ -62,16 +62,15 @@ const createUser = async (
   phone = validation.validString(phone);
   emailId = validation.validEmail(emailId);
   govtIdType = validation.validGovernmentIdType(govtIdType);
-  if(govtIdType== "ssn"){
+  if (govtIdType == "ssn") {
     govtIdNumber = validation.validSSN(govtIdNumber);
-  }
-  else{
+  } else {
     govtIdNumber = validation.validDriverLicense(govtIdNumber);
   }
   dob = validation.validDob(dob);
   gender = validation.validGender(gender);
   let dobArray = dob.split("-");
-  let newDob = `${dobArray[1]}/${dobArray[2]}/${dobArray[0]}`
+  let newDob = `${dobArray[1]}/${dobArray[2]}/${dobArray[0]}`;
   const govtIdHashed = await hash.generateHash(govtIdNumber); //TODO: Gotta hash this (BCRYPT)
 
   // Initialize
@@ -93,11 +92,9 @@ const createUser = async (
   };
   // Insert user into database
   const client = getClient();
-  const result = await client.collection("users").findOneAndUpdate(
-    { "emailId": emailId },
-    { $set: newUser},
-    {}
-  );
+  const result = await client
+    .collection("users")
+    .findOneAndUpdate({ emailId: emailId }, { $set: newUser }, {});
   // console.log(result);
   // if (!result.ackowledged || !result.matchedCount) throw `failed to set profile`;
   // if(result.lastErrorObject.n<0) throw `failed to set profile`;
@@ -132,54 +129,57 @@ const getLandsOfUserID = async (id) => {
   return lands;
 };
 
-const initializeProfile = async(email)=>{
+const initializeProfile = async (email) => {
   email = validation.validEmail(email);
   let newUser = {
-      name: "",
-      phone: "",
-      emailId: email,
-      governmentId: {
-        typeofId: "",
-        id: "",
-      },
-      dob: "",
-      gender: "",
-      approved: false,
-      rating: {
-        totalRating: 0,
-        count: 0,
-      },
-      land: [],
-    };
+    name: "",
+    phone: "",
+    emailId: email,
+    governmentId: {
+      typeofId: "",
+      id: "",
+    },
+    dob: "",
+    gender: "",
+    approved: false,
+    rating: {
+      totalRating: 0,
+      count: 0,
+    },
+    land: [],
+  };
 
   const client = getClient();
 
   //if email already being used
   try {
     const isPresent = await getUserByEmail(email);
-    throw "Email already exist, please login."
-  } catch (error) {
-  }
+    throw "Email already exist, please login.";
+  } catch (error) {}
 
   //initializing user
   const result = await client.collection("users").insertOne(newUser);
   // console.log(result);
 
-  if (!result.acknowledged || !result.insertedId) {throw `failed to insert user`};
-  
-  return true;
-}
+  if (!result.acknowledged || !result.insertedId) {
+    throw `failed to insert user`;
+  }
 
-const addLandToUser = async(userId, landId)=>{
+  return true;
+};
+
+const addLandToUser = async (userId, landId) => {
   userId = validation.validObjectId(userId, "User Id");
-  landId = validation.validObjectId(landId, "Land Id")
+  landId = validation.validObjectId(landId, "Land Id");
   // console.log(userId, landId);
 
   const client = getClient();
-  let result = await client.collection("users").findOneAndUpdate(
-    {_id: new ObjectId(userId)},
-    {$push: {land: {_id: new ObjectId(landId)}}},
-    {returnDocument: "after"}
+  let result = await client
+    .collection("users")
+    .findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $push: { land: { _id: new ObjectId(landId) } } },
+      { returnDocument: "after" }
     );
 
   if (result.lastErrorObject.n < 1) throw "Land could not be added";
@@ -187,18 +187,20 @@ const addLandToUser = async(userId, landId)=>{
   // console.log('Land addition');
   // console.log(result.value);
   return result;
-}
+};
 
-const removeLandFromUser = async(userId, landId) => {
+const removeLandFromUser = async (userId, landId) => {
   userId = validation.validObjectId(userId, "User Id");
-  landId = validation.validObjectId(landId, "Land Id")
+  landId = validation.validObjectId(landId, "Land Id");
   // console.log(userId, landId);
 
   const client = getClient();
-  let result = await client.collection("users").findOneAndUpdate(
-    {_id: new ObjectId(userId)},
-    {$pull: {land: {_id: new ObjectId(landId)}}},
-    {returnDocument: "after"}
+  let result = await client
+    .collection("users")
+    .findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $pull: { land: { _id: new ObjectId(landId) } } },
+      { returnDocument: "after" }
     );
 
   if (result.lastErrorObject.n < 1) throw "Land could not be removed";
@@ -206,7 +208,27 @@ const removeLandFromUser = async(userId, landId) => {
   // console.log('Land removal');
   // console.log(result.value);
   return result;
-}
+};
+
+const addRatingToUser = async (userId, rate) => {
+  if (!exists(rate)) throw new Error("Rate parameter does not exists");
+  if (!checkInputType(rate, "number") || rate === NaN || rate === Infinity)
+    throw new Error("rate must be of type number only");
+  if (!Number.isInteger(rate))
+    throw new Error("rate cannot be in decimal place");
+  if (rate < 0 || rate > 5) throw new Error("Rating must be between 0-5");
+  const client = getClient();
+  const result = await client.collection("users").findOneAndUpdate(
+    {
+      _id: new ObjectId(userId),
+    },
+    {
+      $inc: { "rating.totalRating": rate, "rating.count": 1 },
+    },
+    { new: true }
+  );
+  return result;
+};
 
 const userData = {
   getOwnerByLandId: getOwnerByLandId,
@@ -215,9 +237,10 @@ const userData = {
   getUserById: getUserById,
   createUser: createUser,
   getLandsOfUserID: getLandsOfUserID,
-  initializeProfile:initializeProfile,
+  initializeProfile: initializeProfile,
   addLandToUser: addLandToUser,
-  removeLandFromUser: removeLandFromUser
+  removeLandFromUser: removeLandFromUser,
+  addRatingToUser: addRatingToUser,
 };
 
 export default userData;
