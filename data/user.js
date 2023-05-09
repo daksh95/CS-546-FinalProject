@@ -210,7 +210,7 @@ const removeLandFromUser = async (userId, landId) => {
   return result;
 };
 
-const addRatingToUser = async (userId, rate) => {
+const addRatingToUser = async (otherPartyId, rate, transactionId, role) => {
   if (!exists(rate)) throw new Error("Rate parameter does not exists");
   if (!checkInputType(rate, "number") || rate === NaN || rate === Infinity)
     throw new Error("rate must be of type number only");
@@ -220,13 +220,32 @@ const addRatingToUser = async (userId, rate) => {
   const client = getClient();
   const result = await client.collection("users").findOneAndUpdate(
     {
-      _id: new ObjectId(userId),
+      _id: new ObjectId(otherPartyId),
     },
     {
       $inc: { "rating.totalRating": rate, "rating.count": 1 },
     },
     { new: true }
   );
+  if (role === "buyer") {
+    const newResult = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+      },
+      {
+        $set: { "seller.rating": rate },
+      }
+    );
+  } else if (role === "seller") {
+    const newResult = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+      },
+      {
+        $set: { "buyer.rating": rate },
+      }
+    );
+  }
   return result;
 };
 

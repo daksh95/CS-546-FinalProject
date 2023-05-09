@@ -78,8 +78,8 @@ const getProfile = async (req, res) => {
     details.url = `/user/${req.session.user.id}/profile`;
     details.user = true;
     details.nameInput = "";
-    details.phoneInput ="";
-    details.governmentIdInput ="";
+    details.phoneInput = "";
+    details.governmentIdInput = "";
     res.status(200).render("authentication/profileSetUp", {
       title: "Profile Set up",
       details,
@@ -239,6 +239,7 @@ const getTransactionDetails = async (req, res) => {
   }
   try {
     let land = await landData.getLand(transaction.land.toString());
+    console.log(transaction.buyer.rating);
     res.status(200).render("transactionDetails", {
       title: "Transaction Details",
       transaction: transaction,
@@ -271,20 +272,20 @@ const setUpProfile = async (req, res) => {
   details.emailId = req.session.user.email;
   details.url = `/user/${req.session.user.id}/profile`;
   details.user = true;
-  let errors =[];
-  
+  let errors = [];
+
   //name input
   try {
     if (typeof nameInput == "undefined") {
       details["nameInput"] = "";
     } else {
-      details["nameInput"] =nameInput;
+      details["nameInput"] = nameInput;
     }
     nameInput = validation.validString(nameInput, "Name", 128);
   } catch (e) {
     errors.push(e);
   }
- //phone input
+  //phone input
   try {
     if (typeof phoneInput == "undefined") {
       details["phoneInput"] = "";
@@ -300,48 +301,50 @@ const setUpProfile = async (req, res) => {
     if (typeof emailIdInput == "undefined") {
       details["emailIdInput"] = "";
     } else {
-      details["emailIdInput"]= emailIdInput;
+      details["emailIdInput"] = emailIdInput;
     }
     emailIdInput = validation.validEmail(emailIdInput);
   } catch (e) {
-    errors.push(e)
+    errors.push(e);
   }
   //valid government id type and number
   try {
     if (typeof typeofGovernmentIdInput == "undefined") {
       details["typeofGovernmentIdInput"] = "";
     } else {
-      details["typeofGovernmentIdInput"]= typeofGovernmentIdInput;
+      details["typeofGovernmentIdInput"] = typeofGovernmentIdInput;
     }
-    typeofGovernmentIdInput = validation.validGovernmentIdType(typeofGovernmentIdInput);
-    
+    typeofGovernmentIdInput = validation.validGovernmentIdType(
+      typeofGovernmentIdInput
+    );
+
     //valid government number
-    if(typeof governmentIdInput == "undefined"){
+    if (typeof governmentIdInput == "undefined") {
       details["governmentIdInput"] = "";
-    }else{
+    } else {
       details["governmentIdInput"] = governmentIdInput;
     }
-    if(typeofGovernmentIdInput== "ssn"){
+    if (typeofGovernmentIdInput == "ssn") {
       governmentIdInput = validation.validSSN(governmentIdInput);
     } else {
       governmentIdInput = validation.validDriverLicense(governmentIdInput);
     }
   } catch (e) {
-    errors.push(e)
+    errors.push(e);
   }
 
   //dob
   try {
     dobInput = validation.validDob(dobInput);
   } catch (e) {
-    errors.push(e)
+    errors.push(e);
   }
   try {
     genderInput = validation.validGender(genderInput);
   } catch (e) {
     errors.push(e);
   }
-  if(errors.length>0){
+  if (errors.length > 0) {
     res.status(400).render("authentication/profileSetUp", {
       title: "Profile set up",
       details,
@@ -350,7 +353,7 @@ const setUpProfile = async (req, res) => {
     });
     return;
   }
-  
+
   // // console.log("here inside the set up profile");
   // // console.log("Session id here is", req.session.user.id);
   //TODO call create user
@@ -391,7 +394,7 @@ const setUpProfile = async (req, res) => {
 const postRateUser = async (req, res) => {
   let transactionId = req.params.id;
   let rate = parseInt(req.body.ratingInput);
-  // let role = req.session.user.typeOfUser;/
+  let otherPartyId = undefined;
   let userId = req.session.user.id;
   let error = [];
   if (!exists(transactionId)) error.push("ID parameter does not exists");
@@ -412,9 +415,28 @@ const postRateUser = async (req, res) => {
       hasError: true,
       error: error,
     });
+  let role = undefined;
+  try {
+    let transaction = await transactionData.getTransactionById(transactionId);
+    transaction.buyer._id = transaction.buyer._id.toString();
+    transaction.seller._id = transaction.seller._id.toString();
+    if (transaction.buyer._id === req.session.user.id) {
+      role = "buyer";
+      otherPartyId = transaction.seller._id;
+    } else if (transaction.seller._id === req.session.user.id) {
+      role = "seller";
+      otherPartyId = transaction.buyer._id;
+    } else role = "admin";
+  } catch (error) {
+    return res.status(400).render("Error", {
+      title: "Error",
+      hasError: true,
+      error: [error.message],
+    });
+  }
 
   try {
-    await userData.addRatingToUser(userId, rate);
+    await userData.addRatingToUser(otherPartyId, rate, transactionId, role);
     return res.status(200).redirect("/user/transaction/" + transactionId);
   } catch (error) {
     return res.status(400).render("Error", {

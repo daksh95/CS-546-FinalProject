@@ -31,11 +31,17 @@
         <p>Bid Amount: ${{transaction.buyer.bid}}</p>
         {{#if (eq role "buyer")}}
         <p>Status: {{transaction.status}}</p>
-        {{/if}}
+
         {{#if (eq transaction.status "approved")}}
+        {{#if transaction.seller.rating}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
+            Rate
+        </button>
+        {{else}}
         <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal">
             Rate
         </button>
+        {{/if}}
         {{else}}
         <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
             Rate
@@ -69,6 +75,7 @@
                 </div>
             </div>
         </div>
+        {{/if}}
         {{#if (eq role "seller")}}
         {{#if (eq transaction.seller.status "pending")}}
         <div class="row">
@@ -80,9 +87,15 @@
         {{else}}
         <p>Status: You have {{transaction.seller.status}} the transaction!</p>
         {{#if (eq transaction.status "approved")}}
+        {{#if transaction.buyer.rating}}
+        <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
+            Rate
+        </button>
+        {{else}}
         <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal">
             Rate
         </button>
+        {{/if}}
         {{else}}
         <button id="rating" type="button" class="btn btn-dark" data-toggle="modal" data-target="#ratingModal" disabled>
             Rate

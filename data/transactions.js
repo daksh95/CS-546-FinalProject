@@ -192,11 +192,13 @@ const createTransaction = async (bid, landId, sellerId, buyerId) => {
     buyer: {
       _id: new ObjectId(buyerId),
       bid: bid,
+      rating: undefined,
     },
     priceSoldFor: null,
     seller: {
       _id: new ObjectId(sellerId),
       status: "pending",
+      rating: undefined,
     },
     surveyor: {},
     titleCompany: {},
