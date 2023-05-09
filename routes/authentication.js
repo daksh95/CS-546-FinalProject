@@ -7,7 +7,7 @@ const logoutRoutes = Router();
 //login page routes
 loginRoutes.route("/").get(auth.getLogin).post(auth.postLogin);
 
-//signUp page routes
+//signup page routes
 signUpRoutes.route("/").get(auth.getSignUp).post(auth.postSignUp);
 
 logoutRoutes.route("/").get(auth.getLogout);

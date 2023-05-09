@@ -75,7 +75,7 @@ const postLogin = async (req, res) => {
   //gettiing the ID of the user
   let id = undefined;
   let approvalStatus = undefined;
-  let profileSetUpDone = undefined;
+  let profileSetUpDone = validUser.profileSetUpDone;
   try {
     if (validUser.typeOfUser === "user") {
       let userObj = await userData.getUserByEmail(xss(emailInput));
@@ -85,6 +85,7 @@ const postLogin = async (req, res) => {
     } else if (validUser.typeOfUser === "admin") {
       id = undefined;
       approvalStatus = 'approved';
+      profileSetUpDone = true;
     }
     else {
       let entityObj = await entityData.getEntityByEmail(xss(emailInput));
