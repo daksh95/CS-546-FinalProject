@@ -25,30 +25,39 @@
       <div class="row">
       <div class="col-md-6">
       <h4 class="mt-3">Land Details</h4>
-      <dt>ID:</dt>
-      <dd>{{ land._id }} </dd>
-      <dt>Address:</dt>
-      <dd>{{ land.address.line1 }} {{ land.address.line2 }},</dd>
-      <dd>{{ land.address.city }}, {{ land.address.state }} {{ land.address.zipCode }}</dd>
-      <dt>Dimensions:</dt>
-      <dd>{{ land.dimensions.length }}ft x {{ land.dimensions.breadth }}ft</dd>
-      <dt>Area:</dt>
-      <dd>{{ land.area }}</dd>
-      <dt>Restrictions:</dt>
-      {{#each land.restrictions }}
-        <dd>{{this}}</dd>
-      {{/each}}
+      <dl>
+        <dt>ID:</dt>
+        <dd>{{ land._id }} </dd>
+        <dt>Address:</dt>
+        <dd>{{ land.address.line1 }} {{ land.address.line2 }},</dd>
+        <dd>{{ land.address.city }}, {{ land.address.state }} {{ land.address.zipCode }}</dd>
+        <dt>Dimensions:</dt>
+        <dd>{{ land.dimensions.length }}ft x {{ land.dimensions.breadth }}ft</dd>
+        <dt>Area:</dt>
+        <dd>{{ land.area }}</dd>
+        <dt>Restrictions:</dt>
+        <dd><ul>
+          {{#each land.restrictions }}
+            <li class="ml-0">{{this}}</li>
+          {{/each}}
+        </ul></dd>
+      </dl>
       </div>
       <div class="col-md-6">
-      <h4 class="mt-3">Owner Details:</h4>
-      <dd>
-        <a href="/admin/approvals/account/{{owner._id}}" target="_blank">{{ owner.name }}</a>
-        <br>
-        {{ owner.emailId }}
-      </dd>
-      <dt>Transactions:</dt>
-      <dd>{{ transactionsCount }}</dd>
-      <dd class="my-0"></dd>
+      <h4 class="mt-3">Other Details</h4>
+      <dl>
+        <dt>Owner:</dt>
+        <dd>
+          <dl class="ml-2">
+            <dt>Name:</dt>
+            <dd><a href="/admin/account/{{owner._id}}" target="_blank">{{ owner.name }}</a></dd>
+            <dt>Email Address:</dt>
+            <dd>{{ owner.emailId }}</dd>
+          </dl>
+        </dd>
+        <dt>Transactions:</dt>
+        <dd>This account is part of {{ transactionsCount }} transactions.</dd>
+      </dl>
       </div>
       </div>
     </div>
@@ -59,7 +68,7 @@
         {{#if isPending }} 
           <span class="status-pending">Pending</span>
           </h5>
-          <form action="/admin/approvals/land/{{ land._id }}" id="approvalForm" class="form-check" method="post">
+          <form action="/admin/land/{{ land._id }}" id="approvalForm" class="form-check" method="post">
           <div class="d-grid gap-2 d-md-block">
               <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
               <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected">REJECT</button>

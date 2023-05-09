@@ -16,7 +16,7 @@ const getOwnerByLandId = async (id) => {
   const result = await client
     .collection("users")
     .findOne({ "land._id": new ObjectId(id) });
-  if (result === null) throw new Error("No user found for this Land ID");
+  if (result === null) throw new Error("No owner found for this Land ID");
   result._id = result._id.toString();
   return result;
 };

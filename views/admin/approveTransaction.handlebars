@@ -22,8 +22,15 @@
 <main class="container-fluid">
   <div class="row">
     <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
-      <dt>ID:</dt>
-      <dd>{{ transaction._id }}</dd>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <h4>Transaction Details</h4>
+          <dl>
+            <dt>ID:</dt>
+            <dd>{{ transaction._id }}</dd>
+          </dl>
+        </div>
+      </div>
     </div>
 
     <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
@@ -32,7 +39,8 @@
         {{#if isPending }} 
           <span class="status-pending">Pending</span>
           </h5>
-          <form action="/admin/approvals/transaction/{{ transaction._id }}" id="approvalForm" class="form-check" method="post">
+          {{#if approvalRequired}}
+          <form action="/admin/transaction/{{ transaction._id }}" id="approvalForm" class="form-check" method="post">
           <div class="d-grid gap-2 d-md-block">
               <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
               <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected">REJECT</button>
@@ -42,6 +50,7 @@
             <textarea name="comment" id="commentTextArea" rows="5" class="form-control"></textarea>
           </div>
           </form>
+          {{/if}}
         {{else}}
           {{#if isApproved }}
             <span class="status-approved">Approved</span>

@@ -22,44 +22,70 @@
 <main class="container-fluid">
   <div class="row">
     <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
+      <div class="row mt-3">
+      <div class="col-md-6">
+      <h4>Account Details</h4>
       {{#if isUser }}
         <dl>
           <dt>ID:</dt>
           <dd>{{ account._id }}</dd>
+          <dt>Email Address:</dt>
+          <dd>{{ account.emailId }}</dd>
+          {{#if profileSetUpDone }}
           <dt>Name:</dt>
           <dd>{{ account.name }}</dd>
           <dt>Account Type:</dt>
           <dd>User</dd>
           <dt>Phone Number:</dt>
           <dd>{{ account.phone }}</dd>
-          <dt>Email Address:</dt>
-          <dd>{{ account.emailId }}</dd>
           <dt>Government ID:</dt>
           <dd>{{ account.typeOfId }} - {{ account.Id }}</dd>
           <dt>Date of Birth:</dt>
           <dd>{{ account.dob }}</dd>
           <dt>Gender:</dt>
           <dd>{{ account.gender }}</dd>
+          {{else}}
+          <h5 class="mt-3">Account profile has not been set up yet.</h5>
+          {{/if}}
         </dl>
       {{else }}
         <dl>
           <dt>ID:</dt>
           <dd>{{ account._id }}</dd>
+          <dt>Email Address:</dt>
+          <dd>{{ account.emailId }}</dd>
+          {{#if profileSetUpDone}}
           <dt>Name:</dt>
           <dd>{{ account.name }}</dd>
           <dt>Account Type:</dt>
           <dd>{{ account.role }}</dd>
           <dt>Phone Number:</dt>
           <dd>{{ account.contactInfo }}</dd>
-          <dt>Email Address:</dt>
-          <dd>{{ account.emailId }}</dd>
           <dt>Website:</dt>
           <dd>{{ account.Website }}</dd>
           <dt>License:</dt>
           <dd>{{ account.license }}</dd>
+          {{else}}
+          <h5 class="mt-3">Account profile has not been set up yet.</h5>
+          {{/if}}
         </dl>
       {{/if}}
+      </div>
+      <div class="col-md-6">
+        <h4>Lands and Transactions</h4>
+          <dl>
+          {{#if isUser}}
+            <dt>Lands:</dt>
+            <dd>This account owns {{landsCount}} lands.</dd>
+          {{/if}}
+            <dt>Transactions:</dt>
+            <dd>This account is/has been involved in {{transactionCount}} transactions.</dd>
+          </dl>
+      </div>
+      </div>
     </div>
+
+    {{#if profileSetUpDone}}
     <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
       <h4 class="ml-3 mb-3">Approval</h4>
       <h5 class="ml-3 mb-3">Approval State:
@@ -97,6 +123,8 @@
           {{/if}}
         {{/if}}
     </div>
+    {{/if }}
+
   </div>
 </main>
 

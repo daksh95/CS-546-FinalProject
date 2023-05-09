@@ -22,10 +22,21 @@ const getAccountsListForApproval = async (req, res) => {
 
 const getApprovalAccount = async (req, res) => {
   let accountId = req.params.accountId;
-  
+  let account;
+
   try {
     accountId = validation.validObjectId(accountId, 'accountId');
-    const account = await adminData.getAccountById(accountId);
+  } catch (error) {
+    return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+  
+  try {
+    account = await adminData.getAccountById(accountId);
+  } catch (error) {
+    return res.status(404).render('error', { title: 'Error', hasError: true, error: [error] });
+  }
+
+  try {
     if (!account) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
     const isUser = account.role.toLowerCase() === 'user';
     const isEntity = !isUser;
@@ -34,18 +45,19 @@ const getApprovalAccount = async (req, res) => {
     const isApproved = account.approved.toLowerCase() === 'approved';
     const isRejected = account.approved.toLowerCase() === 'rejected';
 
-    const approvalRequired = account.credentialInfo.profileSetUpDone;
+    const profileSetUpDone = account.credentialInfo.profileSetUpDone;
     let landsCount = 0;
     if (isUser) landsCount = account.land.length;
 
     const accountTransactions = await transactionData.getTransactionsForAccount(accountId);
     if (!accountTransactions) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
+    console.log(accountTransactions);
     let transactionCount = accountTransactions.length;
 
     return res.render('admin/approveAccount', {
       title: "Approve Account",
       account, isUser, isEntity,
-      isPending, isApproved, isRejected, approvalRequired,
+      isPending, isApproved, isRejected, profileSetUpDone,
       landsCount, transactionCount
     });
   } catch (error) {
@@ -66,7 +78,7 @@ const approveAccount = async (req, res) => {
     const accountId = validation.validObjectId(req.params.accountId, 'accountId');
     const approvalResult = await adminData.approveAccount(accountId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
-    return res.redirect(`/admin/approvals/account/${accountId}`)
+    return res.redirect(`/admin/account/${accountId}`)
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
@@ -133,7 +145,7 @@ const approveLand = async (req, res) => {
     const landId = validation.validObjectId(req.params.landId, 'landId');
     const approvalResult = await adminData.approveLand(landId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
-    return res.redirect(`/admin/approvals/land/${landId}`)
+    return res.redirect(`/admin/land/${landId}`)
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }
@@ -237,7 +249,7 @@ const approveTransaction = async (req, res) => {
     
     const approvalResult = await adminData.approveTransaction(transactionId, xss(status), xss(comment));
     if (!approvalResult) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
-    return res.redirect(`/admin/approvals/transaction/${transactionId}`)
+    return res.redirect(`/admin/transaction/${transactionId}`)
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
   }

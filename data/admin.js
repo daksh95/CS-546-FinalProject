@@ -29,6 +29,17 @@ const getUnapprovedAccounts = async () => {
       { projection: { _id: 1, name: 1, emailId: 1, role: 1 }}
     ).toArray();
 
+  const entityRoles = {
+    'government': 'Government',
+    'landsurveyor': 'Land Sureveyor',
+    'titlecompany': 'Title Company'
+  }
+
+  unapprovedEntities = unapprovedEntities.map((entity) => {
+    entity.role = entityRoles[entity.role]
+    return entity;
+  });
+
   let unapprovedCreds = await client
     .collection('credential')
     .find({
@@ -53,6 +64,7 @@ const getUnapprovedAccounts = async () => {
 };
 
 const getAccountById = async (accountId) => {
+  accountId = validation.validObjectId(accountId)
   const client = getClient();
 
   const accountUser = await client
@@ -90,6 +102,13 @@ const getAccountById = async (accountId) => {
     });
   }
 
+  const entityRoles = {
+    'government': 'Government',
+    'landsurveyor': 'Land Sureveyor',
+    'titlecompany': 'Title Company'
+  };
+
+  if (accountEntity) account.role = entityRoles[account.role];
 
   account._id = account._id.toString();
 
@@ -113,9 +132,9 @@ const getUnapprovedLands = async () => {
     return land;
   });
 
-  // for (let i in unapprovedLands) {
-  //   unapprovedLands[i].owner = await userData.getOwnerByLandId(unapprovedLands[i]._id);
-  // }
+  for (let i in unapprovedLands) {
+    unapprovedLands[i].owner = await userData.getOwnerByLandId(unapprovedLands[i]._id);
+  }
   
   return unapprovedLands;
 }
