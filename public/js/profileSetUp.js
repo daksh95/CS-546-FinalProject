@@ -1,6 +1,6 @@
 (function(){
     const profileForm = document.getElementById("profileSetUp-form");
-    profileForm.addEventListener('submit', profileValidation);
+    profileForm.addEventListener('submit', "");
     
     function profileValidation(event){
         const error = document.getElementById("error");
@@ -230,7 +230,7 @@
 
     function validWebsite(website){
         website = validString(website, "website");
-        const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
+        const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.[a-zA-Z]{2,}$/i);
         if (!regex.test(website)) {
           throw `Valid website URL needed ${website}`;
         }

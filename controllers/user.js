@@ -77,6 +77,9 @@ const getProfile = async (req, res) => {
     details.emailId = req.session.user.email;
     details.url = `/user/${req.session.user.id}/profile`;
     details.user = true;
+    details.nameInput = "";
+    details.phoneInput ="";
+    details.governmentIdInput ="";
     res.status(200).render("authentication/profileSetUp", {
       title: "Profile Set up",
       details,
@@ -264,28 +267,90 @@ const setUpProfile = async (req, res) => {
     dobInput,
     genderInput,
   } = req.body;
+  let details = {};
+  details.emailId = req.session.user.email;
+  details.url = `/user/${req.session.user.id}/profile`;
+  details.user = true;
+  let errors =[];
+  
+  //name input
   try {
-    nameInput = validation.validString(nameInput);
+    if (typeof nameInput == "undefined") {
+      details["nameInput"] = "";
+    } else {
+      details["nameInput"] =nameInput;
+    }
+    nameInput = validation.validString(nameInput, "Name", 128);
+  } catch (e) {
+    errors.push(e);
+  }
+ //phone input
+  try {
+    if (typeof phoneInput == "undefined") {
+      details["phoneInput"] = "";
+    } else {
+      details["phoneInput"] = phoneInput;
+    }
     phoneInput = validation.validPhone(phoneInput);
+  } catch (e) {
+    errors.push(e);
+  }
+  //valid email
+  try {
+    if (typeof emailIdInput == "undefined") {
+      details["emailIdInput"] = "";
+    } else {
+      details["emailIdInput"]= emailIdInput;
+    }
     emailIdInput = validation.validEmail(emailIdInput);
-    typeofGovernmentIdInput = validation.validGovernmentIdType(
-      typeofGovernmentIdInput
-    );
-    if (typeofGovernmentIdInput == "ssn") {
+  } catch (e) {
+    errors.push(e)
+  }
+  //valid government id type and number
+  try {
+    if (typeof typeofGovernmentIdInput == "undefined") {
+      details["typeofGovernmentIdInput"] = "";
+    } else {
+      details["typeofGovernmentIdInput"]= typeofGovernmentIdInput;
+    }
+    typeofGovernmentIdInput = validation.validGovernmentIdType(typeofGovernmentIdInput);
+    
+    //valid government number
+    if(typeof governmentIdInput == "undefined"){
+      details["governmentIdInput"] = "";
+    }else{
+      details["governmentIdInput"] = governmentIdInput;
+    }
+    if(typeofGovernmentIdInput== "ssn"){
       governmentIdInput = validation.validSSN(governmentIdInput);
     } else {
       governmentIdInput = validation.validDriverLicense(governmentIdInput);
     }
+  } catch (e) {
+    errors.push(e)
+  }
+
+  //dob
+  try {
     dobInput = validation.validDob(dobInput);
+  } catch (e) {
+    errors.push(e)
+  }
+  try {
     genderInput = validation.validGender(genderInput);
-  } catch (error) {
+  } catch (e) {
+    errors.push(e);
+  }
+  if(errors.length>0){
     res.status(400).render("authentication/profileSetUp", {
       title: "Profile set up",
+      details,
       hasError: true,
-      error: [error],
+      error: [errors],
     });
     return;
   }
+  
   // // console.log("here inside the set up profile");
   // // console.log("Session id here is", req.session.user.id);
   //TODO call create user

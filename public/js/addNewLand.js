@@ -16,7 +16,9 @@
         let type = document.getElementById("typeInput").value;
         let length = document.getElementById("dimensionsLengthInput").value;
         let breadth = document.getElementById("dimensionsBreadthInput").value;
-
+        let restrictionText = document.getElementById("restrictionsInput").value;
+        let restrictions = document.getElementsByName("restrictions");
+        
         //valid line1
         try {
             line1 = validString(line1, "line1", 46);
@@ -69,7 +71,41 @@
         } catch (e) {
             errors.push(e);
         }
-    
+        console.log(restrictions);
+        let count = 0;
+        let noRestriction =false;
+        try {
+            for(let checkbox of restrictions){
+                if(checkbox.checked){
+                    count = count+1;
+                    if(checkbox.value.toLowerCase() == "No restrictions".toLowerCase()){
+                        noRestriction = true;
+                    }
+                    validrestrictions(checkbox.value);
+                }
+                // validrestrictions(checkbox.value);
+            }
+        } catch (e) {
+            errors.push(e);
+        } 
+        if(restrictionText.trim().length>0){
+            count +=1;
+            try {
+                restrictionText = validString(restrictionText);
+            } catch (e) {
+                errors.push(e)
+            }
+        }
+        if(count==0 && restrictionText.trim().length==0){
+            errors.push("If you don't have any restrictions, please select 'No restrictions'.");
+        }
+        if(count>1 && noRestriction == true){
+            errors.push(`Please verify your input as it seems that you have selected "No restrictions" and other restrictions, which contradict each other.`)
+        }
+        if(restrictionText>400){
+            errors.push("Only 400 characters allowed for 'other restriction(s)'")
+        }
+       
         if(errors.length>0){
             for (let e of errors){
                 var li = document.createElement("li");
@@ -138,7 +174,15 @@
           }
           return num;
     }
-
+    function validrestrictions(restrictions){
+        restrictions = validString(restrictions);
+        if(restrictions!="Environmental restrictions" &&
+        restrictions != "Deed restrictions" && 
+        restrictions != "Zoning restrictions" &&
+        restrictions != "No restrictions"){
+            throw 'valid restriction needed';
+         }
+    }
     function validState(state){
        const validStateCodes = [
             "AL",

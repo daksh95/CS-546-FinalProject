@@ -1,6 +1,8 @@
 (function(){
 const loginForm = document.getElementById("login-form");
 const signUpForm = document.getElementById("signUp-form");
+let button = document.getElementById("Button");
+button.disabled = false;
 if(loginForm){
     loginForm.addEventListener('submit', loginValidation);
 }
@@ -8,7 +10,7 @@ if(signUpForm){
     signUpForm.addEventListener('submit', signUpValidation);
 }
 
-function loginValidation(event){
+function loginValidation(event){ //loop through ALL THE ERROS IN PASSOWRD
     const error = document.getElementById("error");
     error.hidden = true;
     error.innerHTML ="";
@@ -38,6 +40,7 @@ function loginValidation(event){
             error.hidden = false;       
         }
     }else{
+        button.disabled = true;
         event.target.submit();
     }
     return;
@@ -82,6 +85,7 @@ function signUpValidation(event){
             error.hidden = false;       
         }
     }else{
+        button.disabled = true;
         event.target.submit();
     }
     return;

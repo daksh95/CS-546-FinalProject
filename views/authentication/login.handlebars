@@ -8,22 +8,35 @@
 
 <div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
     <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
+      <h3>Login!</h3>
         <form action="/login" method="POST" id="login-form">
+            {{#if hasDetails}}
             <label for="emailInput" id="email-text">
                 Email Address:
             </label>
-            <input type="email" name="emailInput" id="emailInput">
+            <input type="email" name="emailInput" id="emailInput" value = "{{details.emailId}}" placeholder="example@example.com">
             <br>
             <label for="passwordInput" id="password-text">
                 Password:
             </label>
-            <input type="password" name="passwordInput" id="passwordInput">
+            <input type="password" name="passwordInput" id="passwordInput" value = "{{details.password}}" placeholder="password..">
+            {{else}}
+             <label for="emailInput" id="email-text">
+                Email Address:
+            </label>
+            <input type="email" name="emailInput" id="emailInput" placeholder="example@example.com">
+            <br>
+            <label for="passwordInput" id="password-text">
+                Password:
+            </label>
+            <input type="password" name="passwordInput" id="passwordInput" placeholder="password..">
+            {{/if}}
             <br>
             <br>
-            <button class="btn" type="submit" style="background-color: #008c00; color:black">Submit </button>
+            <button class="btn" type="submit" style="background-color: #008c00; color:black" id="Button">Submit </button>
         </form>
         <div id="links">
-            <a class="text-dark" href="/signup" id="signUpLink">Click here to sign up!</a>
+            <a class="text-primary" href="/signup" id="signUpLink">Click here to sign up!</a>
         </div>
             <ul id ="error"></ul>
             {{#if hasError}}

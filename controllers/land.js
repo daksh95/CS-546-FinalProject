@@ -311,126 +311,126 @@ const placedBid = async (req, res) => {
 };
 
 const updateLand = async (req, res) => {
-  let landId = req.params.id;
-  landId = validation.validObjectId(id);
+  // let landId = req.params.id;
+  // landId = validation.validObjectId(id);
 
-  if (req.method == "get") {
-    const result = await landData.getLand(landId);
-    res.staus(200).render("editLand", {
-      title: "Edit Land Information",
-      result,
-      id: landId,
-    });
-    return;
-  } else {
-    let {
-      dimensionsLengthInput: length,
-      dimensionsBreadthInput: breadth,
-      typeInput: type,
-      restrictionsInput: restrictions,
-      line1Input: line1,
-      line2Input: line2,
-      zipCodeInput: zipCode,
-      cityInput: city,
-      stateInput: state,
-      priceInput: price,
-      onSaleInput: onSale,
-    } = req.body;
-    const queryData = {};
+  // if (req.method == "get") {
+  //   const result = await landData.getLand(landId);
+  //   res.staus(200).render("editLand", {
+  //     title: "Edit Land Information",
+  //     result,
+  //     id: landId,
+  //   });
+  //   return;
+  // } else {
+  //   let {
+  //     dimensionsLengthInput: length,
+  //     dimensionsBreadthInput: breadth,
+  //     typeInput: type,
+  //     restrictionsInput: restrictions,
+  //     line1Input: line1,
+  //     line2Input: line2,
+  //     zipCodeInput: zipCode,
+  //     cityInput: city,
+  //     stateInput: state,
+  //     priceInput: price,
+  //     onSaleInput: onSale,
+  //   } = req.body;
+  //   const queryData = {};
 
-    //valid numbers
-    queryData.dimensions.length = validation.validNumber(
-      length,
-      "length",
-      (min = 1)
-    );
-    queryData.dimensions.breadth = validation.validNumber(
-      breadth,
-      "breadth",
-      (min = 1)
-    );
-    queryData.sale.price = validation.validNumber(price, "Price", (min = 1));
-    validation.validBool(onSale, "On sale");
-    queryData.sale.onSale = onSale;
+  //   //valid numbers
+  //   queryData.dimensions.length = validation.validNumber(
+  //     length,
+  //     "length",
+  //     (min = 1)
+  //   );
+  //   queryData.dimensions.breadth = validation.validNumber(
+  //     breadth,
+  //     "breadth",
+  //     (min = 1)
+  //   );
+  //   queryData.sale.price = validation.validNumber(price, "Price", (min = 1));
+  //   validation.validBool(onSale, "On sale");
+  //   queryData.sale.onSale = onSale;
 
-    //default behaviour
-    queryData.landId = landId;
+  //   //default behaviour
+  //   queryData.landId = landId;
 
-    if (onSale) {
-      queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
-    }
+  //   if (onSale) {
+  //     queryData.sale.dateOfListing = "11/11/1234"; // TODO: to be updated
+  //   }
 
-    //valid string and string of array
-    queryData.type = validation.validString(type, "type of land", 20);
+  //   //valid string and string of array
+  //   queryData.type = validation.validString(type, "type of land", 20);
 
-    //if not default then validation
-    queryData.restrictions = validation.validArrayOfStrings(
-      restrictions,
-      "restrictions"
-    );
+  //   //if not default then validation
+  //   queryData.restrictions = validation.validArrayOfStrings(
+  //     restrictions,
+  //     "restrictions"
+  //   );
 
-    // valid address
-    queryData.address.line1 = validation.validString(line1, "line1", 46);
-    queryData.address.line2 = validation.validString(line2, "line2", 46);
-    queryData.address.city = validation.validString(city, "city", 17);
-    queryData.address.state = validation.validString(state, "state", 2);
-    queryData.address.zipCode = validation.validString(
-      zipCode,
-      "zipCode",
-      (min = 501),
-      (max = 99950)
-    );
+  //   // valid address
+  //   queryData.address.line1 = validation.validString(line1, "line1", 46);
+  //   queryData.address.line2 = validation.validString(line2, "line2", 46);
+  //   queryData.address.city = validation.validString(city, "city", 17);
+  //   queryData.address.state = validation.validString(state, "state", 2);
+  //   queryData.address.zipCode = validation.validString(
+  //     zipCode,
+  //     "zipCode",
+  //     (min = 501),
+  //     (max = 99950)
+  //   );
 
-    // Calculated field
-    queryData.area = (dimensions.length * dimensions.breadth).toString();
+  //   // Calculated field
+  //   queryData.area = (dimensions.length * dimensions.breadth).toString();
 
-    /*
-    queryData has following structure
-    queryDate = {
-      dimensions:{
-        lenght, 
-        breadth
-      },
-      sale:{
-        price,
-        dateOfListing,
-        onSale,
-      },
-      approved,
-      restrictions:[],
-      type,
-      address:{
-        line1,
-        line2,
-        city,
-        state,
-        zipCode
-      },
-      area
-    }
-    */
-    let addLand;
-    try {
-      addLand = await landData.updateLand(queryData);
-    } catch (error) {
-      if (error == "Could not add land") {
-        res
-          .status(500)
-          .render("error", { title: "Server Error", error: [error] });
-        return;
-      } else {
-        res.status(400).render("editLand", {
-          title: "Edit Land Information",
-          id: landId,
-          error: [error],
-        }); //TODO: to be decided
-        return;
-      }
-    }
+  //   /*
+  //   queryData has following structure
+  //   queryDate = {
+  //     dimensions:{
+  //       lenght, 
+  //       breadth
+  //     },
+  //     sale:{
+  //       price,
+  //       dateOfListing,
+  //       onSale,
+  //     },
+  //     approved,
+  //     restrictions:[],
+  //     type,
+  //     address:{
+  //       line1,
+  //       line2,
+  //       city,
+  //       state,
+  //       zipCode
+  //     },
+  //     area
+  //   }
+  //   */
+  //   let addLand;
+  //   try {
+  //     addLand = await landData.updateLand(queryData);
+  //   } catch (error) {
+  //     if (error == "Could not add land") {
+  //       res
+  //         .status(500)
+  //         .render("error", { title: "Server Error", error: [error] });
+  //       return;
+  //     } else {
+  //       res.status(400).render("editLand", {
+  //         title: "Edit Land Information",
+  //         id: landId,
+  //         error: [error],
+  //       }); //TODO: to be decided
+  //       return;
+  //     }
+  //   }
 
-    //if successfully added then redirect to my lands wala page
-    res.redirect(`/land/${landId}`);
-  }
+  //   //if successfully added then redirect to my lands wala page
+  //   res.redirect(`/land/${landId}`);
+  // }
 };
 
 const addNewLand = async (req, res) => {
@@ -507,7 +507,7 @@ const addNewLand = async (req, res) => {
     }
     line1 = validation.validString(line1, "line1", 46);
   } catch (e) {
-    error.push(e)
+    errors.push(e)
   }
 
   // valid address line 2
@@ -566,45 +566,57 @@ const addNewLand = async (req, res) => {
     zipCode: zipCode,
   };
   //if no restriction and no text.
-  if(typeof restrictions == "undefined" && restrictionsText.length==0){
-    errors.push('Please select no restriction if you dont have any');
+  if(typeof restrictions == "undefined" && restrictionsText.trim().length==0){
+    errors.push(`If you don't have any restrictions, please select 'No restrictions`);
   }
+  let count = 0;
+  let noRestriction =0;
   //validating check restrictions
   try {
     if(typeof restrictions != "undefined"){
       if(typeof restrictions == "string"){
         let temp = restrictions;
         restrictions =[temp];
+        for (let restri of restrictions){
+          count = count+1;
+            if(restri.toLowerCase() == "No restrictions".toLowerCase()){
+              noRestriction= true;
+            }
+          }      
       }
       restrictions = validation.validArrayOfStrings(restrictions,"Restriction list");
-      console.log("line 580", restrictions);
       queryData["restrictions"] = restrictions;
     }
   } catch (e) {
     errors.push(e);
   } 
+
   //validating text restriction
-  if(restrictionsText.length>0){ 
-    details["restrictionsText"] = restrictionsText;
-    restrictionsText = validation.validString(restrictionsText, "restriction text");
+  if(restrictionsText.trim().length>0){ 
+    count = count+1;
+    details["restrictionsText"] = restrictionsText; 
+    restrictionsText = validation.validString(restrictionsText, "restriction text", 400);
     let restrictionsTextArray = restrictionsText.split(",");
     try {
       restrictionsTextArray= validation.validArrayOfStrings(restrictionsTextArray,"Restriction text list");
-      console.log("line 593",restrictionsTextArray );
+      
       //adding text restriction into restrictions array
       if(typeof restrictions != "undefined"){
         for(let restrict of restrictionsTextArray ){
-          console.log("inside the loop", restrict)
             restrictions.push(restrict);
         }
         queryData["restrictions"] = restrictions;
-      }//if no restrictions array exist then store the values in queryData 
+      }
+      //if no restrictions array exist then store the values in queryData 
       else{
         queryData["restrictions"] = restrictionsTextArray;
       }
     } catch (e) {
       errors.push(e);
       }
+  }
+  if(count>1 && noRestriction == true){
+    errors.push(`Please verify your input as it seems that you have selected "No restrictions" and other restrictions, which contradict each other.`)
   }
 
   // Calculated field

@@ -12,6 +12,12 @@
     position: relative;
     z-index: 1;
 } */
+*{
+    font-family:'Segoe UI', "Tahoma", "Geneva", "Verdana", "sans-serif";
+}
+#links a:hover{
+    color: rgb(0, 0, 255);
+}
 
 body {
     max-width: 100%;
@@ -29,3 +35,13 @@ span.status-pending {
 span.status-rejected {
     color: #c82333;
 }
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+

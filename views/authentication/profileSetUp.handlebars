@@ -7,12 +7,13 @@
 </nav>
 
 <div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
-    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">    
+    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">  
+        <h3>Profile Set Up!!</h3>  
         <form action="{{details.url}}" method="post" id="profileSetUp-form">
             <label for="nameInput" id ="name-text">Full Name:</label>
-            <input type="text" id = "nameInput" name="nameInput"><br>
+            <input type="text" id = "nameInput" name="nameInput" value="{{details.nameInput}}" placeholder="Full Legal Name"><br>
             <label for ="phoneInput"id ="phone-number"> Phone:</label>
-            <input type="number" id = "phoneInput" name="phoneInput"> <br>
+            <input type="number" id = "phoneInput" name="phoneInput" value="{{details.phoneInput}}" placeholder="Eg: 1234567890"> <br>
             <label for ="emailIdInput"id ="email-text"> Email address:</label>
             <input type="email" id = "emailIdInput" name="emailIdInput" value="{{details.emailId}}" readonly> <br>
 
@@ -21,10 +22,9 @@
                 <select name="typeofGovernmentIdInput" id="typeofGovernmentIdInput">
                 <option value="ssn">SSN</option>
                 <option value="driverLicense">Driver's License</option>
-                <option value="val3">val 3</option>
                 </select> 
             <label for ="governmentIdInput"id ="government-text"> valid GovernmentID number:</label>
-            <input type="text" id = "governmentIdInput" name="governmentIdInput"> <br> 
+            <input type="text" id = "governmentIdInput" name="governmentIdInput" value = "{{details.governmentIdInput}}" placeholder="Eg ssn: XXX-XX-XXXX"> <br> 
             
             <label for ="dobInput"id ="dob-date"> Date of birth:</label>
             <input type="Date" id = "dobInput" name="dobInput"> <br> 
@@ -33,18 +33,19 @@
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
-                </select> 
+                </select> <br>
             {{/if}}
 
             {{#if details.entity}}
             <label for ="roleInput"id ="role-text">Role:</label>
             <input type="role" id = "roleInput" name="roleInput" value="{{details.role}}"> <br>
             <label for ="websiteInput"id ="website-text">Website: </label>
-            <input type="url" id = "websiteInput" name="websiteInput"> <br> 
+            <input type="url" id = "websiteInput" name="websiteInput" placeholder="http://www.example.com"> <br> 
             <label for ="licenseInput"id ="license-text">License: </label>
-            <input type="text" id = "licenseInput" name="licenseInput"> <br> 
+            <input type="text" id = "licenseInput" name="licenseInput"><br> 
             {{/if}}
-            <button type="submit">Submit </button>
+            <br>
+            <button class="btn" type="submit" style="background-color: #008c00; color:black" type="submit">Set up!</button>
         </form> 
         <ul id="error"></ul>  
         <script src="/public/js//profileSetUp.js"></script>

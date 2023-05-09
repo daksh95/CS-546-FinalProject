@@ -67,7 +67,6 @@ const addNewLand = async (object) => {
   }
   address.city = validation.validString(address.city, "city", 17);
   address.state = validation.validState(address.state);
-  address.zipCode = address.zipCode.toString();
   address.zipCode = validation.validZip(address.zipCode,address.state, address.city);
 
   queryData.address = {
@@ -96,63 +95,63 @@ const addNewLand = async (object) => {
 };
 
 const updateLand = async (object) => {
-  let { dimensions, type, restrictions, sale, address, approved, landId } =
-    object;
-  const queryData = {};
+  // let { dimensions, type, restrictions, sale, address, approved, landId } =
+  //   object;
+  // const queryData = {};
 
-  //valid numbers
-  queryData.dimensions.length = validation.validNumber(
-    dimensions.length,
-    "length",
-    1
-  );
-  queryData.dimensions.breadth = validation.validNumber(
-    dimensions.breadth,
-    "breadth",
-    1
-  );
-  queryData.sale.price = validation.validNumber(sale.price, "price", (min = 1));
-  queryData.address.zipCode = validation.validString(
-    address.zipCode,
-    "zipCode",
-    501,
-    99950
-  );
+  // //valid numbers
+  // queryData.dimensions.length = validation.validNumber(
+  //   dimensions.length,
+  //   "length",
+  //   1
+  // );
+  // queryData.dimensions.breadth = validation.validNumber(
+  //   dimensions.breadth,
+  //   "breadth",
+  //   1
+  // );
+  // queryData.sale.price = validation.validNumber(sale.price, "price", (min = 1));
+  // queryData.address.zipCode = validation.validString(
+  //   address.zipCode,
+  //   "zipCode",
+  //   501,
+  //   99950
+  // );
 
-  //valid string and string of array
-  queryData.type = validation.validString(type, "type of land", 20);
-  queryData.restrictions = validation.validArrayOfStrings(
-    restrictions,
-    "restrictions"
-  );
-  queryData.sale.dateOfListing = validation.validString(
-    sale.dateOfListing,
-    "dateOfListing",
-    10
-  );
-  queryData.area = (dimensions.length * dimensions.breadth).toString();
-  queryData.address.line1 = validation.validString(address.line1, "line1", 46);
-  queryData.address.line2 = validation.validString(address.line2, "line2", 46);
-  queryData.address.city = validation.validString(address.city, "city", 17);
-  queryData.address.state = validation.validString(address.state, "state", 2);
+  // //valid string and string of array
+  // queryData.type = validation.validString(type, "type of land", 20);
+  // queryData.restrictions = validation.validArrayOfStrings(
+  //   restrictions,
+  //   "restrictions"
+  // );
+  // queryData.sale.dateOfListing = validation.validString(
+  //   sale.dateOfListing,
+  //   "dateOfListing",
+  //   10
+  // );
+  // queryData.area = (dimensions.length * dimensions.breadth).toString();
+  // queryData.address.line1 = validation.validString(address.line1, "line1", 46);
+  // queryData.address.line2 = validation.validString(address.line2, "line2", 46);
+  // queryData.address.city = validation.validString(address.city, "city", 17);
+  // queryData.address.state = validation.validString(address.state, "state", 2);
 
-  //valid bool
-  queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
-  queryData.approved = validation.validApprovalStatus(approved, "approved");
+  // //valid bool
+  // queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
+  // queryData.approved = validation.validApprovalStatus(approved, "approved");
 
-  //fetch db reference
-  const client = getClient();
+  // //fetch db reference
+  // const client = getClient();
 
-  //inserting new land
-  let result = await client
-    .collection("land")
-    .findOneAndUpdate({ id: landId }, queryData, {});
+  // //inserting new land
+  // let result = await client
+  //   .collection("land")
+  //   .findOneAndUpdate({ id: landId }, queryData, {});
 
-  //error handling incase Insertion doesn't happen
-  if (!result.acknowledged || !result.insertedId) throw "Could not update land"; //TODO check this functionality;
+  // //error handling incase Insertion doesn't happen
+  // if (!result.acknowledged || !result.insertedId) throw "Could not update land"; //TODO check this functionality;
 
-  //returning newly added land
-  return result;
+  // //returning newly added land
+  // return result;
 };
 
 const removeLand = async (id) => {

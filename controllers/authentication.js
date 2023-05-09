@@ -13,9 +13,15 @@ const getLogin = async (req, res) => {
 const postLogin = async (req, res) => {
   // console.log(req.body);
   let { emailInput, passwordInput } = req.body;
+  let details ={};
   let errors = [];
   //validation for email
   try {
+    if(typeof emailInput == "undefined"){
+      details.emailId = "";
+    }else{
+      details.emailId = emailInput;
+    }
     emailInput = validation.validEmail(emailInput);
   } catch (e) {
     errors.push(e);
@@ -23,6 +29,11 @@ const postLogin = async (req, res) => {
 
   //validation for password
   try {
+    if(typeof passwordInput == "undefined"){
+      details.password = "";
+    }else{
+      details.password = passwordInput;
+    }
     passwordInput = validation.validPassword(passwordInput);
   } catch (e) {
     errors.push(e);
@@ -33,6 +44,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       password: passwordInput,
+      hasDetails:true,
+      details,
       hasError: true,
       error: [errors],
     });
@@ -49,6 +62,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
+      hasDetails:true,
+      details,
       hasError: true,
       error: ["Invalid Email or Password"],
     });
@@ -66,6 +81,8 @@ const postLogin = async (req, res) => {
       title: "Login Page",
       email: emailInput,
       pasword: passwordInput,
+      hasDetails:true,
+      details,
       hasError: true,
       error: ["Invalid Email or Password"],
     });
