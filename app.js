@@ -35,9 +35,12 @@ hbs.handlebars.registerHelper("eq", function (val1, val2) {
   return val1 === val2;
 });
 
-hbs.handlebars.registerHelper("flagCheck", function (num) {
-  if (num < 1) return "freeze";
-  else if (num >= 1 && num <= 2) return "flag";
+hbs.handlebars.registerHelper("flagCheck", function (num1, num2) {
+  if (num2 == 0) return false;
+  else {
+    let num = (num1 / num2).toFixed(1);
+    if (num >= 1 && num <= 2) return true;
+  }
 });
 
 //middleware

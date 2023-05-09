@@ -30,10 +30,10 @@
                 <dt>Gender:</dt>
                 <dd>{{user.gender}}</dd>
                 <dt>Rating:</dt>
-                <dd>{{if divide user.rating.totalRating user.rating.count}} ({{user.rating.count}})</dd>
-                {{!-- {{#if flagCheck(divide user.rating.totalRating user.rating.count) === "freeze" }} 
-                <p></p> --}}
-                {{!-- {{/if}} --}}
+                <dd>{{divide user.rating.totalRating user.rating.count}} ({{user.rating.count}})</dd>
+                {{#if (flagCheck user.rating.totalRating user.rating.count )}}
+                <p>Your account has been flagged. Please improve your ratings to avoid getting your account freezed</p>
+                {{/if}}
             </div>
         </div>
     </div>

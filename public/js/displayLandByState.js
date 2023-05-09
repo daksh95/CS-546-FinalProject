@@ -76,43 +76,45 @@
       mainResultsDiv.appendChild(resultsDiv);
       resultsDiv.classList.add("col-sm-8");
       for (let i = 0; i < landByState.length; i++) {
-        aElement = document.createElement("a");
-        aElement.href = "/land/" + landByState[i]._id;
-        aElement.classList.add("text-decoration-none");
-        aElement.classList.add("text-dark");
-        divElement = document.createElement("div");
-        divElement.classList.add("card");
-        divElement.classList.add("border-info");
-        divElement.classList.add("rounded-lg");
-        divElement.classList.add("shadow-lg");
-        divElement.classList.add("p-2");
-        pElement = document.createElement("p");
-        pElement.textContent =
-          landByState[i].address.line1 +
-          " " +
-          landByState[i].address.line2 +
-          ",";
-        pElement.classList.add("m-0");
-        pElement1 = document.createElement("p");
-        pElement1.textContent =
-          landByState[i].address.city +
-          ", " +
-          landByState[i].address.state +
-          " " +
-          landByState[i].address.zipCode;
-        pElement2 = document.createElement("p");
-        pElement2.textContent = landByState[i].type + " Area";
-        pElement3 = document.createElement("p");
-        if (landByState[i].sale.onSale) pElement3.textContent = "Sale: Yes";
-        else pElement3.textContent = "Sale: No";
-        brElement = document.createElement("br");
-        divElement.appendChild(pElement);
-        divElement.appendChild(pElement1);
-        divElement.appendChild(pElement2);
-        divElement.appendChild(pElement3);
-        aElement.appendChild(divElement);
-        resultsDiv.appendChild(aElement);
-        resultsDiv.appendChild(brElement);
+        if (landByState[i].sale.onSale) {
+          aElement = document.createElement("a");
+          aElement.href = "/land/" + landByState[i]._id;
+          aElement.classList.add("text-decoration-none");
+          aElement.classList.add("text-dark");
+          divElement = document.createElement("div");
+          divElement.classList.add("card");
+          divElement.classList.add("border-info");
+          divElement.classList.add("rounded-lg");
+          divElement.classList.add("shadow-lg");
+          divElement.classList.add("p-2");
+          pElement = document.createElement("p");
+          pElement.textContent =
+            landByState[i].address.line1 +
+            " " +
+            landByState[i].address.line2 +
+            ",";
+          pElement.classList.add("m-0");
+          pElement1 = document.createElement("p");
+          pElement1.textContent =
+            landByState[i].address.city +
+            ", " +
+            landByState[i].address.state +
+            " " +
+            landByState[i].address.zipCode;
+          pElement2 = document.createElement("p");
+          pElement2.textContent = landByState[i].type + " Area";
+          pElement3 = document.createElement("p");
+          if (landByState[i].sale.onSale) pElement3.textContent = "Sale: Yes";
+          else pElement3.textContent = "Sale: No";
+          brElement = document.createElement("br");
+          divElement.appendChild(pElement);
+          divElement.appendChild(pElement1);
+          divElement.appendChild(pElement2);
+          divElement.appendChild(pElement3);
+          aElement.appendChild(divElement);
+          resultsDiv.appendChild(aElement);
+          resultsDiv.appendChild(brElement);
+        }
       }
     });
   }
@@ -135,8 +137,7 @@
       throw new Error("minArea parameter does not exists");
     if (!maxArea && !(maxArea == false))
       throw new Error("maxArea parameter does not exists");
-    if ((maxArea) < (minArea))
-      throw new Error("minArea must be less than maxArea");
+    if (maxArea < minArea) throw new Error("minArea must be less than maxArea");
     return [minArea, maxArea];
   }
 
