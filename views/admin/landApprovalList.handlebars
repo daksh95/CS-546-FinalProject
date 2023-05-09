@@ -21,13 +21,14 @@
 <main>
   <div class="container-xl border border-dark rounded"; style="height: 85vh">
   {{#if landsExist}}
-  <ul class="list-group">
     {{#each landList}}
       <a href="/admin/approvals/land/{{this._id}}">
-        <li class="list-group-item">{{this.name}} {{this.emailId}}</li>
+        <div class="card border-info rounded-lg shadow-lg p-2 my-3">
+          <p class="my-1">{{this.address.fullAddress}}
+          <p class="my-1">Owner: {{ this.owner.name }}
+        </div>
       </a>
     {{/each}}
-  </ul>
   {{else}}
     <div class="row">
       <div class="col-md-4"></div>

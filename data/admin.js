@@ -112,6 +112,10 @@ const getUnapprovedLands = async () => {
     land.address.fullAddress = getFullAddress(land.address);
     return land;
   });
+
+  // for (let i in unapprovedLands) {
+  //   unapprovedLands[i].owner = await userData.getOwnerByLandId(unapprovedLands[i]._id);
+  // }
   
   return unapprovedLands;
 }

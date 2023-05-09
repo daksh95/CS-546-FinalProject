@@ -23,18 +23,7 @@
   <div class="row">
     <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
       <dt>ID:</dt>
-      <dd>{{ transaction._id }} </dd>
-      <dt>Address:</dt>
-      <dd>{{ land.address.line1 }} {{ land.address.line2 }},</dd>
-      <dd>{{ land.address.city }}, {{ land.address.state }} {{ land.address.zipCode }}</dd>
-      <dt>Dimensions:</dt>
-      <dd>{{ land.dimensions.length }}ft x {{ land.dimensions.breadth }}ft</dd>
-      <dt>Area:</dt>
-      <dd>{{ land.area }}</dd>
-      <dt>Restrictions:</dt>
-      {{#each land.restrictions }}
-        <dd>{{this}}</dd>
-      {{/each}}
+      <dd>{{ transaction._id }}</dd>
     </div>
 
     <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">

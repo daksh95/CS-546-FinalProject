@@ -4,6 +4,7 @@ import landData from "../data/land.js";
 import transactionData from "../data/transactions.js";
 import xss from "xss";
 import userData from "../data/user.js";
+import { getFullAddress } from "../utils/helpers.js";
 
 
 const getAccountsListForApproval = async (req, res) => {
@@ -73,7 +74,7 @@ const approveAccount = async (req, res) => {
 
 const getLandsListForApproval = async (req, res) => {
   try {
-    const landList = await adminData.getUnapprovedLands();
+    let landList = await adminData.getUnapprovedLands();
 
     if (!landList) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
 
@@ -85,8 +86,7 @@ const getLandsListForApproval = async (req, res) => {
 };
 
 const getApprovalLand = async (req, res) => {
-  const landId = req.params.landId;
-
+  let landId = req.params.landId;
   try {
     landId = validation.validObjectId(landId, 'landId');
     const land = await landData.getLand(landId);
@@ -113,7 +113,7 @@ const getApprovalLand = async (req, res) => {
     const transactionsCount = transactions.length;
     
     return res.render('admin/approveLand', {
-      title: "Approve Land", land, isPending, isApproved, isRejected, owner, transactionsCount
+      title: "Approve Land", land, isPending, isApproved, isRejected, owner, transactionsCount, transactions
     });
   } catch (error) {
     return res.status(400).render('error', { title: 'Error', hasError: true, error: [error] });
@@ -153,7 +153,7 @@ const getTransactionsListForApproval = async (req, res) => {
 };
 
 const getApprovalTransaction = async (req, res) => {
-  const transactionId = req.params.transactionId;
+  let transactionId = req.params.transactionId;
 
   try {
     transactionId = validation.validObjectId(transactionId, 'transactionId');
@@ -198,7 +198,6 @@ const getApprovalTransaction = async (req, res) => {
       transaction.admin._id = validation.validObjectId(transaction.admin._id, 'adminId');
       adminExists = true;
     }
-
     transaction.status = validation.validApprovalStatus(transaction.status, 'Transaction Status');
 
     const approvalRequired = transaction.surveyor.status === "approved" &&
@@ -206,9 +205,9 @@ const getApprovalTransaction = async (req, res) => {
     transaction.government.status === "approved" &&
     transaction.status === "pending";
 
-    const isPending = transaction.approved.toLowerCase() === 'pending';
-    const isApproved = transaction.approved.toLowerCase() === 'approved';
-    const isRejected = transaction.approved.toLowerCase() === 'rejected';
+    const isPending = transaction.status.toLowerCase() === 'pending';
+    const isApproved = transaction.status.toLowerCase() === 'approved';
+    const isRejected = transaction.status.toLowerCase() === 'rejected';
 
     const buyer = await userData.getUserById(transaction.buyer._id);
     const seller = await userData.getUserById(transaction.seller._id);
