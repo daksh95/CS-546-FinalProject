@@ -43,14 +43,23 @@
         {{#if surveyorExists}}
         <dt><a href="/admin/account/{{transaction.surveyor._id}}">Surveyor</a></dt>
         <dd>{{ transaction.surveyor.status }}</dd>
+        {{#if transaction.surveyor.approvalComment }}
+        <dd>{{ transaction.surveyor.approvalComment }}</dd>
+        {{/if}}
         {{/if}}
         {{#if titleCompanyExists}}
         <dt><a href="/admin/account/{{transaction.titleCompany._id}}">Title Company</a></dt>
         <dd>{{ transaction.titleCompany.status }}</dd>
+        {{#if transaction.titleCompany.approvalComment }}
+        <dd>{{ transaction.titleCompany.approvalComment }}</dd>
+        {{/if}}
         {{/if}}
         {{#if governmentExists}}
         <dt><a href="/admin/account/{{transaction.government._id}}">Government</a></dt>
         <dd>{{ transaction.government.status }}</dd>
+        {{#if transaction.government.approvalComment }}
+        <dd>{{ transaction.government.approvalComment }}</dd>
+        {{/if}}
         {{/if}}
       </dl>
     </div>
@@ -65,7 +74,7 @@
           <form action="/admin/transaction/{{ transaction._id }}" id="approvalForm" class="form-check" method="post">
           <div class="d-grid gap-2 d-md-block">
               <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
-              <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected">REJECT</button>
+              <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected" disabled>REJECT</button>
           </div>
           <div class="mt-3 mb-3 mr-4">
             <label for="commentTextArea" class="form-label"><h6>Comments:</h6></label>
@@ -91,3 +100,5 @@
     </div>
   </div>
 </main>
+
+<script src="/public/js/adminComment.js"></script>

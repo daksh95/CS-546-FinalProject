@@ -31,6 +31,26 @@
         <p>Bid Amount: ${{transaction.buyer.bid}}</p>
         {{#if (eq role "buyer")}}
         <p>Status: {{transaction.status}}</p>
+        {{#if (eq transaction.status "pending")}}
+        <p class="font-weight-bold">Land Surveyor Info:</p>
+        <p class="m-0">{{transaction.surveyor._id}}</p>
+        <p class="m-0">Status: {{transaction.surveyor.status}}</p>
+        {{#if transaction.surveyor.Comment}}
+        <p>Comment: {{transaction.surveyor.Comment}}</p>
+        {{/if}}
+        <p class="font-weight-bold">Title Company Info:</p>
+        <p class="m-0">{{transaction.titleCompany._id}}</p>
+        <p class="m-0">Status: {{transaction.titleCompany.status}}</p>
+        {{#if transaction.titleCompany.Comment}}
+        <p>Comment: {{transaction.titleCompany.Comment}}</p>
+        {{/if}}
+        <p class="font-weight-bold">Government Info:</p>
+        <p class="m-0">{{transaction.government._id}}</p>
+        <p class="m-0">Status: {{transaction.government.status}}</p>
+        {{#if transaction.government.Comment}}
+        <p>Comment: {{transaction.government.Comment}}</p>
+        {{/if}}
+        {{/if}}
         {{#if (eq transaction.status "approved")}}
         <p class="font-weight-bold">Land Surveyor Info:</p>
         <p class="m-0">{{transaction.surveyor._id}}</p>
@@ -103,6 +123,26 @@
         </div>
         {{else}}
         <p>Status: You have {{transaction.seller.status}} the transaction!</p>
+        {{#if (eq transaction.status "pending")}}
+        <p class="font-weight-bold">Land Surveyor Info:</p>
+        <p class="m-0">{{transaction.surveyor._id}}</p>
+        <p class="m-0">Status: {{transaction.surveyor.status}}</p>
+        {{#if transaction.surveyor.Comment}}
+        <p>Comment: {{transaction.surveyor.Comment}}</p>
+        {{/if}}
+        <p class="font-weight-bold">Title Company Info:</p>
+        <p class="m-0">{{transaction.titleCompany._id}}</p>
+        <p class="m-0">Status: {{transaction.titleCompany.status}}</p>
+        {{#if transaction.titleCompany.Comment}}
+        <p>Comment: {{transaction.titleCompany.Comment}}</p>
+        {{/if}}
+        <p class="font-weight-bold">Government Info:</p>
+        <p class="m-0">{{transaction.government._id}}</p>
+        <p class="m-0">Status: {{transaction.government.status}}</p>
+        {{#if transaction.government.Comment}}
+        <p>Comment: {{transaction.government.Comment}}</p>
+        {{/if}}
+        {{/if}}
         {{#if (eq transaction.status "approved")}}
         <p class="font-weight-bold">Land Surveyor Info:</p>
         <p class="m-0">{{transaction.surveyor._id}}</p>

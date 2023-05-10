@@ -74,6 +74,7 @@ const getLand = async (req, res) => {
 const getLandByState = async (req, res) => {
   try {
     let lands = await landData.getAllLand();
+    lands = lands.filter((element) => element.sale.onSale === true);
     let empty_lands = false;
     if (!arrayLength(lands, 1)) empty_lands = true;
     res.status(200).render("displayLandByState", {
@@ -113,6 +114,7 @@ const postLandByState = async (req, res) => {
 
   try {
     let landByState = await landData.getLandByState(xss(state));
+    landByState = landByState.filter((element) => element.sale.onSale === true);
     let empty_lands = false;
     if (!arrayLength(landByState, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -638,13 +640,11 @@ const addNewLand = async (req, res) => {
     addLand = await landData.addNewLand(queryData);
   } catch (error) {
     if (error == "Could not add land") {
-      res
-        .status(500)
-        .render("error", {
-          title: "Server Error",
-          hasError: true,
-          error: [error],
-        });
+      res.status(500).render("error", {
+        title: "Server Error",
+        hasError: true,
+        error: [error],
+      });
       return;
     } else {
       res.status(400).render("addNewLand", {
