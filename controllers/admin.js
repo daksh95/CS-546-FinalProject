@@ -188,7 +188,7 @@ const postFilterArea = async (req, res) => {
 const getAdminHome = async (req, res) => {
   try {
     const accountList = await adminData.getUnapprovedAccounts();
-    console.log(accountList);
+
     const landList = await adminData.getUnapprovedLands();
     const transactionList = await adminData.getUnapprovedTransactions();
   
@@ -199,9 +199,9 @@ const getAdminHome = async (req, res) => {
     const pendingLands = landList.length;
     const pendingTransactions = transactionList.length;
 
-    console.log(`pendingAccounts: ${pendingAccounts}`)
-    console.log(`pendingLands: ${pendingLands}`)
-    console.log(`pendingTransactions: ${pendingTransactions}`)
+
+
+
   
     res.render('admin/adminHome', { 
       title: 'Home', pendingAccounts,
@@ -256,7 +256,7 @@ const getApprovalAccount = async (req, res) => {
 
     const accountTransactions = await transactionData.getTransactionsForAccount(accountId);
     if (!accountTransactions) return res.status(500).render('error', { title: 'Error', hasError: true, error: ['Internal Server Error'] });
-    console.log(accountTransactions);
+
     let transactionCount = accountTransactions.length;
 
     return res.render('admin/approveAccount', {

@@ -71,7 +71,7 @@
         } catch (e) {
             errors.push(e);
         }
-        console.log(restrictions);
+
         let count = 0;
         let noRestriction =false;
         try {

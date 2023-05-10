@@ -175,7 +175,7 @@
       let maxArea = document.getElementById("maxAreaInput");
       const errorDiv = document.getElementById("filterError");
       try {
-        // console.log(minArea, maxArea);
+
         errorDiv.hidden = true;
         areaValidation(parseInt(minArea.value), parseInt(maxArea.value));
         event.target.submit();

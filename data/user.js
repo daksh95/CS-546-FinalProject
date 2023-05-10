@@ -95,7 +95,7 @@ const createUser = async (
   const result = await client
     .collection("users")
     .findOneAndUpdate({ emailId: emailId }, { $set: newUser }, {});
-  // console.log(result);
+
   // if (!result.ackowledged || !result.matchedCount) throw `failed to set profile`;
   // if(result.lastErrorObject.n<0) throw `failed to set profile`;
   // const newId = result.value._id.toString();
@@ -159,7 +159,7 @@ const initializeProfile = async (email) => {
 
   //initializing user
   const result = await client.collection("users").insertOne(newUser);
-  // console.log(result);
+
 
   if (!result.acknowledged || !result.insertedId) {
     throw `failed to insert user`;
@@ -171,7 +171,7 @@ const initializeProfile = async (email) => {
 const addLandToUser = async (userId, landId) => {
   userId = validation.validObjectId(userId, "User Id");
   landId = validation.validObjectId(landId, "Land Id");
-  // console.log(userId, landId);
+
 
   const client = getClient();
   let result = await client
@@ -184,15 +184,15 @@ const addLandToUser = async (userId, landId) => {
 
   if (result.lastErrorObject.n < 1) throw "Land could not be added";
 
-  // console.log('Land addition');
-  // console.log(result.value);
+
+
   return result;
 };
 
 const removeLandFromUser = async (userId, landId) => {
   userId = validation.validObjectId(userId, "User Id");
   landId = validation.validObjectId(landId, "Land Id");
-  // console.log(userId, landId);
+
 
   const client = getClient();
   let result = await client
@@ -205,8 +205,8 @@ const removeLandFromUser = async (userId, landId) => {
 
   if (result.lastErrorObject.n < 1) throw "Land could not be removed";
 
-  // console.log('Land removal');
-  // console.log(result.value);
+
+
   return result;
 };
 

@@ -322,15 +322,15 @@ const assignEntity = async (id, role) => {
     } else if (meh[random].transactions.length < 25 && random < meh.length) {
       if (role === "landsurveyor") {
         await addTransactionToEntity(id, meh[random]._id.toString());
-        // console.log('landsurveyor');
+
         return meh[random]._id.toString();
       } else if (role === "titlecompany") {
         await addTransactionToEntity(id, meh[random]._id.toString());
-        // console.log('titlecompany');
+
         return meh[random]._id.toString();
       } else if (role === "government") {
         await addTransactionToEntity(id, meh[random]._id.toString());
-        // console.log('government');
+
         return meh[random]._id.toString();
       }
       break;
@@ -350,7 +350,7 @@ const addTransactionToEntity = async (transactionId, entityId) => {
       { $push: { transactions: transactionId } },
       { returnDocument: "after" }
     );
-  // console.log(result)
+
 
   if (result.lastErrorObject.n < 1)
     throw "Transaction could not be added to entity";

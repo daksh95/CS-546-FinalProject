@@ -182,9 +182,9 @@ const validZip= (zip, state, city)=>{
   const zipLookUp = zip_lookup;
   for(let zipKey of Object.keys(zipLookUp)){
     if(zip == zipKey){
-      console.log(zipLookUp[zipKey]["state"].toUpperCase(), state.toUpperCase());
+
         if(zipLookUp[zipKey]["state"].toUpperCase() == state.toUpperCase()){
-          console.log(zipLookUp[zipKey]["city"].toLowerCase(), city.toLowerCase());
+
           if(zipLookUp[zipKey]["city"].toLowerCase() == city.toLowerCase()){
             return zip;
           }else{
@@ -213,13 +213,13 @@ const validDob = (dob) =>{
   } 
   let dateArry = dob.split("-");
   let excact18 = false;
-  console.log( parseInt(dateArry[0])+18, new Date().getFullYear()) ;
+
   //minus years
   if(parseInt(dateArry[0]) + 18 > new Date().getFullYear()){
       throw 'User should be between 18 and 110 years old';    
   }
   if(parseInt(dateArry[0]) + 18 == new Date().getFullYear()){
-      console.log("here i am exact 18");
+
       excact18= true;
   }
   if(new Date().getFullYear() - parseInt(dateArry[0]) >110 ){
@@ -227,12 +227,12 @@ const validDob = (dob) =>{
   }
   //month check and date check
   if(excact18){
-      console.log(parseInt(dateArry[1]), new Date().getMonth()+1, "this is month comparison");
+
       if(parseInt(dateArry[1]) > new Date().getMonth()+1){
           throw "User should be between 18 and 110 years old";
       }
-      console.log(dateArry);
-      console.log(parseInt(dateArry[2]), new Date().getDate(), "this is day comparison");
+
+
       if(parseInt(dateArry[2]) > new Date().getDate()){//edge case, leap year.
           throw "User should be between 18 and 110 years old";
       } 

@@ -39,7 +39,7 @@ const addCredential = async(object) =>{
 
     //inserting credential
     const result = await client.collection(credentialCollection).insertOne(queryData);
-    // console.log("inside auth add",result);
+
     //error handling, incase credential is not inserted
     if (!result.acknowledged || !result.insertedId) throw 'Could not create account';
     return true;
@@ -127,7 +127,7 @@ const updateProfileStatus = async(id,profileSetUpDone)=>{
     if (result.lastErrorObject.n < 1) {
         throw `Could not update profile set up status`;
     }
-    // console.log(result);
+
     return;
 }
 

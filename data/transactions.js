@@ -152,7 +152,7 @@ const sellerApproved = async (transactionId, sellerId, value, landId) => {
       { $set: approvalupdates },
       { returnDocument: "after" }
     );
-    // console.log(result)
+
     if (result.lastErrorObject.n < 1) {
       throw "Could not be approved";
     }

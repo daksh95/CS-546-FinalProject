@@ -436,9 +436,9 @@ const allTransacs = async (req, res) => {
         error: ["Invalid role!"],
       });
 
-    // console.log(`land_surveyor: ${land_surveyor}`)
-    // console.log(`title_company: ${title_company}`)
-    // console.log(`government: ${government}`)
+
+
+
     
     return res.status(200).render("entity/allTrans", {
       length: Boolean(trans.length),
@@ -545,7 +545,7 @@ const transDetails = async (req, res) => {
         error: ["Internal Server Error"],
       });
 
-    // console.log(transaction);
+
 
     let sellerId = transaction.seller._id.toString();
     let buyerId = transaction.buyer._id.toString();
@@ -637,7 +637,7 @@ const transDetails = async (req, res) => {
 };
 
 const response = async (req, res) => {
-  console.log(req.body);
+
   let status = req.body.approval;
   let comment = req.body.comment;
   let entityId = req.params.entityId;

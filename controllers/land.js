@@ -13,7 +13,7 @@ import validation from "../utils/validation.js";
 import xss from "xss";
 
 const getLand = async (req, res) => {
-  // // console.log("here");
+
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -298,7 +298,7 @@ const placedBid = async (req, res) => {
     await transactionData.createTransaction(bid, landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
-    // console.log(error);
+
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -320,7 +320,7 @@ const addNewLand = async (req, res) => {
     stateInput: state,
     restrictions,
   } = req.body;
-  console.log(req.body);
+
   const queryData = {};
   const details = {};
 
@@ -505,7 +505,7 @@ const addNewLand = async (req, res) => {
   }
 
   // Calculated field
-  console.log(queryData);
+
   queryData.dimensions = {
     length: length,
     breadth: breadth,
@@ -544,10 +544,10 @@ const addNewLand = async (req, res) => {
     }
   }
   //if successfully added then redirect to my lands wala page
-  // // console.log(req.session.user.id, new ObjectId (addLand._id));
+
 
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
-  // // console.log(resul);
+
 
   res.redirect(`/user/${req.session.user.id}/land`);
   return;

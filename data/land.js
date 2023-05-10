@@ -138,8 +138,8 @@ const getLandByState = async (state) => {
 };
 
 const filterByArea = async (state, minArea, maxArea) => {
-  console.log(minArea, maxArea);
-  console.log(state);
+
+
   try {
     state = inputValidation("state", state, "string").trim();
   } catch (error) {
@@ -170,7 +170,7 @@ const filterByArea = async (state, minArea, maxArea) => {
       area: { $gte: minArea, $lte: maxArea },
     })
     .toArray();
-  console.log(result);
+
   return result;
 };
 
