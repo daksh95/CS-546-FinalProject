@@ -55,6 +55,7 @@ const getHome = async (req, res) => {
       });
 
     res.status(200).render("entity/entityHome", {
+      title: "Home Page",
       id: id,
       name: entityName,
       total: totalCount,
@@ -134,6 +135,7 @@ const getProfile = async (req, res) => {
       });
 
     res.status(200).render("entity/profile", {
+      title:"Profile Page",
       entity: entity,
     });
   } catch (error) {
@@ -441,6 +443,7 @@ const allTransacs = async (req, res) => {
 
     
     return res.status(200).render("entity/allTrans", {
+      title: "All transactions",
       length: Boolean(trans.length),
       id: id,
       transactions: transactions,
@@ -498,6 +501,7 @@ const pendingTransacs = async (req, res) => {
       });
 
     res.status(200).render("entity/pendingTrans", {
+      title: "Pending Transactions" ,
       length: Boolean(trans.length),
       id: id,
       transactions: trans,
