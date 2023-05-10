@@ -311,8 +311,8 @@ const validState= (state)=>{
 }
 
 const validDriverLicense = (driverLicense)=>{
-  driverLicense = validString(driverLicense, "Driver's License", 14);
-  let onlyAlphaNumeric = /[a-zA-Z0-9]{8,14}$/g;
+  driverLicense = validString(driverLicense, "Driver's License", 20);
+  let onlyAlphaNumeric = /[a-zA-Z0-9]{1,20}$/g;
   if(!onlyAlphaNumeric.test(driverLicense)){
       throw `please provide valid drivers license`;
   }
