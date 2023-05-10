@@ -19,7 +19,7 @@
     {{#if length}}
     <h1>Below are all the transactions on your account, and their statuses, from your end:</h1>
     {{#each transactions}}
-    <ul class="transactions list" id="transactionsList">
+    <ul class="transactions-list" >
         <li class="transaction id">Transaction ID: <a class="dark-links" href="/entity/{{../id}}/transactionDetails/{{_id}}">{{_id}}</a></li>
         {{#if ../landSurveyor}}
             <li class="transaction status">Transaction status: {{this.surveyor.status}}</li>

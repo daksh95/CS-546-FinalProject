@@ -39,7 +39,7 @@ input {
     border-color: #ff0000;
 }
 
-#transactionsList a:hover{
+.transactions-list a:hover{
     color:  #023c7a;
 }
 
@@ -47,7 +47,7 @@ a:visited {
     color: #023c7a;
 }
 
-#transactionsList {
+.transactions-list {
     border-style: solid;
     border-color: black;
 }

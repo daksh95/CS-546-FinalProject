@@ -1,6 +1,6 @@
 (function(){
     const profileForm = document.getElementById("profileSetUp-form");
-    profileForm.addEventListener('submit', "");
+    profileForm.addEventListener('submit', profileValidation);
     
     function profileValidation(event){
         const error = document.getElementById("error");
@@ -76,6 +76,7 @@
         //its an entity
         if(role){
             role = role.value;
+            console.log("here");
             try {
                 role = validTypeOfUser(role);
             } catch (e) {
