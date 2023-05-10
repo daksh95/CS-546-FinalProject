@@ -5,11 +5,11 @@
 }
 
 #links a:hover{
-    color: rgb(0, 0, 255);
+    color: #023c7a;
 }
 
 a:visited {
-    color:brown;
+    color: #023c7a;
 }
 
 body {
@@ -29,29 +29,22 @@ span.status-rejected {
     color: #c82333;
 }
 
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* form {
-    background-color: antiquewhite;
-    border-style: dotted;
-    border-color: aqua;
-} */
-
 input {
     border-color: #ff0000;
 }
 
 #transactionsList a:hover{
-    color: rgb(0, 0, 255);
+    color:  #023c7a;
 }
 
 a:visited {
-    color:brown;
+    color: #023c7a;
 }
 
 #transactionsList {
