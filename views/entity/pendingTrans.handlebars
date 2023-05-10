@@ -20,7 +20,7 @@
     <h1>Below are all the pending transactions on your account:</h1>
     {{#each transactions}}
     <ul class="transactions list" id="transactionsList">
-        <li class="transaction id">Transaction ID: <a href="/entity/{{ ../id }}/transactionDetails/{{this._id}}">{{this._id}}</a></li>
+        <li class="transaction id">Transaction ID: <a class="dark-clinks" href="/entity/{{ ../id }}/transactionDetails/{{this._id}}">{{this._id}}</a></li>
         {{#if ../landSurveyor}}
         <li class="transaction status">Transaction status: {{this.surveyor.status}}</li>
         {{/if}}

@@ -22,7 +22,7 @@
   <div class="container-xl border border-dark rounded"; style="min-height: 85vh">
   {{#if accountsExist}}
     {{#each accountList}}
-      <a href="/admin/account/{{this._id}}">
+      <a class="dark-links" href="/admin/account/{{this._id}}">
         <div class="card border-info rounded-lg shadow-lg p-2 my-3">
           <p class="my-0">{{this.name}}</p>
           <p class="my-0">{{this.emailId}}</p>

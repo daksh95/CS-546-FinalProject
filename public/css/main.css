@@ -79,3 +79,19 @@ a:visited {
     border-style: solid;
     border-color: black;
 }
+
+a.dark-links {
+    color: #023c7a
+}
+
+#approveButton {
+    background-color: #005900
+}
+
+#rejectButton {
+    background-color: #750010;
+}
+
+#rejectButton:disabled {
+    background-color: #440023;
+}

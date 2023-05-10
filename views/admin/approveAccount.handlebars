@@ -24,7 +24,7 @@
     <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
       <div class="row mt-3">
       <div class="col-md-6">
-      <h4>Account Details</h4>
+      <p class="h4">Account Details<p>
       {{#if isUser }}
         <dl>
           <dt>ID:</dt>
@@ -43,7 +43,7 @@
           <dt>Gender:</dt>
           <dd>{{ account.gender }}</dd>
           {{else}}
-          <h5 class="mt-3">Account profile has not been set up yet.</h5>
+          <p class="h5 mt-3">Account profile has not been set up yet.<p>
           {{/if}}
         </dl>
       {{else }}
@@ -64,13 +64,13 @@
           <dt>License:</dt>
           <dd>{{ account.license }}</dd>
           {{else}}
-          <h5 class="mt-3">Account profile has not been set up yet.</h5>
+          <p class="h5 mt-3">Account profile has not been set up yet.<p>
           {{/if}}
         </dl>
       {{/if}}
       </div>
       <div class="col-md-6">
-        <h4>Lands and Transactions</h4>
+        <p class="h4">Lands and Transactions<p>
           <dl>
           {{#if isUser}}
             <dt>Lands:</dt>
@@ -85,18 +85,18 @@
 
     {{#if profileSetUpDone}}
     <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
-      <h4 class="ml-3 mb-3">Approval</h4>
-      <h5 class="ml-3 mb-3">Approval State:
+      <p class="h4 ml-3 mb-3">Approval<p>
+      <p class="h5 ml-3 mb-3">Approval State:
         {{#if isPending }} 
           <span class="status-pending">Pending</span>
-          </h5>
+          <p>
           <form action="/admin/account/{{ account._id }}" id="approvalForm" class="form-check" method="post">
           <div class="d-grid gap-2 d-md-block">
               <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved">APPROVE</button>
               <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected" disabled>REJECT</button>
           </div>
           <div class="mt-3 mb-3 mr-4">
-            <label for="commentTextArea" class="form-label"><h6>Comments:</h6></label>
+            <label for="commentTextArea" class="form-label"><p class="h6">Comments:<p></label>
             <textarea name="comment" id="commentTextArea" rows="5" class="form-control"></textarea>
             {{#if isUser }}
             <input type="hidden" name="role" value="user">
@@ -112,10 +112,10 @@
           {{#if isRejected }}
             <span class="status-rejected">Rejected</span>
           {{/if}}
-          </h5>
+          <p>
           {{#if account.approvalComment}}
             <div class="mt-2 ml-3">
-              <h6>Comment:</h6>
+              <p class="h6">Comment:<p>
               <p>{{account.approvalComment}}</p>
             </div>
           {{/if}}
