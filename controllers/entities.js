@@ -704,7 +704,7 @@ const response = async (req, res) => {
     } else if (status === "rejected") {
       success = await entityData.entityTerminateTransaction(
         transactionId,
-        comment,
+        xss(comment),
         entityRole
       );
     }

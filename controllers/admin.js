@@ -110,7 +110,7 @@ const postFilterPrice = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByPrice(state, minPrice, maxPrice);
+    let filteredLands = await landData.filterByPrice(xss(state), minPrice, maxPrice);
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("admin/adminHome", {
@@ -165,7 +165,7 @@ const postFilterArea = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByArea(state, minArea, maxArea);
+    let filteredLands = await landData.filterByArea(xss(state), minArea, maxArea);
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("admin/adminHome", {
