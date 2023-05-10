@@ -7,9 +7,9 @@
 </nav>
 
 <div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
-  
+
   <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
-    <h3>SignUp!</h3>
+    <h2>SignUp!</h2>
     <form action="/signup" method="POST" id="signUp-form">
       <label for="emailInput" id="email-text">
         Email Address:
@@ -36,31 +36,31 @@
       <br>
       <br>
       <button class="btn" type="submit" style="background-color: #008c00; color:black" id="Button">Submit</button>
-     
+
     </form>
     <div id="links">
       <a class="text-dark" href="/login" id="loginLink">Already have an account? Click here to Login</a>
     </div>
-     <ul id ="error"></ul>
-            {{#if hasError}}
-            <ul>
-              {{#each error}}
-              <li>{{this}}</li>
-              {{/each}}
-              {{/if}}
-            </ul>
-     <div id = "PasswordInformation">
-     Password Requirements
-        <ul>
-          <li class="text-secondary">Minimum 8 character long</li>
-          <li class="text-secondary">At least 1 UpperCase Alphabet</li>
-          <li class="text-secondary">At least 1 Special Character</li>
-          <li class="text-secondary">At least 1 Number</li>
-          <li class="text-secondary">Cannot have space(s) in between</li>
-        </ul>
-        </div>
-         
-      </div>
+    <ul id="error"></ul>
+    {{#if hasError}}
+    <ul>
+      {{#each error}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+    <div id="PasswordInformation">
+      Password Requirements
+      <ul>
+        <li class="text-secondary">Minimum 8 character long</li>
+        <li class="text-secondary">At least 1 UpperCase Alphabet</li>
+        <li class="text-secondary">At least 1 Special Character</li>
+        <li class="text-secondary">At least 1 Number</li>
+        <li class="text-secondary">Cannot have space(s) in between</li>
+      </ul>
+    </div>
+
+
   </main>
 </div>
 <script src="/public/js/authentication.js"></script>

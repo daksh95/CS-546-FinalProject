@@ -176,7 +176,7 @@ const postLogin = async (req, res) => {
 
 //Sign up
 const getSignUp = async (req, res) => {
-  res.status(200).render("authentication/signUp");
+  res.status(200).render("authentication/signUp", {title: "Registration Page"});
 };
 
 const postSignUp = async (req, res) => {

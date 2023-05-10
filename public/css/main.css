@@ -8,10 +8,6 @@
     color: #023c7a;
 }
 
-a:visited {
-    color: #023c7a;
-}
-
 body {
     max-width: 100%;
     overflow-x: hidden;
@@ -41,10 +37,6 @@ input {
 
 #transactionsList a:hover{
     color:  #023c7a;
-}
-
-a:visited {
-    color: #023c7a;
 }
 
 #transactionsList {
@@ -87,4 +79,8 @@ a.dark-links {
 
 #rejectButton:disabled {
     background-color: #440023;
+}
+
+.disable-link {
+    pointer-events: none;
 }

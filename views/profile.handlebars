@@ -19,6 +19,7 @@
     <div class="row">
         <div class="col-md-9 mt-5 mr-3 ml-4">
             <div class="card border-info rounded-lg shadow-lg p-2">
+                <dl>
                 <dt>Name:</dt>
                 <dd>{{user.name}}</dd>
                 <dt>Phone:</dt>
@@ -31,6 +32,7 @@
                 <dd>{{user.gender}}</dd>
                 <dt>Rating:</dt>
                 <dd>{{divide user.rating.totalRating user.rating.count}} ({{user.rating.count}})</dd>
+                </dl>
                 {{#if (flagCheck user.rating.totalRating user.rating.count )}}
                 <p>Your account has been flagged. Please improve your ratings to avoid getting your account freezed</p>
                 {{/if}}

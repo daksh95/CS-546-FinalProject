@@ -4,7 +4,7 @@
       throw new Error("Bid parameter does not exists");
     if (!typeof bid === "number" || bid === NaN || bid === Infinity)
       throw new Error("bid must be of type number");
-    if (bid < price - 1000)
+    if (bid < price - 1000 || bid > price + 1000)
       throw new Error(
         "Difference between bid and price cannot be more than $1000"
       );

@@ -13,7 +13,6 @@ import validation from "../utils/validation.js";
 import xss from "xss";
 
 const getLand = async (req, res) => {
-
   let id = req.params.id;
   let error = [];
   if (!exists(id)) error.push("ID parameter does not exists");
@@ -174,7 +173,14 @@ const postFilterPrice = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByPrice(xss(state), minPrice, maxPrice);
+    let filteredLands = await landData.filterByPrice(
+      xss(state),
+      minPrice,
+      maxPrice
+    );
+    filteredLands = filteredLands.filter(
+      (element) => element.sale.onSale === true
+    );
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -232,7 +238,14 @@ const postFilterArea = async (req, res) => {
     });
 
   try {
-    let filteredLands = await landData.filterByArea(xss(state), minArea, maxArea);
+    let filteredLands = await landData.filterByArea(
+      xss(state),
+      minArea,
+      maxArea
+    );
+    filteredLands = filteredLands.filter(
+      (element) => element.sale.onSale === true
+    );
     let empty_lands = false;
     if (!arrayLength(filteredLands, 1)) empty_lands = true;
     return res.status(200).render("displayLandByState", {
@@ -298,7 +311,6 @@ const placedBid = async (req, res) => {
     await transactionData.createTransaction(bid, landId, sellerId, buyerId);
     return res.status(200).redirect("/land/" + landId);
   } catch (error) {
-
     return res.status(400).render("Error", {
       title: "Error",
       hasError: true,
@@ -513,7 +525,7 @@ const addNewLand = async (req, res) => {
   if (errors.length > 0) {
     res.status(400).render("addNewLand", {
       title: "Add Land",
-      id: req.session.user.id,
+      userId: req.session.user.id,
       hasError: true,
       error: [errors],
       hasDetails: true,
@@ -536,7 +548,7 @@ const addNewLand = async (req, res) => {
     } else {
       res.status(400).render("addNewLand", {
         title: "Add Land",
-        id: req.session.user.id,
+        userId: req.session.user.id,
         hasError: true,
         error: [error],
       }); //TODO: to be decided
@@ -545,18 +557,17 @@ const addNewLand = async (req, res) => {
   }
   //if successfully added then redirect to my lands wala page
 
-
   const resul = await userData.addLandToUser(req.session.user.id, addLand._id);
-
 
   res.redirect(`/user/${req.session.user.id}/land`);
   return;
 };
 
 const addNewLandForm = async (req, res) => {
+  console.log(req.session.user.id);
   res
     .status(200)
-    .render("addNewLand", { title: "Add Land", id: req.session.user.id });
+    .render("addNewLand", { title: "Add Land", userId: req.session.user.id });
 };
 
 const postLandonSale = async (req, res) => {

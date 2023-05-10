@@ -87,15 +87,14 @@
         <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
             {{#if isOwner}}
             {{#if (eq land.approved "pending")}}
-            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button type="button" class="btn btn-dark"
-                    disabled>View Transaction</button></a>
+            <a class="mx-auto my-auto class-dark disable-link" href="/transactions/land/{{land._id}}">
+                    View Transaction</a>
             {{/if}}
             {{#if (eq land.approved "rejected")}}
             <p>Your land approval has been rejected!</p>
             {{/if}}
             {{#if (eq land.approved "approved")}}
-            <a class="mx-auto my-auto" href="/transactions/land/{{land._id}}"><button type="button"
-                    class="btn btn-dark">View Transaction</button></a>
+            <a class="mx-auto my-auto text-dark" href="/transactions/land/{{land._id}}">View Transaction</a>
             {{/if}}
             {{else}}
             {{#if land.sale.onSale}}
@@ -131,7 +130,6 @@
                             <form action="/land/{{land._id}}/{{owner._id}}" method="post" id="bidForm">
                                 <label for="bidInput">Bid: </label>
                                 <input type="number" name="bidInput" id="bidInput">
-                                <label hidden for="price">Price</label>
                                 <input type="hidden" name="price" id="price" value="{{land.sale.price}}">
                                 <button type="submit" class="btn"
                                     style="background-color: #008c00; color:black">Bid</button>
