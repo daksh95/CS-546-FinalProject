@@ -1,0 +1,129 @@
+<div id="mainResults">
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
+        <div class="container-fluid">
+            <div class="navbar-header text-light">
+                TradeMyProperty
+            </div>
+            <ul class="nav navbar-nav">
+                <li class="nav-item"><a href="/land" class="nav-link text-light">Home</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link text-light">My Property</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link text-light">My
+                        Transactions</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+                <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link text-light">Profile</a></li>
+            </ul>
+        </div>
+    </nav>
+    <br>
+<div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
+    <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
+        <h3>Add Land</h3>
+        <form action= "/user/{{id}}/land/add" method="POST" id = "addLand-form">
+                {{#if hasDetails}}
+                <label for = "line1Input" id = "line1-text">Line1: </label>
+                <input type="text" name="line1Input" id = "line1Input" value="{{details.line1}}" placeholder ="Max 46 characters"> <br>   
+                
+                <label for = "line2Input" id = "line2-text">Line2:</label>
+                <input type="text" name="line2Input" id = "line2Input" value= "{{details.line2}}" placeholder ="Max 46 characters">   
+                
+                <label for = "cityInput" id = "city-text">City:</label>
+                <input type="text" name="cityInput" id = "cityInput" value = "{{details.city}}" placeholder="Eg: Jersey City"> <br>
+
+                <label for = "stateInput" id = "state-text">State:</label>
+                <input type="text" name="stateInput" id = "stateInput" value = "{{details.state}}" placeholder ="Eg: NY, NJ">  
+
+                <label for = "zipCodeInput" id = "zipCode-num">Zip:</label>
+                <input type="number" name="zipCodeInput" id = "zipCodeInput" value = "{{details.zipCode}}" placeholder="Eg: 07307"> <br>   
+                
+                <label for = "typeInput" id = "type-dropdown">Type of Property:</label>
+                <select name="typeInput" id="typeInput">
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>    
+                    <option value="industrial">Industrial</option>    
+                    <option value="agricultural">Agricultural</option>    
+                </select>
+                <br>  
+
+                <label for="dimensionsLengthInput" id = "dimensionsLength-num">Length</label>
+                <input type="number" name="dimensionsLengthInput" id = "dimensionsLengthInput" value = "{{details.length}}" placeholder ="in feet">  <br>
+
+                <label for="dimensionsBreadthInput" id = "dimensionsB',.'readth-num">Breadth</label>
+                <input type="number" name="dimensionsBreadthInput" id = "dimensionsBreadthInput" value = "{{details.breadth}}" placeholder ="in feet">   <br>
+                
+                {{!-- TODO dynamic restriction thing --}}
+                {{!-- for the time being --}}
+                
+                {{else}}
+                <label for = "line1Input" id = "line1-text">Line1: </label>
+                <input type="text" name="line1Input" id = "line1Input" placeholder ="Max 46 characters"> <br>   
+                
+                <label for = "line2Input" id = "line2-text">Line2:</label>
+                <input type="text" name="line2Input" id = "line2Input" placeholder ="Max 46 characters">   
+                
+                <label for = "cityInput" id = "city-text">City:</label>
+                <input type="text" name="cityInput" id = "cityInput"  placeholder="Eg: Jersey City"> <br>
+
+                <label for = "stateInput" id = "state-text">State:</label>
+                <input type="text" name="stateInput" id = "stateInput" placeholder ="Eg: NY, NJ">  
+
+                <label for = "zipCodeInput" id = "zipCode-num">Zip:</label>
+                <input type="number" name="zipCodeInput" id = "zipCodeInput" placeholder="Eg: 07307"> <br>   
+                
+                <label for = "typeInput" id = "type-dropdown">Type of Property:</label>
+                <select name="typeInput" id="typeInput">
+                    <option value="residential">Residential</option>
+                    <option value="commercial">Commercial</option>    
+                    <option value="industrial">Industrial</option>    
+                    <option value="agricultural">Agricultural</option>    
+                </select>
+                <br>  
+
+                <label for="dimensionsLengthInput" id = "dimensionsLength-num">Length</label>
+                <input type="number" name="dimensionsLengthInput" id = "dimensionsLengthInput" placeholder ="In feet">  <br>
+
+                <label for="dimensionsBreadthInput" id = "dimensionsB',.'readth-num">Breadth</label>
+                <input type="number" name="dimensionsBreadthInput" id = "dimensionsBreadthInput" placeholder ="in feet">   <br>
+                
+                {{!-- TODO dynamic restriction thing --}}
+                {{!-- for the time being --}}
+
+                {{!-- <label for ="restrictionsInput" id = "restrictions-text">restrictions: </label>
+                <input type="text" name="restrictionsInput" id = "restrictionsInput">  <br>  --}}
+                {{/if}}
+                <label for="zoningRestrictions" id = "zoningRestrictions-checkbox">Zoning restrictions</label>
+                <input type="checkbox" name="restrictions" id="zoningRestrictions" value="Zoning restrictions">
+                <br>
+                <label for="deedRestrictions" id = "deedRestrictions-checkbox">Deed restrictions</label>
+                <input type="checkbox" name="restrictions" id="deedRestrictions" value="Deed restrictions">
+                <br>
+
+                <label for="environmentalRestrictions" id = "environmentalRestrictions-checkbox" >Environmental restrictions</label>
+                <input type="checkbox" name="restrictions" id="environmentalRestrictions" value="Environmental restrictions">
+                <br>
+
+                <label for="noRestrictions" id = "noRestrictions-checkbox">No restrictions</label>
+                <input type="checkbox" name="restrictions" id="noRestrictions" value="No restrictions">
+                <br>
+
+                {{#if hasDetails}}
+                <label for ="restrictionsInput" id = "restrictions-text">Other Restriction(s) if any: </label><br>
+                <textarea name="restrictionsInput" id = "restrictionsInput" value="{{details.restrictionsText}}" placeholder ="Please use ' , '  to separate restrictions" rows="3" cols="30"></textarea><br> 
+                {{else}}
+                <label for ="restrictionsInput" id = "restrictions-text">Other Restriction(s) if any: </label><br>
+                <textarea name="restrictionsInput" id = "restrictionsInput" rows="3" cols="30" placeholder ="Please use ' , ' to separate restrictions"></textarea><br> 
+                {{/if}}
+                <button class="btn" type="submit" style="background-color: #008c00; color:black">Add</button>
+                <button class ="btn" type="cancel"
+            </form>   
+        <ul id = "error">
+            {{#if hasError}}
+                {{#each error}}
+                <li>{{this}}</li>
+                {{/each}}
+            {{/if}}
+        </ul>
+    </main>
+</div>
+<script src="/public/js/addNewLand.js"> </script>

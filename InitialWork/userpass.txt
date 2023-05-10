@@ -1,0 +1,22 @@
+Admin (only 1):
+admin@stevens.edu - Admin@1234$
+
+Users:
+1) tanyagoel@gmail.com - Tanya@12345
+2) yashshah@stevens.edu - Yash@12345
+3) dakshmehta@outlook.com - Daksh@12345
+4) bhavin@yahoo.com - Bhavin@12345
+
+Land Surveyors:
+1) tgoelland@gmail.com - Land@12345
+2) tgoelland2@gmail.com - Land@12345
+3) tgoelland3@gmail.com - Land@12345
+
+Title Companies:
+1) tgoeltitle@stevens.edu - Title@12345
+2) tgoeltitle2@gmail.com - Title@12345
+3) tgoeltitle3@gmail.com - Title@12345
+
+Government:
+1) tgoelgovt@gmail.com - Govt@12345
+2) tgoelgovt2@gmail.com - Govt@12345

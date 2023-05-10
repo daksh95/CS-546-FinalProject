@@ -2,12 +2,16 @@ import { ObjectId } from "mongodb";
 import validation from "../utils/validation.js";
 import { getClient } from "../config/connection.js";
 import { inputValidation } from "../utils/helpers.js";
+import landData from "./land.js";
+import userData from "./user.js";
+import adminData from "./admin.js";
+import entityData from "./entities.js";
 
 //fetch all the information about the a single land from transaction collection
 const getTransactionsByBuyerId = async (id) => {
   id = validation.validObjectId(id, "Buyer Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
     .find({ "buyer._id": new ObjectId(id) })
     .toArray();
@@ -16,8 +20,8 @@ const getTransactionsByBuyerId = async (id) => {
   let data = [];
   for (let i = 0; i < result.length; i++) {
     data.push({
-      transactionId: result[i]._id,
-      landId: result[i].landId,
+      transactionId: result[i]._id.toString(),
+      landId: result[i].land.toString(),
       status: result[i].status,
     });
   }
@@ -28,7 +32,7 @@ const getTransactionsByBuyerId = async (id) => {
 const getTransactionsBySellerId = async (id) => {
   id = validation.validObjectId(id, "Seller Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
     .find({ "seller._id": new ObjectId(id) })
     .toArray();
@@ -37,9 +41,9 @@ const getTransactionsBySellerId = async (id) => {
   let data = [];
   for (let i = 0; i < result.length; i++) {
     data.push({
-      transactionId: result[i]._id,
-      landId: result[i].landId,
-      status: result[i].seller.status,
+      transactionId: result[i]._id.toString(),
+      landId: result[i].land.toString(),
+      status: result[i].status,
     });
   }
   return data;
@@ -48,12 +52,12 @@ const getTransactionsBySellerId = async (id) => {
 const getTransactionsByLandId = async (id) => {
   id = validation.validObjectId(id, "land Id");
   const client = getClient();
-  const result = client
+  const result = await client
     .collection("transaction")
-    .find({ landId: new ObjectId(id) })
+    .find({ land: new ObjectId(id) })
     .toArray();
   if (result.length < 1) {
-    throw "No transaction from that ID";
+    return [];
   }
   let data = [];
   for (let i = 0; i < result.length; i++) {
@@ -62,7 +66,7 @@ const getTransactionsByLandId = async (id) => {
       result[i].buyer._id.toString()
     );
     data.push({
-      transactionId: result[i]._id,
+      transactionId: result[i]._id.toString(),
       buyerId: result[i].buyer._id.toString(),
       buyer: buyerName,
       bid: result[i].buyer.bid,
@@ -73,23 +77,82 @@ const getTransactionsByLandId = async (id) => {
   return data;
 };
 
-const sellerApproved = async (transactionId, sellerId, value) => {
+const sellerApproved = async (transactionId, sellerId, value, landId) => {
   //update will happen if and only if it is done by seller. Therefore, seller's ID is needed to authenticate.
   transactionId = validation.validObjectId(transactionId, "transactionId");
   sellerId = validation.validObjectId(sellerId, "sellersId");
+  landId = validation.validObjectId(landId, "landId");
 
   //validate value field same as route validation
 
   const client = getClient();
   if (value === "approve") {
+    const landSurveyorId = await entityData.assignEntity(
+      transactionId,
+      "landsurveyor"
+    );
+    const titleCompanyId = await entityData.assignEntity(
+      transactionId,
+      "titlecompany"
+    );
+    const governmentId = await entityData.assignEntity(
+      transactionId,
+      "government"
+    );
+
+    if (!landSurveyorId)
+      throw "Could not find any Land Surveyor to assign to this transaction";
+    if (!titleCompanyId)
+      throw "Could not find any Title Company to assign to this transaction";
+    if (!governmentId)
+      throw "Could not find any Government user to assign to this transaction";
+
+    let approvalupdates = {
+      "seller.status": "approved",
+      surveyor: {
+        _id: new ObjectId(landSurveyorId),
+        status: "pending",
+        Comment: null,
+      },
+      titleCompany: {
+        _id: new ObjectId(titleCompanyId),
+        status: "pending",
+        Comment: null,
+      },
+      government: {
+        _id: new ObjectId(governmentId),
+        status: "pending",
+        Comment: null,
+      },
+      status: "pending",
+    };
+
+    let rejectAllOther;
+
+    let transactions = await transactionData.getTransactionsByLandId(landId);
+    for (let i = 0; i < transactions.length; i++) {
+      if (transactions[i].transactionId !== transactionId) {
+        rejectAllOther = await client
+          .collection("transaction")
+          .findOneAndUpdate(
+            {
+              _id: new ObjectId(transactions[i].transactionId),
+            },
+            { $set: { status: "rejected", "seller.status": "rejected" } },
+            {}
+          );
+      }
+    }
+
     const result = await client.collection("transaction").findOneAndUpdate(
       {
         _id: new ObjectId(transactionId),
         "seller._id": new ObjectId(sellerId),
       },
-      { $set: { "seller.status": "approved" } },
+      { $set: approvalupdates },
       { returnDocument: "after" }
     );
+
     if (result.lastErrorObject.n < 1) {
       throw "Could not be approved";
     }
@@ -99,17 +162,69 @@ const sellerApproved = async (transactionId, sellerId, value) => {
         _id: new ObjectId(transactionId),
         "seller._id": new ObjectId(sellerId),
       },
-      { $set: { "seller.status": "rejected" } },
+      {
+        $set: {
+          "seller.status": "rejected",
+          status: "rejected",
+        },
+      },
       { returnDocument: "after" }
     );
     if (result.lastErrorObject.n < 1) {
-      throw "Could not be approved";
+      throw "Could not be rejected";
     }
   }
   return;
 };
 
-const createTransaction = async (bid, landId, sellerId) => {};
+const createTransaction = async (bid, landId, sellerId, buyerId) => {
+  // Validating input
+  bid = validation.validNumber(bid, "bid");
+  landId = validation.validObjectId(landId);
+  sellerId = validation.validObjectId(sellerId);
+  buyerId = validation.validObjectId(buyerId);
+
+  landData.getLand(landId);
+  userData.getUserById(sellerId);
+  userData.getUserById(buyerId);
+
+  const adminId = await adminData.getAdminId();
+  if (!adminId) throw "could not fetch admin accounts";
+
+  let transaction = {
+    land: new ObjectId(landId),
+    buyer: {
+      _id: new ObjectId(buyerId),
+      bid: bid,
+      rating: undefined,
+    },
+    priceSoldFor: null,
+    seller: {
+      _id: new ObjectId(sellerId),
+      status: "pending",
+      rating: undefined,
+    },
+    surveyor: {},
+    titleCompany: {},
+    government: {},
+    admin: {
+      _id: new ObjectId(adminId),
+      status: false,
+      Comment: null,
+    },
+    status: "pending",
+  };
+
+  const client = getClient();
+  const insertedInfo = await client
+    .collection("transaction")
+    .insertOne(transaction);
+
+  if (!insertedInfo.acknowledged || !insertedInfo.insertedId)
+    throw "Could not initiate a transaction";
+
+  return;
+};
 
 const terminateTransaction = async (transactionId, adminComment) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
@@ -131,8 +246,6 @@ const terminateTransaction = async (transactionId, adminComment) => {
   return result;
 };
 
-const updateBid = async (transactionId, bidAmount) => {};
-
 const getTransactionById = async (transactionId) => {
   transactionId = validation.validObjectId(transactionId, "transactionId");
 
@@ -148,6 +261,56 @@ const getTransactionById = async (transactionId) => {
   return result;
 };
 
+// This function is for admin usage
+const getTransactionsForAccount = async (accountId) => {
+  accountId = validation.validObjectId(accountId, "accountId");
+
+  const client = getClient();
+  let result = await client
+    .collection("transaction")
+    .find({
+      $or: [
+        { "seller._id": new ObjectId(accountId) },
+        { "seller._id": new ObjectId(accountId) },
+        { "surveyor._id": new ObjectId(accountId) },
+        { "titleCompany._id": new ObjectId(accountId) },
+        { "government._id": new ObjectId(accountId) },
+      ],
+    })
+    .toArray();
+
+  if (!result) throw "Could not fetch transactions from the database";
+
+  result = result.map((element) => {
+    element._id = element._id.toString();
+    element.seller._id = element.seller._id.toString();
+    element.buyer._id = element.buyer._id.toString();
+    if (
+      "surveyor" in element &&
+      "_id" in element.surveyor &&
+      element.surveyor._id
+    )
+      element.surveyor._id = element.surveyor._id.toString();
+    if (
+      "titleCompany" in element &&
+      "_id" in element.titleCompany &&
+      element.titleCompany._id
+    )
+      element.titleCompany._id = element.titleCompany._id.toString();
+    if (
+      "government" in element &&
+      "_id" in element.government &&
+      element.government._id
+    )
+      element.government._id = element.government._id.toString();
+    if ("admin" in element && "_id" in element.admin && element.admin._id)
+      element.admin._id = element.admin._id.toString();
+    return element;
+  });
+
+  return result;
+};
+
 const transactionData = {
   getTransactionsByBuyerId: getTransactionsByBuyerId,
   getTransactionsBySellerId: getTransactionsBySellerId,
@@ -156,6 +319,7 @@ const transactionData = {
   createTransaction: createTransaction,
   terminateTransaction: terminateTransaction,
   getTransactionById: getTransactionById,
+  getTransactionsForAccount: getTransactionsForAccount,
 };
 
 export default transactionData;

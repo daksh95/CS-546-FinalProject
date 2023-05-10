@@ -1,0 +1,127 @@
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
+    <div class="container-fluid">
+        <div class="navbar-header text-light">
+            TradeMyProperty
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="nav-item"><a href="/" class="nav-link text-light">Home</a></li>
+            <li class="nav-item"><a href="/entity/allTransactions/{{id}}" class="nav-link text-light">View all transactions</a></li>
+            <li class="nav-item"><a href="/entity/pendingTransactions/{{id}}" class="nav-link text-light">View pending transactions</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            <li class="nav-item"><a href="/entity/myProfile" class="nav-link text-light">Profile</a></li>
+        </ul>
+    </div>
+</nav>
+
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 card mt-3 ml-3 border-info rounded-lg shadow-lg">
+            <p class="h1">Below are all the required details:</p>
+            <p class="h3">Below are the land details:</p>
+            <dl id="land">
+                <dt>ID:</dt>
+                <dd>{{land._id}}</dd>
+                <dt>Dimensions:</dt>
+                <dd>{{land.dimensions.length}}ft x {{land.dimensions.breadth}}ft</dd>
+                <dt>Area:</dt>
+                <dd>{{land.area}}</dd>
+                <dt>Land Type:</dt>
+                <dd>{{land.type}}</dd>
+                <dt>Restrictions:</dt>
+                <dd>
+                    <ul>
+                        {{#each land.restrictions}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                    </ul>
+                </dd>
+                <dt>Land on Sale:</dt>
+                <dd>{{land.sale.onSale}}</dd>
+                <dt>Land Price:</dt>
+                <dd>{{land.sale.price}}</dd>
+                <dt>Date of listing:</dt>
+                <dd>{{land.sale.dateOfListing}}</dd>
+                <dt>Land address:</dt>
+                <dd>{{land.address.line1}} {{land.address.line2}},</dd>
+                <dd>{{land.address.city}}, {{land.address.state}} {{land.address.zipCode}}</dd>
+                <dt>Land approval status:</dt>
+                <dd>{{land.approved}}</dd>
+            </dl>
+            <p class="h3">Below are the seller details:</p>
+            <dl id="seller">
+                <dt>Seller ID:</dt>
+                <dd>{{seller._id}}</dd>
+                <dt>Seller name:</dt>
+                <dd>{{seller.name}}</dd>
+                <dt>Seller contact number:</dt>
+                <dd>{{seller.phone}}</dd>
+                <dt>Seller email ID:</dt>
+                <dd>{{seller.emailId}}</dd>
+                <dt>Seller date of birth:</dt>
+                <dd>{{seller.dob}}</dd>
+                <dt>Seller gender:</dt>
+                <dd>{{seller.gender}}</dd>
+                <dt>Seller rating:</dt>
+                <dd>{{sellerRating}}</dd>
+                <dt>Seller account approval status:</dt>
+                <dd>{{seller.approved}}</dd>
+            </dl>
+            <p class="h3">Below are the buyer details:</p>
+            <dl id="buyer">
+                <dt>Buyer ID:</dt>
+                <dd>{{buyer._id}}</dd>
+                <dt>Buyer name:</dt>
+                <dd>{{buyer.name}}</dd>
+                <dt>Buyer contact number:</dt>
+                <dd>{{buyer.phone}}</dd>
+                <dt>Buyer email ID:</dt>
+                <dd>{{buyer.emailId}}</dd>
+                <dt>Buyer date of birth:</dt>
+                <dd>{{buyer.dob}}</dd>
+                <dt>Buyer gender:</dt>
+                <dd>{{buyer.gender}}</dd>
+                <dt>Buyer rating:</dt>
+                <dd>{{buyerRating}}</dd>
+                <dt>Buyer account approval status:</dt>
+                <dd>{{buyer.approved}}</dd>
+            </dl>
+    </div>
+    <div class="col-md-3 card mt-3 ml-3 border-info rounded-lg shadow-lg pt-4">
+        <p class="h4 ml-3 mb-3">Approval</p>
+        <p class="h5 ml-3 mb-3">Approval State:
+            {{#if isPending }} 
+            <span class="status-pending">Pending</span>
+            </p>
+            <form action="/entity/{{id}}/transactionDetails/{{transaction._id}}" id="approvalForm" class="form-check" method="post">
+            <div class="d-grid gap-2 d-md-block">
+                <button type="submit" name="approval" id="approveButton" class="btn btn-success" value="approved" disabled>APPROVE</button>
+                <button type="submit" name="approval" id="rejectButton" class="btn btn-danger" value="rejected" disabled>REJECT</button>
+            </div>
+            <div class="mt-3 mb-3 mr-4">
+                <label for="commentTextArea" class="form-label"><p class="h6">Comments:</p></label>
+                <textarea name="comment" id="commentTextArea" rows="5" class="form-control"></textarea>
+            </div>
+            <div id="errors"></div>
+            </form>
+            {{else}}
+            {{#if isApproved }}
+            <span class="status-approved">Approved</span>
+            {{/if}}
+            {{#if isRejected }}
+            <span class="status-rejected">Rejected</span>
+            {{/if}}
+        </p>
+        {{#if comment}}
+        <div class="mt-2 ml-3">
+            <p class="h6">Comment:</p>
+            <p>{{comment}}</p>
+        </div>
+        {{/if}}
+        {{/if}}
+    </div>
+</div>
+
+</main>
+<script src="/public/js/entityComment.js"></script>

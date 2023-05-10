@@ -1,28 +1,37 @@
 import { ObjectId } from "mongodb";
-import { getClient } from "../config/connection.js";
-import {
-  entityCollection,
-  transacsCollection,
-} from "./data/collectionNames.js";
-import bcrypt from "bcrypt";
-const saltRounds = 16;
+import { connectionClose, getClient } from "../config/connection.js";
+import { entityCollection, transacsCollection } from "./collectionNames.js";
+import validation from "../utils/validation.js";
+import transactionData from "./transactions.js";
 
-const addNewEntity = async (
-  name,
-  contactNumber,
-  emailId,
-  govtIdType,
-  govtIdNumber,
-  role
-) => {
-  if (
-    !name ||
-    !contactNumber ||
-    !emailId ||
-    !govtIdType ||
-    !govtIdNumber ||
-    !role
-  )
+const initializeEntityProfile = async (email, role) => {
+  email = validation.validEmail(email);
+  role = validation.validTypeOfUser(role);
+
+  let newEntity = {
+    name: "",
+    role: role,
+    contactInfo: "",
+    emailId: email,
+    website: "",
+    license: "",
+    transactions: [],
+    approved: "pending",
+  };
+
+  const client = getClient();
+  const entityData = await client.collection(entityCollection);
+  let meh = await entityData.findOne({ emailId: email });
+  if (meh !== null) throw `Email address already in use!`;
+
+  let result = await entityData.insertOne(newEntity);
+  if (!result.acknowledged || !result.insertedId)
+    throw "Could not add the entity!";
+  return true;
+};
+
+const addNewEntity = async (name, contactInfo, emailId, website, license) => {
+  if (!name || !contactInfo || !emailId || !website || !license)
     throw `Recheck your inputs, one or more inputs are missing!`;
 
   if (typeof name !== "string") throw `Entity name must be a string!`;
@@ -30,68 +39,47 @@ const addNewEntity = async (
     throw `Entity name cannot be an empty string or just spaces!`;
   name = name.trim();
 
-  if (typeof contactNumber !== "number")
-    throw `Contact number must be a number!`;
-  let numStr = contactNumber.toString();
-  if (numStr.length < 10) throw `Input a valid 10-digit contact number!`;
+  if (typeof contactInfo !== "string") throw `Contact number must be a string!`;
+  if (contactInfo.length !== 10) throw `Input a valid 10-digit contact number!`;
 
   if (typeof emailId !== "string") throw `Email address must be a string!`;
   if (emailId.trim().length === 0)
     throw `Email address cannot be an empty string or just spaces!`;
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
+  let bleh = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
   if (!bleh.test(emailId)) throw `Invalid email address!`;
   emailId = emailId.trim().toLowerCase();
 
-  govtIdType = govtIdType.toLowerCase();
-  if (
-    govtIdType !== "ssn" &&
-    govtIdType !== "stateid" &&
-    govtIdType !== "driversid"
-  )
-    throw `Invalid government ID type!`;
+  if (typeof website !== "string") throw `Band website must be a string!`;
+  if (website.trim().length === 0)
+    throw `Band website cannot be an empty string or just spaces!`;
+  const regex = new RegExp(/^http:\/\/www\.[\w\W]{5,}\.com$/i);
+  if (!regex.test(website)) throw `Invalid entity website!`;
+  website = website.trim();
 
-  if (govtIdType === "ssn") {
-    if (govtIdNumber.length !== 9)
-      throw `Input a valid 9-digit social security number!`;
-  } else {
-    if (typeof govtIdNumber !== "string")
-      throw `Government ID number must be a string!`;
-    if (govtIdNumber.trim().length === 0)
-      throw `Government ID number cannot be an empty string or just spaces!`;
-    govtIdNumber = govtIdNumber.trim();
-  }
-
-  role = role.toLowerCase();
-  if (
-    role !== "admin" &&
-    role !== "user" &&
-    role !== "land surveyor" &&
-    role !== "title company" &&
-    role !== "government"
-  )
-    throw `Invalid role!`;
-
-  const govtIdHashed = await bcrypt.hash(govtIdNumber, saltRounds);
+  if (typeof license !== "string") throw `Entity license must be a string!`;
+  if (license.trim().length === 0)
+    throw `Entity license cannot be an empty string or just spaces!`;
+  license = license.trim();
 
   const client = getClient();
   const entityData = client.collection(entityCollection);
-  let meh = await entityData.findOne({ emailId: emailId });
-  if (meh !== null) throw `Email address already in use!`;
-
-  let newEntity = {
-    name: name,
-    contactNumber: contactNumber,
-    emailId: emailId,
-    govtIdType: govtIdType,
-    govtIdNumber: govtIdHashed,
-    role: role,
-    transactions: [],
-  };
-  const insertInfo = await entityData.insertOne(newEntity);
-  if (!insertInfo.acknowledged || !insertInfo.insertedId)
-    throw "Could not add the entity!";
-  const newOne = await this.get(emailId);
-  return newOne;
+  let updatedEntity = await entityData.findOneAndUpdate(
+    { emailId: emailId },
+    {
+      $set: {
+        name: name,
+        contactInfo: contactInfo,
+        website: website,
+        license: license,
+        approved: "pending",
+      },
+    },
+    { returnDocument: "after" }
+  );
+  if (updatedEntity.lastErrorObject.n < 1) {
+    throw `Details for entity with email ${emailId} could not be inputted!`;
+  }
+  return updatedEntity;
 };
 
 const getAllEntities = async () => {
@@ -106,53 +94,51 @@ const getAllEntities = async () => {
   return entityList;
 };
 
-const get = async (emailAddress) => {
-  if (!emailAddress) throw `Recheck your input, no email address inputted!!`;
-  if (typeof emailAddress !== "string") throw `Email address must be a string!`;
-  if (emailAddress.trim().length === 0)
-    throw `Email address cannot be an empty string or just spaces!`;
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
-  if (!bleh.test(emailAddress)) throw `Invalid email address!`;
-  emailAddress = emailAddress.trim().toLowerCase();
+const getEntityById = async (id) => {
+  if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
+  if (!ObjectId.isValid(id)) throw `Invalid entity id inputted!`;
 
   const client = getClient();
   const entityData = client.collection(entityCollection);
-  let meh = await entityData.findOne({ emailId: emailAddress });
+  let meh = await entityData.findOne({ _id: new ObjectId(id) });
   if (meh === null) throw `No entity with given email address!`;
   meh._id = meh._id.toString();
   return meh;
 };
 
-const updateEntity = async (emailId) => {};
+const getEntityByEmail = async (emailInput) => {
+  let email = validation.validEmail(emailInput);
+  const client = getClient();
+  const result = await client.collection("entity").findOne({ emailId: email });
+  return result;
+};
 
-const getTransactionsByEntityEmail = async (emailId) => {
-  if (!emailId) throw `Recheck your input, no email address inputted!`;
-  if (typeof emailId !== "string") throw `Email address must be a string!`;
-  if (emailId.trim().length === 0)
-    throw `Email address cannot be an empty string or just spaces!`;
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
-  if (!bleh.test(emailId)) throw `Invalid email address!`;
-  emailId = emailId.trim().toLowerCase();
+const getTransactionsByEntityId = async (id) => {
+  if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
+  if (!ObjectId.isValid(id)) throw `Invalid entity id inputted!`;
 
   const client = getClient();
   const entityData = client.collection(entityCollection);
-  let meh = await entityData.findOne({ emailId: emailId });
-  if (meh === null) throw `No entity with given email address!`;
+  let meh = await entityData.findOne({ _id: new ObjectId(id) });
+  if (meh === null) throw `No entity with given id!`;
 
   const trans = meh.transactions;
-  if (trans.length === 0) throw `No transaction has been alloted to you yet!`;
 
   return trans;
 };
 
-const entityApproved = async (id, role) => {
+const entityApproved = async (id, comment, role) => {
   if (!id || !role)
     throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
+  if (typeof comment !== "string") throw `Comment must be a string!`;
+  if (comment.trim().length === 0)
+    throw `Comment box cannot be empty or just spaces!`;
+  comment = comment.trim();
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
@@ -160,33 +146,40 @@ const entityApproved = async (id, role) => {
   const client = getClient();
   const transaction = await client
     .collection(transacsCollection)
-    .findOne({ _id: id });
+    .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
+
   let result = undefined;
-  if (role === "land surveyor") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: id },
-        { $set: { surveyorApproval: true } },
-        { returnDocument: "after" }
-      );
-  } else if (role === "title company") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: id },
-        { $set: { titleCompanyApproval: true } },
-        { returnDocument: "after" }
-      );
+  if (role === "landsurveyor") {
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: { "surveyor.status": "approved", "surveyor.Comment": comment },
+      },
+      { returnDocument: "after" }
+    );
+  } else if (role === "titlecompany") {
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "titleCompany.status": "approved",
+          "titleCompany.Comment": comment,
+        },
+      },
+      { returnDocument: "after" }
+    );
   } else if (role === "government") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: id },
-        { $set: { governmentApproval: true } },
-        { returnDocument: "after" }
-      );
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "government.status": "approved",
+          "government.Comment": comment,
+        },
+      },
+      { returnDocument: "after" }
+    );
   }
   if (result.lastErrorObject.n < 1) {
     throw `Transaction with id ${id} could not be approved!`;
@@ -199,13 +192,13 @@ const entityTerminateTransaction = async (id, comment, role) => {
     throw `Recheck your inputs, one or more inputs are missing!`;
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
   if (typeof comment !== "string") throw `Comment must be a string!`;
-  if (comment.length > 0 && comment.trim().length === 0)
-    throw `Comment cannot be just spaces!`;
+  if (comment.trim().length === 0)
+    throw `Comment box cannot be empty or just spaces!`;
   comment = comment.trim();
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
@@ -213,57 +206,88 @@ const entityTerminateTransaction = async (id, comment, role) => {
   const client = getClient();
   const transaction = await client
     .collection(transacsCollection)
-    .findOne({ _id: id });
+    .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
   let result = undefined;
-  if (role === "land surveyor") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { surveyorApproval: false, surveyorComment: comment } },
-        { returnDocument: "after" }
-      );
-  } else if (role === "title company") {
+  if (role === "landsurveyor") {
     result = await client.collection(transacsCollection).findOneAndUpdate(
       { _id: new ObjectId(id) },
       {
-        $set: { titleCompanyApproval: false, titleCompanyComment: comment },
+        $set: {
+          "surveyor.status": "rejected",
+          "surveyor.Comment": comment,
+          status: "rejected",
+        },
+      },
+      { returnDocument: "after" }
+    );
+  } else if (role === "titlecompany") {
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "titleCompany.status": "rejected",
+          "titleCompany.Comment": comment,
+          status: "rejected",
+        },
       },
       { returnDocument: "after" }
     );
   } else if (role === "government") {
-    result = await client
-      .collection(transacsCollection)
-      .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { governmentApproval: false, governmentcomment: comment } },
-        { returnDocument: "after" }
-      );
+    result = await client.collection(transacsCollection).findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          "government.status": "rejected",
+          "government.Comment": comment,
+          status: "rejected",
+        },
+      },
+      { returnDocument: "after" }
+    );
   }
+
   if (result.lastErrorObject.n < 1) {
     throw `Transaction with id ${id} could not be terminated!`;
   }
   return result;
 };
 
-const filterByStatus = async (emailId) => {
-  if (!emailId) throw `Recheck your input, no email address inputted!`;
-  if (typeof emailId !== "string") throw `Email address must be a string!`;
-  if (emailId.trim().length === 0)
-    throw `Email address cannot be an empty string or just spaces!`;
-  let bleh = /^[^s@]+@[^s@]+.[^s@]+$/;
-  if (!bleh.test(emailId)) throw `Invalid email address!`;
-  emailId = emailId.trim().toLowerCase();
+const pendingTransactionsByEntityId = async (id) => {
+  if (!id) throw `Recheck your inputs, one or more inputs are missing!`;
+  if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
 
-  const transactions = await this.getTransactionsByEntityEmail(emailId);
+  const transactionIds = await getTransactionsByEntityId(id);
+  const entity = await getEntityById(id);
   let result = [];
-  for (let i = 0; i < transactions.length; i++) {
-    if (transactions[i].status.toLowerCase() === "pending") {
-      result.push(transactions[i]);
+  for (let i = 0; i < transactionIds.length; i++) {
+    let transactions = await transactionData.getTransactionById(
+      transactionIds[i]
+    );
+    if (entity.role === "landsurveyor") {
+      if (
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.surveyor.status === "pending"
+      ) {
+        result.push(transactions);
+      }
+    } else if (entity.role === "titlecompany") {
+      if (
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.titleCompany.status === "pending"
+      ) {
+        result.push(transactions);
+      }
+    } else if (entity.role === "government") {
+      if (
+        transactions.status.toLowerCase() === "pending" &&
+        transactions.government.status === "pending"
+      ) {
+        result.push(transactions);
+      }
     }
   }
-  if (result.length === 0) throw `No pending transaction exists!`;
+
   return result;
 };
 
@@ -272,84 +296,102 @@ const assignEntity = async (id, role) => {
   if (!ObjectId.isValid(id)) throw `Invalid transaction ObjectId inputted!`;
   role = role.toLowerCase();
   if (
-    role !== "land surveyor" &&
-    role !== "title company" &&
+    role !== "landsurveyor" &&
+    role !== "titlecompany" &&
     role !== "government"
   )
     throw `Invalid role!`;
 
+  const client = await getClient();
   const transaction = await client
     .collection(transacsCollection)
-    .findOne({ _id: id });
+    .findOne({ _id: new ObjectId(id) });
   if (transaction === null) throw `No transaction with given ID found!`;
-  const client = await getClient();
+
   const entityData = client.collection(entityCollection);
 
-  if (transaction.surveyorId === null) {
-    let meh = await entityData.find({ role: "land surveyor" }).toArray();
-    const random = Math.floor(Math.random() * meh.length + 1);
-    for (let i = 0; i < meh.length; i++) {
-      if (meh[random].transactions.length === 25 && random < meh.length) {
-        random = random + 1;
-      } else if (
-        meh[random].transactions.length === 25 &&
-        random > meh.length
-      ) {
-        random = 0;
-      } else if (meh[random].transactions.length < 25 && random < meh.length) {
-        transaction.surveyorId = meh._id;
-        break;
+  let meh = await entityData
+    .find({ role: role, approved: "approved" })
+    .toArray();
+  const random = Math.floor(Math.random() * meh.length);
+  for (let i = 0; i < meh.length; i++) {
+    if (meh[random].transactions.length === 25 && random < meh.length) {
+      random = random + 1;
+    } else if (meh[random].transactions.length === 25 && random > meh.length) {
+      random = 0;
+    } else if (meh[random].transactions.length < 25 && random < meh.length) {
+      if (role === "landsurveyor") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+
+        return meh[random]._id.toString();
+      } else if (role === "titlecompany") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+
+        return meh[random]._id.toString();
+      } else if (role === "government") {
+        await addTransactionToEntity(id, meh[random]._id.toString());
+
+        return meh[random]._id.toString();
       }
+      break;
     }
-  } else if (transaction.titleCompanyId === null) {
-    let meh = await entityData.find({ role: "title company" }).toArray();
-    const random = Math.floor(Math.random() * meh.length + 1);
-    for (let i = 0; i < meh.length; i++) {
-      if (meh[random].transactions.length === 25 && random < meh.length) {
-        random = random + 1;
-      } else if (
-        meh[random].transactions.length === 25 &&
-        random > meh.length
-      ) {
-        random = 0;
-      } else if (meh[random].transactions.length < 25 && random < meh.length) {
-        transaction.titleCompanyId = meh._id;
-        break;
-      }
-    }
-  } else if (transaction.governmentId === null) {
-    let meh = await entityData.find({ role: "government" }).toArray();
-    const random = Math.floor(Math.random() * meh.length + 1);
-    for (let i = 0; i < meh.length; i++) {
-      if (meh[random].transactions.length === 25 && random < meh.length) {
-        random = random + 1;
-      } else if (
-        meh[random].transactions.length === 25 &&
-        random > meh.length
-      ) {
-        random = 0;
-      } else if (meh[random].transactions.length < 25 && random < meh.length) {
-        transaction.governmentId = meh._id;
-        break;
-      }
-    }
-  } else {
-    throw `This transaction has all entities assigned!`;
   }
 };
 
-// export default exportedMethods;
+const addTransactionToEntity = async (transactionId, entityId) => {
+  transactionId = validation.validObjectId(transactionId);
+  entityId = validation.validObjectId(entityId);
 
-const entityFunctions = {
-  addNewEntity,
-  getAllEntities,
-  get,
-  updateEntity,
-  getTransactionsByEntityEmail,
-  entityApproved,
-  entityTerminateTransaction,
-  filterByStatus,
-  assignEntity,
+  const client = getClient();
+  const result = await client
+    .collection(entityCollection)
+    .findOneAndUpdate(
+      { _id: new ObjectId(entityId) },
+      { $push: { transactions: transactionId } },
+      { returnDocument: "after" }
+    );
+
+
+  if (result.lastErrorObject.n < 1)
+    throw "Transaction could not be added to entity";
+
+  return result;
 };
 
-export default entityFunctions;
+const pendingTransactionsCount = async (id) => {
+  let transactions = [];
+  try {
+    transactions = await pendingTransactionsByEntityId(id);
+  } catch (error) {
+    return 0;
+  }
+  return transactions.length;
+};
+
+const totalTransactionsCount = async (id) => {
+  let transactions = [];
+  try {
+    transactions = await getTransactionsByEntityId(id);
+  } catch (error) {
+    return 0;
+  }
+  return transactions.length;
+};
+
+const entityData = {
+  initializeEntityProfile,
+  addNewEntity,
+  getAllEntities,
+  getEntityById,
+  getTransactionsByEntityId,
+  entityApproved,
+  entityTerminateTransaction,
+  pendingTransactionsByEntityId,
+  assignEntity,
+  pendingTransactionsCount,
+  totalTransactionsCount,
+  getEntityByEmail,
+  addTransactionToEntity,
+};
+
+export default entityData;

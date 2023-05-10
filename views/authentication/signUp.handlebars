@@ -1,24 +1,66 @@
-<main>
-        <form action="/signUp" method="POST" id = "login-form">
-        <label for = "emailInput" id = "email-text">
-            Email Address:
-                </label>
-              <input type="email" name="emailInput" id = "emailInput">
-          <br>  
-        <label for = "passwordInput" id = "Password-text">
-            Password:
-                </label>
-              <input type="password" name="passwordInput" id = "passwordInput">
-        <br> 
-         <label for = "rePasswordInput" id = "rePassword-text">
-            password:
-                </label>
-              <input type="password" name="rePasswordInput" id = "rePasswordInput">
-        <br> 
-     
-        <button type="submit" >submit </button>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top mb-4">
+  <div class="container-fluid">
+    <h1 class="navbar-header text-light mx-auto">
+      TradeMyProperty
+    </h1>
+  </div>
+</nav>
+
+<div class="d-flex aligns-items-center justify-content-center text-center mx-auto my-auto">
+
+  <main class="card mt-3 ml-3 border-info rounded-lg shadow-lg p-4 d-inline-block">
+    <h2>SignUp!</h2>
+    <form action="/signup" method="POST" id="signUp-form">
+      <label for="emailInput" id="email-text">
+        Email Address:
+      </label>
+      <input type="email" name="emailInput" id="emailInput" placeholder="example@example.com">
+      <br>
+      <label for="passwordInput" id="Password-text">
+        Password:
+      </label>
+      <input type="password" name="passwordInput" id="passwordInput" placeholder="password..">
+      <br>
+      <label for="rePasswordInput" id="rePassword-text">
+        Confirm Password:
+      </label>
+      <input type="password" name="rePasswordInput" id="rePasswordInput" placeholder="Retype password..">
+      <br>
+      <label for="roleInput">Role:</label>
+      <select name="roleInput" id="roleInput">
+        <option value="user">User</option>
+        <option value="landSurveyor">Land Surveyor</option>
+        <option value="titleCompany">Title Company</option>
+        <option value="government">Government</option>
+      </select>
+      <br>
+      <br>
+      <button class="btn" type="submit" style="background-color: #008c00; color:black" id="Button">Submit</button>
+
     </form>
     <div id="links">
-    <a href="/login" id="loginLink">Already have an account? click here to login</a>
+      <a class="text-dark" href="/login" id="loginLink">Already have an account? Click here to Login</a>
     </div>
-</main>
+    <ul id="error"></ul>
+    {{#if hasError}}
+    <ul>
+      {{#each error}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+    <div id="PasswordInformation">
+      Password Requirements
+      <ul>
+        <li class="text-secondary">Minimum 8 character long</li>
+        <li class="text-secondary">At least 1 UpperCase Alphabet</li>
+        <li class="text-secondary">At least 1 Special Character</li>
+        <li class="text-secondary">At least 1 Number</li>
+        <li class="text-secondary">Cannot have space(s) in between</li>
+      </ul>
+    </div>
+
+
+  </main>
+</div>
+<script src="/public/js/authentication.js"></script>

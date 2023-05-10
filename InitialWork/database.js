@@ -2,15 +2,15 @@ const users = {
   // buyers and sellers
   _id: new ObjectId(),
   name: String,
-  Phone: String,
+  phone: String,
   emailId: String,
-  Government_id: {
+  governmentId: {
     typeOfId: String,
     Id: String,
   },
-  DOB: String,
+  dob: String,
   gender: String,
-  approved: Boolean, // to be discussed.
+  approved:   String("pending, approved, rejected"), // to be discussed.
   rating: {
     totalRating: Number,
     count: Number,
@@ -44,18 +44,19 @@ const land = {
     state: String,
     zipCode: String,
   }, //Change here. there was no address field.
-  approved: Boolean,
+  status: String("pending, approved, rejected"),
 };
 
 const entity = {
   _id: new ObjectId(),
   name: String,
-  type: String,
+  role: String,
   contactInfo: String, //phone number
   emailId: String,
   Website: String,
   license: String,
-  approved: Boolean,
+  transactions: Array,
+  approved: String("pending, approved, rejected"),
 };
 
 const transaction = {
@@ -68,22 +69,22 @@ const transaction = {
   },
   seller: {
     _id: ObjectId(),
-    status: String("pending, approved, rejected"),   
+    status: String("pending, approved, rejected"),
   }, //change in structure
   priceSoldFor: Number,
   surveyor: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   titleCompany: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   government: {
     _id: ObjectId(),
-    status: Boolean,
+    status: String("pending, approved, rejected"),
     Comment: String,
   },
   admin: {
@@ -100,4 +101,6 @@ const credentials = {
   emailId: String,
   password: String,
   previousPassword: [String],
+  profileSetUpDone: Boolean,
+  isApproved: Boolean,
 };

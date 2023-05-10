@@ -1,3 +1,5 @@
+import validation from "./validation.js";
+
 // You can add and export any helper functions you want here - if you aren't using any, then you can just leave this file as is
 export let exists = (param) => {
   if (!param && !(param == false)) return false;
@@ -23,7 +25,7 @@ export let isObjectDeepEqual = (object1, object2) => {
   let object2Keys = Object.keys(object2);
   if (object1Keys.length != object2Keys.length) return false;
   else {
-    // console.log("here");
+
     for (let key of object1Keys) {
       if (
         !object2Keys.includes(key) ||
@@ -47,7 +49,7 @@ export let objectSameKeys = (obj1, obj2) => {
 };
 
 export let checkInputType = (input, type) => {
-  // console.log(input, type);
+
   if (type == "Array") {
     if (Array.isArray(input)) return true;
     else return false;
@@ -55,7 +57,7 @@ export let checkInputType = (input, type) => {
     if (typeof input === type && !Array.isArray(input)) return true;
     else return false;
   } else {
-    // console.log(typeof input);
+
     if (typeof input === type) return true;
     else return false;
   }
@@ -159,17 +161,13 @@ export let getFullAddress = (address) => {
   // Takes in the address object, containing line1, line2, city, state and zipCode
   // and returns the full address
 
-  for (let field in address) {
-    if (address[field]) address[field] = address[field].trim();
-  }
-
   let fullAddress = "";
-  if (address["line1"]) fullAddress += address["line1"];
-  if (address["line2"]) fullAddress += " " + address["line2"];
+  if (address["line1"]) fullAddress += address["line1"].trim();
+  if (address["line2"]) fullAddress += " " + address["line2"].trim();
   fullAddress = fullAddress.trim();
-  if (address["city"]) fullAddress += ", " + address["city"];
-  if (address["state"]) fullAddress += ", " + address["state"];
-  if (address["zipCode"]) fullAddress += " " + address["zipCode"];
+  if (address["city"]) fullAddress += ", " + address["city"].trim();
+  if (address["state"]) fullAddress += ", " + address["state"].trim();
+  if (address["zipCode"]) fullAddress += " " + address["zipCode"].trim();
   fullAddress = fullAddress.trim();
   return fullAddress;
 };

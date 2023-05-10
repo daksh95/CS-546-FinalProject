@@ -3,7 +3,8 @@ import { getClient } from "../config/connection.js";
 import { arrayLength, checkInputType, exists } from "../utils/helpers.js";
 import { ObjectId } from "mongodb";
 import hash from "../utils/encryption.js";
-const getOwnerByLandId = async (landID) => {
+
+const getOwnerByLandId = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exist");
   if (!checkInputType(id, "string"))
     throw new Error("ID must be of type string only");
@@ -14,16 +15,17 @@ const getOwnerByLandId = async (landID) => {
   const client = getClient();
   const result = await client
     .collection("users")
-    .findOne({ landId: new ObjectId(landID) });
-  if (result === null) throw new Error("No user found for this Land ID");
+    .findOne({ "land._id": new ObjectId(id) });
+  if (result === null) throw new Error("No owner found for this Land ID");
   result._id = result._id.toString();
-  return result[0];
+  return result;
 };
 
 const getUserByEmail = async (email) => {
   email = validation.validEmail(email);
   const client = getClient();
-  const result = await client.collection("users").findOne({ emailId: email });
+  let result = await client.collection("users").findOne({ emailId: email });
+  if (result == null) throw "User not found";
   return result;
 };
 
@@ -56,44 +58,49 @@ const createUser = async (
   gender
 ) => {
   // Validate input
-  name = validation.validString(name);
-  phone = validation.validNumber(phone);
+  name = validation.validName(name);
+  phone = validation.validString(phone);
   emailId = validation.validEmail(emailId);
-  govtIdType = validation.validString(govtIdType);
-  govtIdNumber = validation.validString(govtIdNumber);
-  dob = validation.validDOB(dob);
+  govtIdType = validation.validGovernmentIdType(govtIdType);
+  if (govtIdType == "ssn") {
+    govtIdNumber = validation.validSSN(govtIdNumber);
+  } else {
+    govtIdNumber = validation.validDriverLicense(govtIdNumber);
+  }
+  dob = validation.validDob(dob);
   gender = validation.validGender(gender);
-
-  const govtIdHashed = govtIdNumber; //TODO: Gotta hash this (BCRYPT)
+  let dobArray = dob.split("-");
+  let newDob = `${dobArray[1]}/${dobArray[2]}/${dobArray[0]}`;
+  const govtIdHashed = await hash.generateHash(govtIdNumber); //TODO: Gotta hash this (BCRYPT)
 
   // Initialize
   let newUser = {
     name: name,
     phone: phone,
-    emailId: emailId,
     governmentId: {
       typeofId: govtIdType,
       id: govtIdHashed,
     },
-    dob: dob,
+    dob: newDob,
     gender: gender,
-    approved: false,
+    approved: "pending",
     rating: {
       totalRating: 0,
-      noOfRating: 0,
+      count: 0,
     },
     land: [],
   };
-
   // Insert user into database
   const client = getClient();
-  const result = await client.collection("users").insertOne(newUser);
+  const result = await client
+    .collection("users")
+    .findOneAndUpdate({ emailId: emailId }, { $set: newUser }, {});
 
-  if (!result.ackowledged || !result.insertedId) throw `failed to insert user`;
-
-  const newId = result.insertedId.toString();
-  const user = await getUserById(newId);
-  return user;
+  // if (!result.ackowledged || !result.matchedCount) throw `failed to set profile`;
+  // if(result.lastErrorObject.n<0) throw `failed to set profile`;
+  // const newId = result.value._id.toString();
+  // const user = await getUserById(newId);
+  return true;
 };
 
 const getLandsOfUserID = async (id) => {
@@ -122,6 +129,126 @@ const getLandsOfUserID = async (id) => {
   return lands;
 };
 
+const initializeProfile = async (email) => {
+  email = validation.validEmail(email);
+  let newUser = {
+    name: "",
+    phone: "",
+    emailId: email,
+    governmentId: {
+      typeofId: "",
+      id: "",
+    },
+    dob: "",
+    gender: "",
+    approved: false,
+    rating: {
+      totalRating: 0,
+      count: 0,
+    },
+    land: [],
+  };
+
+  const client = getClient();
+
+  //if email already being used
+  try {
+    const isPresent = await getUserByEmail(email);
+    throw "Email already exist, please login.";
+  } catch (error) {}
+
+  //initializing user
+  const result = await client.collection("users").insertOne(newUser);
+
+
+  if (!result.acknowledged || !result.insertedId) {
+    throw `failed to insert user`;
+  }
+
+  return true;
+};
+
+const addLandToUser = async (userId, landId) => {
+  userId = validation.validObjectId(userId, "User Id");
+  landId = validation.validObjectId(landId, "Land Id");
+
+
+  const client = getClient();
+  let result = await client
+    .collection("users")
+    .findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $push: { land: { _id: new ObjectId(landId) } } },
+      { returnDocument: "after" }
+    );
+
+  if (result.lastErrorObject.n < 1) throw "Land could not be added";
+
+
+
+  return result;
+};
+
+const removeLandFromUser = async (userId, landId) => {
+  userId = validation.validObjectId(userId, "User Id");
+  landId = validation.validObjectId(landId, "Land Id");
+
+
+  const client = getClient();
+  let result = await client
+    .collection("users")
+    .findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $pull: { land: { _id: new ObjectId(landId) } } },
+      { returnDocument: "after" }
+    );
+
+  if (result.lastErrorObject.n < 1) throw "Land could not be removed";
+
+
+
+  return result;
+};
+
+const addRatingToUser = async (otherPartyId, rate, transactionId, role) => {
+  if (!exists(rate)) throw new Error("Rate parameter does not exists");
+  if (!checkInputType(rate, "number") || rate === NaN || rate === Infinity)
+    throw new Error("rate must be of type number only");
+  if (!Number.isInteger(rate))
+    throw new Error("rate cannot be in decimal place");
+  if (rate < 0 || rate > 5) throw new Error("Rating must be between 0-5");
+  const client = getClient();
+  const result = await client.collection("users").findOneAndUpdate(
+    {
+      _id: new ObjectId(otherPartyId),
+    },
+    {
+      $inc: { "rating.totalRating": rate, "rating.count": 1 },
+    },
+    { new: true }
+  );
+  if (role === "buyer") {
+    const newResult = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+      },
+      {
+        $set: { "seller.rating": rate },
+      }
+    );
+  } else if (role === "seller") {
+    const newResult = await client.collection("transaction").findOneAndUpdate(
+      {
+        _id: new ObjectId(transactionId),
+      },
+      {
+        $set: { "buyer.rating": rate },
+      }
+    );
+  }
+  return result;
+};
+
 const userData = {
   getOwnerByLandId: getOwnerByLandId,
   getUserByEmail: getUserByEmail,
@@ -129,6 +256,10 @@ const userData = {
   getUserById: getUserById,
   createUser: createUser,
   getLandsOfUserID: getLandsOfUserID,
+  initializeProfile: initializeProfile,
+  addLandToUser: addLandToUser,
+  removeLandFromUser: removeLandFromUser,
+  addRatingToUser: addRatingToUser,
 };
 
 export default userData;

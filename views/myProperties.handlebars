@@ -1,34 +1,49 @@
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
     <div class="container-fluid">
         <div class="navbar-header text-light">
-            WebSite Name
+            TradeMyProperty
         </div>
         <ul class="nav navbar-nav">
-            <li class="nav-item"><a href="/land" class="nav-link">Home</a></li>
-            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link">My Property</a></li>
-            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link">My Transactions</a></li>
+            <li class="nav-item"><a href="/land" class="nav-link text-light">Home</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/land" class="nav-link text-light">My Property</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/transactions" class="nav-link text-light">My
+                    Transactions</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link">Profile</a></li>
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            <li class="nav-item"><a href="/user/{{userId}}/profile" class="nav-link text-light">Profile</a></li>
         </ul>
     </div>
 </nav>
 <div class="continer-fluid">
-    <a class="float-sm-right mr=3 mt-3" href="#"><button type="button" class="btn btn-primary">Add
-            Land</button></a>
-    {{#if emptyLands}}
-    <div class="card border-info rounded-lg shadow-lg p-2">
-        You do not own any property!
-    </div>
-    {{else}}
-    {{#each lands}}
-    <a href="/land/{{this._id}}" class="text-decoration-none text-info">
-        <div class="card border-info rounded-lg shadow-lg p-2">
-            <p class="m-0">{{this.address.line1}} {{this.address.line2}}, {{this.address.city}}, {{this.address.state}}
-                {{this.address.zipCode}}</p>
+    <div class="row">
+        <div class="col-md-9 mt-5 mr-3 ml-4">
+            {{#if emptyLands}}
+            <div class="card border-info rounded-lg shadow-lg p-2">
+                You do not own any property!
+            </div>
+            {{else}}
+            {{#each lands}}
+            <a href="/land/{{this._id}}" class="text-decoration-none text-dark">
+                <div class="card border-info rounded-lg shadow-lg p-2">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <p class="m-0">{{this.address.line1}} {{this.address.line2}}, {{this.address.city}},
+                                {{this.address.state}}
+                                {{this.address.zipCode}}</p>
+                        </div>
+                        <div class="col-md-2">
+                            {{this.approved}}
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <br>
+            {{/each}}
+            {{/if}}
         </div>
-    </a>
-    <br>
-    {{/each}}
-    {{/if}}
+        <a class="col-md-2 float-md-right ml-2 mt-2 text-dark" href="/user/{{userId}}/land/add">
+            Add
+            Land</a>
+    </div>
 </div>

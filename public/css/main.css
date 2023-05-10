@@ -1,1 +1,86 @@
 /* CSS file */
+
+*{
+    font-family:'Segoe UI', "Tahoma", "Geneva", "Verdana", "sans-serif";
+}
+
+#links a:hover{
+    color: #023c7a;
+}
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+span.status-approved {
+    color: #218838;
+}
+
+span.status-pending {
+    color: rgb(95, 0, 150);
+}
+
+span.status-rejected {
+    color: #c82333;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input {
+    border-color: #ff0000;
+}
+
+.transactions-list a:hover{
+    color:  #023c7a;
+}
+
+#transactionsList {
+    border-style: solid;
+    border-color: black;
+}
+
+#noWork {
+    border-style: dotted;
+    border-color: grey;
+    background-color: bisque;
+}
+
+#land {
+    border-style: solid;
+    border-color: black;
+}
+
+#seller {
+    border-style: solid;
+    border-color: black;
+}
+
+#buyer {
+    border-style: solid;
+    border-color: black;
+}
+
+a.dark-links {
+    color: #023c7a
+}
+
+#approveButton {
+    background-color: #005900
+}
+
+#rejectButton {
+    background-color: #750010;
+}
+
+#rejectButton:disabled {
+    background-color: #440023;
+}
+
+.disable-link {
+    pointer-events: none;
+}

@@ -7,20 +7,28 @@ import {
   getTransactionsListForApproval,
   getApprovalAccount,
   getApprovalLand,
-  getApprovalTransaction
+  getApprovalTransaction,
+  approveAccount,
+  approveLand,
+  approveTransaction,
+  getLandByState,
+  postLandByState,
+  postFilterArea,
+  postFilterPrice
+
 } from "../controllers/admin.js";
 
-router.route('/profile').get((req, res) => {
-  res.render('admin/adminHome', { title: 'Home' });
-});
+router.route("/").get(getLandByState).post(postLandByState);
+router.route("/area/:state").post(postFilterArea);
+router.route("/price/:state").post(postFilterPrice);
 
 router.route('/approvals/account').get(getAccountsListForApproval);
-router.route('/approvals/account/:accountId').get(getApprovalAccount).post();
+router.route('/account/:accountId').get(getApprovalAccount).post(approveAccount);
 
 router.route('/approvals/land').get(getLandsListForApproval);
-router.route('/approvals/land/:landId').get(getApprovalLand).post();
+router.route('/land/:landId').get(getApprovalLand).post(approveLand);
 
 router.route('/approvals/transaction').get(getTransactionsListForApproval);
-router.route('/approvals/transaction/:transactionId').get(getApprovalTransaction).post();
+router.route('/transaction/:transactionId').get(getApprovalTransaction).post(approveTransaction);
 
 export default router;

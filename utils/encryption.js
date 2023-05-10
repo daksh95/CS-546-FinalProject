@@ -19,7 +19,7 @@ const compareHash = async (secret, hash)=>{
     let bool
     try {
         bool = await bcrypt.compare(secret, hash);
-        console.log("inside here \n",secret,hash);
+
     } catch (error) {
         throw `Difficult in comparing encrypted data`;
     }   

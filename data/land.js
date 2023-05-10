@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getClient } from "../config/connection.js";
 import validation from "../utils/validation.js";
+import moment from "moment";
 import {
   exists,
   checkInputType,
@@ -34,46 +35,57 @@ const getAllLand = async () => {
 const addNewLand = async (object) => {
   let { dimensions, type, restrictions, sale, address, approved } = object;
   const queryData = {};
+  let length = parseInt(dimensions.length);
+  let breadth = parseInt(dimensions.breadth);
 
   //valid numbers
-  queryData.length = validation.validNumber(
-    dimensions.length,
-    "length",
-    (min = 1)
-  );
-  queryData.breadth = validation.validNumber(
-    dimensions.breadth,
-    "breadth",
-    (min = 1)
-  );
-  queryData.sale.price = validation.validNumber(sale.price, "price", (min = 1));
-  queryData.address.zipCode = validation.validString(
-    address.zipCode,
-    "zipCode",
-    (min = 501),
-    (max = 99950)
-  );
+  length = validation.validNumber(dimensions.length, "length", 1);
+
+  breadth = validation.validNumber(dimensions.breadth, "breadth", 1);
+
+  queryData.dimensions = {
+    length: length,
+    breadth: breadth,
+  };
+  //default behaviour
+  queryData.sale = {
+    price: undefined,
+    dateOfListing: undefined,
+    onSale: false,
+  };
 
   //valid string and string of array
-  queryData.type = validation.validString(type, "type of land", 20);
+  queryData.type = validation.validLandType(type);
   queryData.restrictions = validation.validArrayOfStrings(
     restrictions,
     "restrictions"
   );
-  queryData.sale.dateOfListing = validation.validString(
-    sale.dateOfListing,
-    "dateOfListing",
-    10
-  );
-  queryData.area = (dimensions.length*dimensions.breadth).toString();
-  queryData.address.line1 = validation.validString(address.line1, "line1", 46);
-  queryData.address.line2 = validation.validString(address.line2, "line2", 46);
-  queryData.address.city = validation.validString(address.city, "city", 17);
-  queryData.address.state = validation.validString(address.state, "state", 2);
 
-  //valid bool
-  queryData.sale.onSale = validation.validBool(sale.onSale, "onSale");
-  queryData.approved = validation.validBool(approved, "approved");
+  queryData.area = (dimensions.length * dimensions.breadth);
+
+  address.line1 = validation.validString(address.line1, "line1", 46);
+  address.line2 = address.line2.trim();
+  if (address.line2.length > 46) {
+    throw "line2 shouldn't be longer that 46 characters";
+  }
+  address.city = validation.validString(address.city, "city", 17);
+  address.state = validation.validState(address.state);
+  address.zipCode = validation.validZip(
+    address.zipCode,
+    address.state,
+    address.city
+  );
+
+  queryData.address = {
+    line1: address.line1,
+    line2: address.line2,
+    city: address.city,
+    state: address.state,
+    zipCode: address.zipCode,
+  };
+
+  //valid status
+  queryData.approved = validation.validApprovalStatus(approved, "approved");
 
   //fetch db reference
   const client = getClient();
@@ -88,8 +100,6 @@ const addNewLand = async (object) => {
   const addedLand = await getLand(result.insertedId.toString());
   return addedLand;
 };
-
-const updateLand = async (object) => {};
 
 const removeLand = async (id) => {
   if (!exists(id)) throw new Error("ID parameter does not exists");
@@ -128,18 +138,20 @@ const getLandByState = async (state) => {
 };
 
 const filterByArea = async (state, minArea, maxArea) => {
+
+
   try {
     state = inputValidation("state", state, "string").trim();
   } catch (error) {
     throw new Error(error.message);
   }
   try {
-    minArea = inputValidation("minArea", minArea, "string").trim();
+    minArea = inputValidation("minArea", minArea, "number");
   } catch (error) {
     throw new Error(error.message);
   }
   try {
-    maxArea = inputValidation("maxArea", maxArea, "string").trim();
+    maxArea = inputValidation("maxArea", maxArea, "number");
   } catch (error) {
     throw new Error(error.message);
   }
@@ -147,19 +159,18 @@ const filterByArea = async (state, minArea, maxArea) => {
     throw new Error(
       "State parameter must be a valid statecode in abbreviations only"
     );
-  if (Number(maxArea) < Number(minArea))
+  if ((maxArea) < (minArea))
     throw new Error("maxArea cannot be less than minArea");
   const regexState = new RegExp(state, "i");
   const client = getClient();
   const result = await client
     .collection("land")
     .find({
-      $and: [
-        { "address.state": { $regex: regexState } },
-        { area: { $gte: minArea, $lte: maxArea } },
-      ],
+      "address.state": { $regex: regexState },
+      area: { $gte: minArea, $lte: maxArea },
     })
     .toArray();
+
   return result;
 };
 
@@ -199,15 +210,45 @@ const filterByPrice = async (state, minPrice, maxPrice) => {
   return result;
 };
 
+const putOnSale = async (landId, price) => {
+  if (!exists(landId)) throw new Error("ID parameter does not exists");
+  if (!checkInputType(landId, "string"))
+    throw new Error("ID must be of type string only");
+  if (landId.trim().length === 0)
+    throw new Error("ID cannot be of empty spaces");
+  landId = landId.trim();
+  if (!ObjectId.isValid(landId)) throw new Error("Invalid Object ID");
+  if (!exists(price)) throw new Error("Price parameter does not exists");
+  if (!checkInputType(price, "number") || price === NaN || price === Infinity)
+    throw new Error("Price must be of type number only");
+
+  let date = moment();
+  const client = getClient();
+  const result = client.collection("land").findOneAndUpdate(
+    {
+      _id: new ObjectId(landId),
+    },
+    {
+      $set: {
+        "sale.onSale": true,
+        "sale.price": price,
+        "sale.dateOfListing": date.format("MM/DD/YYYY"),
+      },
+    },
+    {}
+  );
+  return;
+};
+
 const landData = {
   getAllLand: getAllLand,
   getLand: getLand,
-  updateLand: updateLand,
   removeLand: removeLand,
   getLandByState: getLandByState,
   filterByArea: filterByArea,
   filterByPrice: filterByPrice,
   addNewLand: addNewLand,
+  putOnSale: putOnSale,
 };
 
 export default landData;

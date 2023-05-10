@@ -6,6 +6,6 @@ import {
 } from "../controllers/transaction.js";
 
 routes.route("/land/:landId").get(getAllTransactionsofLand);
-routes.route("/:transactionId/:sellerId/:value").patch(sellerApproved);
+routes.route("/:transactionId/:sellerId/:value").get(sellerApproved);
 
 export default routes;

@@ -1,6 +1,8 @@
 import validation from "../utils/validation.js";
 import hash from "../utils/encryption.js";
 import { getClient } from "../config/connection.js";   
+import { credentialCollection } from "./collectionNames.js";
+import { ObjectId } from "mongodb";
 
 //requies: typeOfUser, emailId, password
 const addCredential = async(object) =>{
@@ -10,30 +12,34 @@ const addCredential = async(object) =>{
     const client = getClient();
 
     //valid email
-    emailId = validation.validEmail(emailId); 
+    queryData.emailId  = validation.validEmail(emailId); 
     
     //Checking if emailId already exists
+    let ans;
     try {
-       let ans = await getCredentialByEmailId(emailId);
-       if(ans){
-            throw  `EmailId is already registered. Please login`;
-       }
+       ans = await getCredentialByEmailId(queryData.emailId);
     }catch(e){
-        queryData.emailId = emailId;    
+       
     }
-
+    if(ans){
+        throw `EmailId is already registered. Please login`;
+   }
+    
     // Validating string
     queryData.typeOfUser = validation.validTypeOfUser(typeOfUser);
     queryData.password = validation.validPassword(password);
-    queryData.approved = false;
     
     //hashing the password
     queryData.password = await hash.generateHash(queryData.password);
+    
+    //default values
+    queryData.isApproved = false;
+    queryData.profileSetUpDone = false;
     queryData.previousPassword =[];
 
     //inserting credential
-    const result = await client.collection("credential").insertOne(queryData);
-    
+    const result = await client.collection(credentialCollection).insertOne(queryData);
+
     //error handling, incase credential is not inserted
     if (!result.acknowledged || !result.insertedId) throw 'Could not create account';
     return true;
@@ -45,11 +51,13 @@ const getCredentialByEmailId = async(emailId) =>{
 
     //initializing db reference
     const client = getClient();
+
     //fetching credentials
-    let result = await client.collection("credential").findOne({"emailId": emailId});
+    let result = await client.collection(credentialCollection).findOne({"emailId": emailId});
+
     //Error handling
     if (result === null) throw "user not found";
-   
+    result._id = result._id.toString();
     return result;
 }
 
@@ -75,7 +83,7 @@ const updateEmailId = async(emailId, newEmailId) =>{
     const userinfo = await getCredentialByEmailId(emailId);
 
     //Updating
-    const result = await client.collection("credential").findOneAndUpdate({_id: userinfo._id},  {$set: {"emailId": newEmailId}}, {returnDocument: 'after'} );
+    const result = await client.collection(credentialCollection).findOneAndUpdate({_id: userinfo._id},  {$set: {"emailId": newEmailId}}, {returnDocument: 'after'} );
     
     //Error handling
     if (result.lastErrorObject.n === 0) throw 'Could not update';
@@ -102,20 +110,41 @@ const updatePassword = async(password, emailId)=>{
 
     
     //TODO combine this two update calls into one;
-    let result = await client.collection("credential").findOneAndUpdate({_id: userInfo._id},  {$set: {"password": password}, }, {returnDocument: 'after'} );
+    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: userInfo._id},  {$set: {"password": password}, }, {returnDocument: 'after'} );
     if (result.lastErrorObject.n === 0) throw 'Could not update'
     
-    result = await client.collection("credential").findOneAndUpdate({_id: userInfo._id},{$push: {previousPassword: userInfo.password} }, {returnDocument: 'after'} ); 
+    result = await client.collection(credentialCollection).findOneAndUpdate({_id: userInfo._id},{$push: {previousPassword: userInfo.password} }, {returnDocument: 'after'} ); 
     if (result.lastErrorObject.n === 0) throw 'Could not update';
     return true;
 
+}
+
+const updateProfileStatus = async(id,profileSetUpDone)=>{
+    id = validation.validObjectId(id, "credentialId");
+    validation.validBool(profileSetUpDone, "Profile set up status");
+    const client = getClient();
+    let result = await client.collection(credentialCollection).findOneAndUpdate({_id: new ObjectId(id)}, {$set: {"profileSetUpDone": profileSetUpDone}}, { returnDocument: "after" });
+    if (result.lastErrorObject.n < 1) {
+        throw `Could not update profile set up status`;
+    }
+
+    return;
+}
+
+const deleteCredentialByEmailId = async(emailId)=>{
+    emailId = validation.validEmail(emailId);
+    const client = getClient();
+    let result = await client.collection(credentialCollection).findOneAndDelete({"emailId": emailId});//todo error handling if its not deleted;
+    return;
 }
 
 const credentialData = {
     addCredential:addCredential,
     getCredentialByEmailId:getCredentialByEmailId,
     updateEmailId:updateEmailId,
-    updatePassword:updatePassword
+    updatePassword:updatePassword,
+    updateProfileStatus:updateProfileStatus,
+    deleteCredentialByEmailId: deleteCredentialByEmailId
 }
 
 export default credentialData;

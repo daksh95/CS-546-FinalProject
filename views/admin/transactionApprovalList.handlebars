@@ -1,30 +1,42 @@
 <header>
-  <nav class="navbar navbar-expand-sm bg-primary navbar-dark justify-content-center sticky-top">
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center sticky-top">
       <div class="container-fluid">
           <div class="navbar-header text-light">
-              <a class="navbar-brand" href="#">WebSite Name</a>
+              <a class="navbar-brand" href="#">TradeMyProperty</a>
           </div>
           <ul class="nav navbar-nav">
-              <li class="nav-item"><a href="/home" class="nav-link text-light">Home</a></li>
+              <li class="nav-item"><a href="/admin" class="nav-link text-light">Home</a></li>
               <li class="nav-item"><a href="/admin/approvals/account" class="nav-link text-light">Account Approvals</a></li>
               <li class="nav-item"><a href="/admin/approvals/land" class="nav-link text-light">Land Approvals</a></li>
               <li class="nav-item"><a href="/admin/approvals/transaction" class="nav-link text-light">Transaction Approvals</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
-              <li class="nav-item"><a href="/admin/profile" class="nav-link text-light">Profile</a></li>
+            <li class="nav-item"><a href="/logout" class="nav-link text-light">Logout</a></li>
+            
           </ul>
       </div>
   </nav>
 </header>
+<br>
 <main>
+  <div class="container-xl border border-dark rounded" style="min-height: 85vh">
   {{#if transactionsExist}}
-  <ul class="approval-list"></ul>
     {{#each transactionList}}
-      <a href="/admin/approvals/transaction/{{this._id}}">
-        <li>{{this.name}} {{this.emailId}}</li>
-      </a>
+    <a class="dark-links" href="/admin/transaction/{{this._id}}">
+      <div class="card border-info rounded-lg shadow-lg p-2 my-3">
+        <p class="my-0">{{this.landAddress}}</p>
+        <p class="my-0">{{this.sellerName}}</p>
+        <p class="my-0">{{this.buyerName}}</p>
+      </div>
+    </a>
     {{/each}}
   {{else}}
-    <div class="empty-list">No transactions to be approved</div>
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+        <p class="text-center">No transactions to be approved</p>
+      </div>
+    </div>
   {{/if}}
+  </div>
 </main>

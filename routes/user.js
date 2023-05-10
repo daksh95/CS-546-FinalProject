@@ -6,11 +6,14 @@ import {
   getTransactionsofUserID,
   setUpProfile,
   getTransactionDetails,
+  postRateUser,
 } from "../controllers/user.js";
+import { addNewLandForm, addNewLand } from "../controllers/land.js";
 
 routes.route("/:id/land").get(getPropertiesOfUser);
+routes.route("/:id/land/add").get(addNewLandForm).post(addNewLand);
 routes.route("/:id/profile").get(getProfile).post(setUpProfile);
 routes.route("/:id/transactions").get(getTransactionsofUserID);
-routes.route("/transaction/:id").get(getTransactionDetails);
+routes.route("/transaction/:id").get(getTransactionDetails).post(postRateUser);
 
 export default routes;
