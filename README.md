@@ -134,7 +134,7 @@ If you are Professor Patrick or one of the TAs grading this project, you will fi
 
 In order to access the database using Compass, please copy and paste the URI when you start Compass. The connection URI should look like this -
 
-    mongodb+srv://<username>:<password>@webproject.zfz2ccf.mongodb.net/WebProject
+    mongodb+srv://<username>:<password>@<mongourl>
 
 Once it succeeds, you are free to access the seed data.
 
